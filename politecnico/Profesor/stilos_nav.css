@@ -1,0 +1,156 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-size: 20px;
+}
+
+body {
+    background-color: #574949;
+}
+
+.header {
+    background-color: #000000;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 85px;
+    padding: 5px 10%;
+}
+
+.header .logo {
+    cursor: pointer;
+}
+
+.header .logo img {
+    height: 80px;
+    width: auto;
+    transition: all 0.3s;
+    border-radius: 50px;
+}
+
+.header .logo img:hover {
+    transform: scale(1.2);
+}
+
+.header .nav-links {
+    list-style: none;
+    display: flex;
+    align-items: center;
+}
+
+.header .nav-links li {
+    display: inline-block;
+    padding: 0 20px;
+}
+
+.header .nav-links li:hover {
+    transform: scale(1.1);
+}
+
+.header .nav-links a {
+    font-size: 700;
+    color: #eceff1;
+    text-decoration: none;
+}
+
+.header .nav-links li a:hover {
+    color: #ffbc0e;
+}
+
+.header .btn button {
+    font-weight: 700;
+    color: #1b3039;
+    padding: 9px 25px;
+    background: #eceff1;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease 0s;
+}
+
+.header .btn button:hover {
+    background-color: #e2f1f8;
+    color: #ffbc0e;
+    transform: scale(1.1);
+}
+
+/* submenu */
+.nav-links {
+    list-style: none;
+    display: flex;
+}
+
+.nav-links li {
+    margin-right: 10px;
+    transition: all 1s ease-out;
+}
+
+.submenu:hover .sub-menu {
+    display: block;
+}
+
+.sub-menu {
+    display: none;
+    position: absolute;
+    min-width: 100px;
+    z-index: 1;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 1s ease-out;
+}
+
+.submenu:hover .sub-menu {
+    opacity: 1;
+    visibility: visible;
+}
+
+.sub-menu li {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.sub-menu a {
+    display: block;
+    padding: 10px;
+    background-color: #000000;
+    color: #333;
+    text-decoration: none;
+}
+
+.sub-menu a:hover {
+    background-color: #000000;
+}
+
+/* Estilos para pantallas más pequeñas */
+
+
+/* Stilos index Profe  */
+ 
+
+.container {
+    position: relative;
+    width: 300px;
+    height: 200px;
+    background-color: #000000;
+    padding: 20px;
+    text-align: center;
+    font-family: Arial, sans-serif;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  }
+
+  .name {
+    font-size: 24px;
+    color: #eeeeee;
+    margin-bottom: 10px;
+  }
+
+  .surname {
+    font-size: 18px;
+    color: #777777;
+  }
+
+  /* estilos inputs  */
+

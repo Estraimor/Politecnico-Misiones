@@ -1,0 +1,62 @@
+body {
+    background-image: url('../imagenes/simulacion-y-automatizacion-de-robotica.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    color: white;
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.registration-box {
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 20px;
+    border-radius: 10px;
+    width: 350px;
+    text-align: center;
+}
+
+input[type="text"], input[type="number"], input[type="password"] {
+    width: 300px;
+    padding: 10px;
+    margin: 5px 0;
+    border: none;
+    border-radius: 5px;
+}
+
+#password-toggle {
+    cursor: pointer;
+    position: absolute; 
+    right: 775px; 
+    top: 64%; 
+    transform: translateY(-50%); 
+}
+button.cancel-button {
+    background-color: #ccc; /* Cambia el color de fondo a tu preferencia */
+    color: #333; /* Cambia el color del texto a tu preferencia */
+    border: none;
+    padding: 10px 20px; /* Ajusta el espaciado interno según tu preferencia */
+    border-radius: 5px; /* Agrega bordes redondeados si lo deseas */
+    text-decoration: none; /* Elimina la decoración de texto */
+    cursor: pointer;
+    margin-right: 10px; /* Ajusta el margen derecho según tu preferencia */
+}
+
+/* Estilos para el botón de "Registrarse" */
+button.register-button {
+    background-color: #ff0000; /* Cambia el color de fondo a tu preferencia */
+    color: white; /* Cambia el color del texto a tu preferencia */
+    border: none;
+    padding: 10px 20px; /* Ajusta el espaciado interno según tu preferencia */
+    border-radius: 5px; /* Agrega bordes redondeados si lo deseas */
+    text-decoration: none; /* Elimina la decoración de texto */
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+button.register-button:hover {
+    background-color: #cc0000; /* Cambia el color de fondo a un rojo más oscuro */
+}
