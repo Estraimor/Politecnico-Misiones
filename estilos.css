@@ -1,0 +1,1348 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+  
+  
+  
+}
+.background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-image: url("./imagenes/simulacion-y-automatizacion-de-robotica.jpg") ;
+  
+  background-size: cover;
+  
+  opacity: 88%;
+  z-index: -1;
+}
+a{
+  text-decoration: none;
+  color: white;
+}
+.preceptores {
+  margin: auto; /* Centra el div horizontalmente */
+  display: flex; /* Alinea los botones en fila, quítalo si prefieres el comportamiento por defecto */
+  justify-content: center; /* Centra los elementos (botones) dentro del div */
+  background-color: rgba(255, 255, 255, 0.5); /* Fondo blanco semitransparente */
+  /* Añade los siguientes estilos para asegurarte de que el fondo se note */
+  padding: 20px; /* Espacio interior para que el fondo se extienda un poco más allá de los botones */
+  border-radius: 10px; /* Bordes redondeados para el fondo */
+}
+.preceptores button {
+  margin: 10px; /* Espacio alrededor de cada botón */
+}
+
+
+
+.navbar {
+  display: flex;
+    justify-content: space-between; /* Ajusta para que los elementos se separen */
+    align-items: center;
+    width: 100%;
+    padding: 5px;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 10;
+    margin-bottom: 20px;
+}
+.nav-options{
+  position: relative;
+  left: -365px;
+}
+
+.nav-left,  .nav-right {
+  display: flex;
+  align-items: center;
+}
+.nav-right {
+  justify-content: flex-end; /* Alinea el botón de cerrar sesión a la derecha */
+}
+
+
+.btn-link {
+    text-decoration: none;
+    color: white;
+}
+
+.btn-new-member,
+.dropbtn, .btn-situacion-academica, .btn-preceptores{
+  background-color: #ff0000;
+  color: white;
+  padding: 8px 7px; /* Reduce el tamaño de los botones */
+  border: none;
+  border-radius: 6px;
+  font-size: 16px; /* Reduce el tamaño del texto de los botones */
+  cursor: pointer;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.3s;
+  margin-right: 1px;
+  margin-left: 5px;
+}
+.dropbtn{
+  padding: 8px 7px !important;
+  
+
+}
+
+
+.btn-new-member:hover, .btn-situacion-academica:hover, .dropbtn:hover  {
+  background-color: #bd2626;
+}
+
+.btn-new-member:active, .btn-situacion-academica:active, .dropbtn:active{
+  background-color: #7c0303;
+}
+
+.btn-new-member:focus, .btn-situacion-academica:focus, .dropbtn:focus {
+  outline: none;
+}
+
+.btn-new-member:disabled, .btn-situacion-academica:disabled, .dropbtn:disabled {
+  background-color: #a6a6a6;
+  cursor: not-allowed;
+}
+
+
+
+.nav-options {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+}
+
+.nav-options li {
+  position: relative;
+}
+
+.nav-options li a {
+  display: block;
+  color: white;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+  font-size: 14px; /* Ajusta el tamaño de la fuente */
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #1d1c1c;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 50;
+  border-radius: 5px;
+}
+
+
+.dropdown-content a {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+@media screen and (max-width: 768px) {
+ 
+  .navbar {
+    flex-direction: column;
+    padding: 0;
+  }
+  
+
+  .nav-left {
+    display: flex;
+    width: auto;
+    margin-bottom: 10px;
+  }
+
+  .nav-options{
+    position: relative;
+    left: 0;
+  }
+
+  .nav-options {
+    flex-direction: column;
+    
+  }
+
+  .dropdown-content {
+    position: relative;
+    display: none;
+    box-shadow: none;
+    border-radius: 0;
+  }
+
+  .dropdown:hover .dropdown-content {
+    display: block;
+  }
+}
+.centered-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+.welcome-box {
+  background-color: #000;
+  opacity: 75%;
+  margin-top: 20px;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  text-align: center;
+  display: inline-block;
+  position: relative;
+  z-index: 1; 
+  
+}
+#welcome-box {
+  transition: opacity 0.3s ease-in-out;
+}
+
+#welcome-box.hide {
+  opacity: 0;
+  pointer-events: none; /* Evita que los elementos sean interactivos mientras están ocultos */
+}
+
+.welcome-box__h1 {
+font-size: 24px;
+color: #ffffff;
+margin-bottom: 10px;
+}
+
+.welcome-box__p {
+font-size: 14px;
+color: #ffffff;
+margin: 0;
+}
+
+
+.form-container {
+background-color: #000;
+opacity: 75%  ;
+border-radius: 10px;
+box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+padding: 20px;
+text-align: center;
+max-width: 400px;
+margin: 20px auto;
+margin-top: 20px;
+position: relative;
+z-index: 0;
+}
+
+.form-container__h2 {
+font-size: 24px;
+margin-bottom: 20px;
+color: #000;
+}
+
+.form-container__input {
+display: block;
+width: 100%;
+padding: 10px;
+margin-bottom: 10px;
+border: 1px solid #ccc;
+border-radius: 5px;
+}
+
+.form-container__input[type="submit"] {
+background-color: #ff0000;
+color: #fff;
+cursor: pointer;
+transition: background-color 0.3s ease;
+}
+
+.form-container__input[type="submit"]:hover {
+background-color: #a51515;
+}
+
+/* Estilos para pantallas pequeñas */
+@media (max-width: 600px) {
+.form-container {
+  max-width: 90%;
+}
+
+.form-container__h2 {
+  font-size: 20px;
+  margin-bottom: 15px;
+}
+
+.form-container__input {
+  padding: 8px;
+  font-size: 14px;
+}
+}
+
+.table {
+width: 100%;
+border-collapse: collapse;
+margin-top: 20px; /* Agregamos un margen superior para separar el botón de la tabla */
+position: relative;
+z-index: 25;
+}
+
+.table th, .table td {
+padding: 10px;
+text-align: left;
+}
+
+/* Estilos del encabezado */
+.table thead {
+background-color: #333;
+color: #fff;
+}
+
+.table th {
+font-weight: bold;
+}
+
+/* Estilos de las filas pares e impares */
+.table tbody tr:nth-child(even) {
+background-color: #f2f2f2;
+}
+
+/* Estilos para las celdas de acciones */
+.table td:last-child {
+white-space: nowrap; /* Evita el ajuste automático del contenido */
+}
+
+.table td a {
+text-decoration: none;
+color: #4CAF50;
+margin-right: 10px;
+
+}
+
+/* Estilos de los enlaces en hover */
+.table td a:hover {
+color: #45a049;
+}
+
+/* Estilos del botón */
+button {
+background-color: #ff0000;
+color: #fff;
+border: none;
+padding: 10px 20px;
+border-radius: 5px;
+cursor: pointer;
+position: relative;
+z-index: 20;
+left: 10px;
+}
+
+button:hover {
+background-color: #940808;
+transition: 1s;
+}
+
+.modal {
+opacity: 0;
+transform: translateY(-50px);
+transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+display: none;
+position: fixed;
+z-index: 9999;
+left: 0;
+top: 0;
+width: 100%;
+height: 100%;
+overflow: auto;
+background-color: rgba(0, 0, 0, 0.7);
+}
+.modal.show {
+  opacity: 1;
+  transform: translateY(0); /* Lleva el modal a su posición normal */
+}
+
+.modal-content {
+background-color: #f7f7f7;
+margin: 15% auto;
+padding: 20px;
+border: 1px solid #888;
+width: 30%;
+border-radius: 5px;
+}
+
+.close {
+color: #aaaaaa;
+float: right;
+font-size: 28px;
+font-weight: bold;
+z-index: 100;
+cursor: pointer;
+}
+.close-estudiante{
+  color: #aaaaaa;
+float: right;
+font-size: 28px;
+font-weight: bold;
+z-index: 1000000;
+cursor: pointer;
+}
+
+.close:hover,
+.close:focus {
+color: #000;
+text-decoration: none;
+cursor: pointer;
+}
+
+.toggle-menu-button {
+  display: none;
+  background-color: #ff0000;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.3s;
+  margin-right: 10px;
+  margin-left: 10px;
+}
+
+#toggle-menu-icon {
+  transition: transform 0.3s; /* Agregamos transición para la propiedad transform */
+}
+
+.toggled #toggle-menu-icon {
+  transform: rotate(90deg); /* Rotación de 90 grados cuando se abre el menú */
+}
+
+@media screen and (max-width: 768px) {
+  
+    .btn-situacion-academica, .btn-preceptores{
+  padding: 5px 8px;
+    }
+  
+  .btn-logout{
+    margin-top: 6px;
+  }
+  .modal-content{
+    width: 80%;
+  }
+  .toggle-menu-button {
+    margin-top: 10px;
+    display: block;
+
+  }
+  .navbar {
+    /* Inicialmente ocultamos el menú en tamaño tablet */
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out; /* Agregamos la transición para max-height y opacity */
+    opacity: 0;
+  }
+   /* Estilo para mostrar el menú cuando la clase show-menu esté presente */
+   .navbar.show-menu {
+    padding: 15px;
+    max-height: 1000px; /* Puedes ajustar este valor para controlar la altura máxima del menú desplegado */
+    transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out; /* Agregamos la transición para max-height y opacity */
+    opacity: 1;
+    
+  }
+}
+
+.btn-new-member:hover, .btn-new-materia:hover {
+  background-color: #bd2626;
+}
+
+.btn-new-member:active, .btn-new-materia:active {
+  background-color: #7c0303;
+}
+
+.btn-new-member:focus, .btn-new-materia:focus {
+  outline: none;
+}
+
+.btn-new-member:disabled, .btn-new-materia:disabled {
+  background-color: #a6a6a6;
+  cursor: not-allowed;
+}
+.nav-welcome-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Centra horizontalmente */
+  padding-top: 40px; /* Ajusta el espaciado superior */
+}
+
+.btn-logout {
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: #ff0000;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  text-decoration: none;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s ease-in-out;
+ 
+}
+
+
+.btn-logout:hover {
+  background-color: #e43f3f;
+}
+#materia-modal {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 9;
+}
+
+#materia-modal .modal-content {
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  max-width: 400px;
+  margin: auto;
+  padding: 20px;
+  position: relative;
+  z-index: 0;
+}
+.modal-content{
+  top: 40%;
+}
+.centered-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%; /* Asegura que el contenido ocupe todo el alto del modal */
+}
+
+#materia-modal .modal-content input[type="text"],
+#materia-modal .modal-content select {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+#materia-modal .modal-content input[type="text"]::placeholder,
+#materia-modal .modal-content select::placeholder {
+  color: #888; /* Color del marcador de posición */
+}
+
+#materia-modal .modal-content input[type="submit"] {
+  background-color: #ff0000; /* Color de fondo rojo */
+  color: #fff; /* Color del texto blanco */
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+}
+
+#materia-modal .modal-content input[type="submit"]:hover {
+  background-color: #b70000; /* Color de fondo bordo al pasar el cursor */
+}
+
+/* Estilos adicionales para el modal */
+#materia-modal .modal-content .close {
+  color: #aaaaaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+#materia-modal .modal-content .close:hover,
+#materia-modal .modal-content .close:focus {
+  color: #000;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* Estilo para el botón de inicio */
+.home-button {
+  display: inline-block;
+  padding: 8px 16px;
+  background-color: #ff0000;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+  text-decoration: none; /* Quitamos el subrayado del enlace */
+  transition: background-color 0.3s;
+  margin-right: 1px;
+  margin-left: 5px;
+}
+
+/* Estilo para el botón de inicio en estado hover */
+.home-button:hover {
+  background-color: #bd2626;
+}
+
+/* Estilo para el botón de inicio en estado activo */
+.home-button:active {
+  background-color: #7c0303;
+}
+
+/* Estilo para el botón de inicio en estado enfocado */
+.home-button:focus {
+  outline: none;
+}
+
+/* Estilo para el botón de inicio en estado deshabilitado */
+.home-button:disabled {
+  background-color: #a6a6a6;
+  cursor: not-allowed;
+}
+
+
+#attendance-modal, #attendance-modal-asistencia {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 30px;
+  text-align: center;
+  width: 500px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  z-index: 999999;
+  position: relative;
+  margin-top: -150px; /* Añadimos un margen negativo para centrarlo verticalmente */
+}
+
+/* Contenedor para los botones de comisión */
+.comission-button-container {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+/* Estilos para los botones de comisión */
+.comission-button {
+  background-color: #ff0000;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 10px 20px;
+  width: 30%;
+}
+
+.comission-button:hover {
+  background-color: #bd2626;
+}
+
+.comission-button:focus {
+  outline: none;
+}
+
+.comission-button:active {
+  background-color: #7c0303;
+}
+
+/* Estilos para el botón de cierre */
+.close-attendance {
+  color: #000;
+  font-size: 28px;
+  font-weight: bold;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  cursor: pointer;
+}
+
+.modal-comision-a {
+  display: none;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 99999999;
+}
+
+.modal-content-comision-a {
+  background-color: #fff;
+  margin: 10% auto;
+  padding: 20px;
+  border: 1px solid #ccc;
+  width: 100%;
+  max-width: 1024px;
+  position: relative;
+  top: 40px;
+  border-radius: 5px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.close-comision-a {
+  color: #000;
+  font-size: 28px;
+  font-weight: bold;
+  position: absolute;
+  top: 0px;
+  right: 3px;
+  cursor: pointer;
+  
+}
+
+/* Estilos para hacer la tabla responsiva */
+.table-comision-a, .table-comision-b {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+  top: 40px;
+}
+.table-comision-a th, .table-comision-a td, .table-comision-b th, .table-comision-b td  {
+  border: 1px solid #ccc;
+  padding: 7px;
+  text-align: left;
+}
+
+.table-comision-a th , .table-comision-b th{
+  background-color: #f2f2f2;
+  font-weight: bold;
+  padding: 8px; /* Ajusta el espaciado interno */
+  text-align: center;
+}
+@media (max-width: 768px) {
+  .modal-content-comision-a{
+    width: 750px;
+  }
+  
+ 
+  .table-comision-a th, .table-comision-b th {
+    padding: 4px; /* Reduce el espaciado interno en dispositivos móviles */
+    font-size: 14px; /* Reduce el tamaño de fuente en dispositivos móviles */
+    text-overflow: clip; /* Muestra el texto completo sin puntos suspensivos */
+  }
+  .table-comision-a td, .table-comision-b td {
+    padding: 4px; /* Reduce el espaciado interno en dispositivos móviles */
+    font-size: 14px; /* Reduce el tamaño de fuente en dispositivos móviles */
+    text-overflow: clip; /* Muestra el texto completo sin puntos suspensivos */
+  }
+  
+}
+
+
+.table-comision-a tr:nth-child(odd) {
+  background-color: #f5f5f5;
+}
+.btn-enviar {
+  background-color: #FF0000;  
+  color: #fff; 
+  padding: 10px 20px;
+  border: none; 
+  border-radius: 5px;
+  cursor: pointer; 
+  font-weight: bold; 
+  transition: background-color 0.3s; 
+  margin-top: 20px; 
+}
+.btn-enviar:hover {
+  background-color: #FF6666; 
+}
+
+/*comision b*/
+.modal-comision-b {
+  display: none;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 99999999;
+}
+
+.modal-content-comision-b {
+  background-color: #fff;
+  margin: 10% auto;
+  padding: 20px;
+  border: 1px solid #ccc;
+  width: 80%;
+  max-width: 600px;
+  position: relative;
+  top: 40px;
+  border-radius: 5px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.close-comision-b {
+  color: #000;
+  font-size: 28px;
+  font-weight: bold;
+  position: absolute;
+  top: 0px;
+  right: 3px;
+  cursor: pointer;
+  
+}
+
+/* Estilos para hacer la tabla responsiva */
+.table-comision-b {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+  top: 40px;
+}
+.table-comision-b th, .table-comision-b td {
+  border: 1px solid #ccc;
+  padding: 10px;
+  text-align: left;
+}
+
+.table-comision-b th {
+  background-color: #f2f2f2;
+  font-weight: bold;
+}
+
+
+.table-comision-b tr:nth-child(odd) {
+  background-color: #f5f5f5;
+}
+.btn-enviar {
+  background-color: #FF0000;  
+  color: #fff; 
+  padding: 10px 20px;
+  border: none; 
+  border-radius: 5px;
+  cursor: pointer; 
+  font-weight: bold; 
+  transition: background-color 0.3s; 
+  margin-top: 20px; 
+}
+.btn-enviar:hover {
+  background-color: #FF6666; 
+}
+
+/*comision c*/
+.modal-comision-c {
+  display: none;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 99999999;
+}
+
+.modal-content-comision-c {
+  background-color: #fff;
+  margin: 10% auto;
+  padding: 20px;
+  border: 1px solid #ccc;
+  width: 80%;
+  max-width: 600px;
+  position: relative;
+  top: 40px;
+  border-radius: 5px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.close-comision-c {
+  color: #000;
+  font-size: 28px;
+  font-weight: bold;
+  position: absolute;
+  top: 0px;
+  right: 3px;
+  cursor: pointer;
+  
+}
+
+/* Estilos para hacer la tabla responsiva */
+.table-comision-c {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+  top: 40px;
+}
+.table-comision-c th, .table-comision-c td {
+  border: 1px solid #ccc;
+  padding: 10px;
+  text-align: left;
+}
+
+.table-comision-c th {
+  background-color: #f2f2f2;
+  font-weight: bold;
+}
+
+
+.table-comision-c tr:nth-child(odd) {
+  background-color: #f5f5f5;
+}
+.btn-enviar {
+  background-color: #FF0000;  
+  color: #fff; 
+  padding: 10px 20px;
+  border: none; 
+  border-radius: 5px;
+  cursor: pointer; 
+  font-weight: bold; 
+  transition: background-color 0.3s; 
+  margin-top: 20px; 
+}
+.btn-enviar:hover {
+  background-color: #FF6666; 
+}
+
+.sub-dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #000;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+  top: 0;
+  left: 100%; /* Muestra los sub-menús a la derecha de los elementos disparadores */
+}
+@media (max-width: 768px) {
+  .sub-dropdown-content {
+    top: 100%; /* Posiciona los sub-menús debajo de los elementos disparadores */
+    left: 0; /* Alinea los sub-menús con el lado izquierdo de los elementos disparadores */
+   
+  }
+
+  .submenu-trigger:hover + .sub-dropdown-content, .sub-dropdown-content:hover {
+    display: block; /* Muestra el sub-menú al pasar el mouse o tocar el elemento disparador */
+  }
+}
+
+.submenu {
+  position: relative;
+  display: block;
+  
+}
+
+.submenu:hover .sub-dropdown-content {
+  display: block;
+}
+
+/* Ajusta el estilo a tu preferencia */
+.submenu-trigger {
+  padding: 10px;
+  text-decoration: none;
+  display: block;
+  margin-top: 5px;
+ 
+}
+
+.submenu-trigger:hover {
+  background-color: #ccc;
+  color: #333;
+}
+
+.fa-chevron-right {
+  display: inline;
+}
+
+/* Estilo cuando el menú está abierto, muestra la flecha hacia abajo */
+.active .fa-chevron-right {
+  display: none;
+}
+
+.active .fa-chevron-down {
+  display: inline;
+}
+
+
+/* Estilos para la tabla */
+.table-comision-a {
+  width: 100%;
+  max-width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  top: 40px;
+  border: 2px solid #ff0000; /* Borde rojo */
+  background-color: #f7f7f7; /* Color de fondo gris claro */
+  font-size: 16px; /* Tamaño de fuente */
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+.table-comision-a thead {
+  background-color: #ff0000; /* Fondo rojo para el encabezado */
+  color: #fff; /* Texto blanco para el encabezado */
+}
+.table-comision-a th {
+  font-weight: bold;
+}
+
+.table-comision-a tbody tr:nth-child(odd) {
+  background-color: #fff; /* Fondo blanco para filas impares */
+}
+.table-comision-a tbody tr:nth-child(even) {
+  background-color: #f2f2f2; /* Fondo gris claro para filas pares */
+}
+.table-comision-a th,
+.table-comision-a td {
+  padding: 10px;
+  text-align: center;
+  border: 1px solid #ccc;
+}
+.table-comision-a td {
+  background-color: #fff; /* Fondo blanco para las celdas de datos */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra ligera */
+}
+
+.table-comision-a th {
+  background-color: #b70606;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.table-comision-a tr:nth-child(odd) {
+  background-color: #f5f5f5;
+}
+
+/* Estilos para los checkbox */
+.table-comision-a input[type="checkbox"] {
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  border: 2px solid #ccc;
+  border-radius: 4px;
+  position: relative;
+  transition: background-color 0.3s, border-color 0.3s;
+  cursor: pointer;
+  margin: 0;
+}
+.table-comision-a input[type="checkbox"]:not(:checked)::before {
+  content: "";
+  width: 10px;
+  height: 10px;
+  background-color: transparent;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border: 2px solid #ccc;
+  border-top: none;
+  border-right: none;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.table-comision-a input[type="checkbox"]:checked::before {
+  content: "✔"; /* Cambia el contenido por una marca de verificación */
+  font-size: 16px;
+  line-height: 24px;
+  color: #ff0000; /* Cambia el color de la marca de verificación */
+  text-align: center;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 1;
+}
+.table-comision-a input[type="checkbox"]:hover::before {
+  opacity: 0.5;
+  background-color: rgba(0, 0, 0, 0.1);
+}
+.table-comision-a input[type="checkbox"]:checked:hover::before {
+  opacity: 0.5;
+  background-color: rgba(255, 0, 0, 0.1);
+}
+.table-comision-a input[type="checkbox"] {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  position: relative;
+  transition: background-color 0.3s, border-color 0.3s;
+  cursor: pointer;
+  margin: 0;
+}
+/* Estilos para los checkbox marcados */
+.table-comision-a input[type="checkbox"]:checked {
+  background-color: #ff000056; /* Cambia el color de fondo cuando está marcado */
+  border: 2px solid #ff0000; /* Cambia el color del borde cuando está marcado */
+}
+
+/* Añade espacio entre los checkbox */
+.table-comision-a input[type="checkbox"] + input[type="checkbox"] {
+  margin-left: 10px;
+}
+
+.table-outer {
+  
+  width: 100%;
+  max-width: 100%;
+  display: table; /* Hacer que la tabla exterior se comporte como una tabla interna */
+}
+.date-picker {
+  text-align: center;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+}
+
+.date-picker label {
+  display: block;
+  margin-bottom: 10px;
+}
+
+.date-picker input[type="date"] {
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  /* Estilo del placeholder del campo de fecha */
+  ::-webkit-input-placeholder {
+    /* Estilos para navegadores basados en Webkit como Chrome y Safari */
+    color: #888; /* Color del placeholder */
+    font-style: italic; /* Texto en cursiva */
+  }
+  :-ms-input-placeholder {
+    /* Estilos para Internet Explorer */
+    color: #888;
+    font-style: italic;
+  }
+  ::placeholder {
+    color: #888;
+    font-style: italic;
+  }
+ 
+  
+}
+
+.date-picker button {
+  padding: 10px 20px;
+  background-color: #FF0000; /* Color rojo para el botón */
+  color: #fff;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.date-picker button:hover {
+  background-color: #CC0000; /* Color rojo ligeramente más oscuro al pasar el ratón por encima */
+}
+/* Estilos para el modal "Ver Asistencias" */
+.custom-modal-ver-asistencias {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1;
+  text-align: center;
+}
+
+.custom-modal-content {
+  background-color: #fff;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  display: inline-block;
+  padding: 20px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Estilos para el botón "Ver Asistencias" */
+#btnVerAsistencias {
+  background-color: red; /* Color de fondo rojo */
+  color: #fff; /* Color del texto blanco */
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+/* Estilos para el botón "Elegir Fecha" (dentro del modal) */
+#btnElegirFecha {
+  background-color: red; /* Color de fondo rojo */
+  color: #fff; /* Color del texto blanco */
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.square-radio {
+  width: 20px;
+  height: 20px;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  border: 2px solid #450404;
+  border-radius: 0;
+  position: relative;
+  background-color: #fff;
+  transition: background-color 0.2s, box-shadow 0.2s;
+}
+
+/* Estilos para los radios cuadrados cuando están seleccionados */
+.square-radio:checked {
+  background-color: #ff0000; /* Cambia el color de fondo cuando se selecciona */
+  box-shadow: 0 0 5px 2px rgba(255, 0, 0, 0.5); /* Agrega una sombra externa roja */
+  border-color: #ff0000; /* Cambia el color del borde cuando se selecciona */
+}
+
+/* Estilos para el punto de selección */
+.square-radio:checked::before {
+  content: "\2713"; /* Unicode para el signo de marca de verificación */
+  font-size: 16px; /* Tamaño del icono de selección */
+  line-height: 20px; /* Alinea verticalmente el icono */
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  color: #fff; /* Color del icono */
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.2); /* Agrega una sombra de texto al icono */
+}
+
+/* Estilos para el modal de estudiantes */
+.estudiantes-modal {
+  display: none;
+  position: fixed;
+  z-index: 999999999999999;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content-estudiantes {
+  background-color: #fff;
+  margin: 10% auto; /* Reducido el margen superior para centrar mejor */
+  padding: 5px;
+  border: 1px solid #ddd;
+  width: 60%;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+}
+.modal-content-estudiantes table {
+  width: 100%;
+  margin-bottom: 3px; /* Añadido margen inferior para separación entre filas */
+}
+
+.modal-content-estudiantes th,
+.modal-content-estudiantes td {
+  padding: 8px;
+  text-align: left;
+}
+
+.modal-close-estudiantes {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 20px;
+  cursor: pointer;
+  color: #555;
+}
+
+.modal-close-estudiantes:hover {
+  color: #333;
+}
+
+/* Estilizar el botón de cerrar modal */
+.close-modal-button {
+  background-color: #fff;
+  border: 1px solid #ccc;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  color: #555;
+}
+
+.close-modal-button:hover {
+  background-color: #f5f5f5;
+  border: 1px solid #bbb;
+  color: #333;
+}
+.modificar-button {
+  background-color: #4CAF50;
+  color: #fff;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.modificar-button:hover {
+  background-color: #45a049;
+}
+.borrar-button {
+  background-color: #e74c3c; /* Rojo */
+  color: #fff;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.borrar-button:hover {
+  background-color: #c0392b; /* Rojo más oscuro al pasar el ratón */
+}
+.accion-button {
+  background-color: #007bff; /* Azul */
+  color: #fff;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  padding-right: 20px;
+  padding-left: 20px;
+}
+
+.accion-button:hover {
+  background-color: #0056b3; /* Azul más oscuro al pasar el ratón */
+}
+
+@media screen and (max-width: 768px) {
+  .modal-content-estudiantes {
+    width: 98%;
+  }
+}
+
