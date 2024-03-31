@@ -1,0 +1,34 @@
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background: url('../../../imagenes/simulacion-y-automatizacion-de-robotica.jpg') ;
+    background-size: auto;
+    font-family: Arial, sans-serif;
+}
+
+td{
+    background-color: white;
+    opacity: 0.9;
+}
+.boton-enviar a{
+    text-decoration: none;
+    color: white;
+}
+th {
+    background-color: #4CAF50; /* Un verde elegante como fondo */
+    color: white; /* Texto en color blanco para contraste */
+    font-family: 'Arial', sans-serif; /* Una fuente clara y profesional */
+    font-size: 16px; /* Un tamaño de texto moderado */
+    text-align: center; /* Centrar el texto */
+    padding: 12px 8px; /* Más espacio alrededor del texto */
+    border-bottom: 2px solid #ddd; /* Un borde sólido debajo para definición */
+    box-shadow: 0 2px 2px rgba(0,0,0,0.1); /* Una ligera sombra para profundidad */
+}
+th:first-child {
+    border-top-left-radius: 10px; /* Esquinas redondeadas en el th del extremo izquierdo */
+}
+
+th:last-child {
+    border-top-right-radius: 10px; /* Esquinas redondeadas en el th del extremo derecho */
+}

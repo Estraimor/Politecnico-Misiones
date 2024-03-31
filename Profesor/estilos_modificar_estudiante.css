@@ -1,0 +1,35 @@
+.formulario {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        max-width:1024px;
+        margin: auto;
+    }
+
+    .input-text, .select-carrera {
+        width: 100%;
+        padding: 8px;
+        margin-bottom: 15px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+    }
+
+    .btn-enviar {
+        width: 100%;
+        padding: 10px;
+        border: none;
+        border-radius: 5px;
+        background-color: #ff4d4d;
+        color: white;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .btn-enviar:hover {
+        background-color: #e60000;
+    }
+
+    .btn-enviar:active {
+        background-color: #990000;
+    }

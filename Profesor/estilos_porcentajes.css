@@ -1,0 +1,48 @@
+.contenedor {
+            background-color: rgba(255,255,255,0.5);
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.9);
+        }
+        h1 {
+            color: black;
+            text-align: center;
+        }
+        .hilera {
+            margin: 20px 0;
+        }
+        .hilera h2 {
+            color: black;
+        }
+        .boton {
+            background-color: red;
+            color: white;
+            border: none;
+            padding: 10px;
+            margin: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .boton a{
+            text-decoration: none;
+            color: white;
+        }
+        .boton:hover {
+            background-color: darkred;
+        }
+         /* Estilos generales para la tabla */
+    table {
+        background-color: rgba(255, 255, 255, 0.5); /* Blanco semitransparente */
+        border-collapse: collapse;
+        width: 100%;
+    }
+    th, td {
+        border: 1px solid #ddd; /* Bordes ligeros para las celdas */
+        text-align: left;
+        padding: 8px;
+    }
+    /* Estilos para los títulos de las columnas */
+    th {
+        background-color: red; /* Fondo rojo */
+        color: white; /* Texto blanco */
+    }
