@@ -12,7 +12,7 @@ if (empty($_SESSION["id"])){header('Location: ./login/login.php');}
     <title>SGPM</title>
     <link rel="stylesheet" type="text/css" href="./estilos.css">
     <link rel="stylesheet" type="text/css" href="./normalize.css">
-    <link rel="icon" href="../politecnico.ico">
+    <link rel="icon" href="./politecnico.ico">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-Bz5/BqJ8SCxmeLEjmo5fD5fgONMAewh+PxQv0tRnm5IsJf5M9bGqDlVCS5c3X7CQZLjdvFtJ+zaOhtlUlm7XjA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link href="https://unpkg.com/vanilla-datatables@latest/dist/vanilla-dataTables.min.css" rel="stylesheet" type="text/css">
@@ -81,7 +81,7 @@ if (empty($_SESSION["id"])){header('Location: ./login/login.php');}
       </li>
     </ul>
     <div class="nav-right">
-        <a href="../login/cerrar_sesion.php" class="btn-logout">Cerrar sesión</a>
+        <a href="./login/cerrar_sesion.php" class="btn-logout">Cerrar sesión</a>
     </div>
     
     
