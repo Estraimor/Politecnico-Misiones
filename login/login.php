@@ -18,7 +18,8 @@
         <div class="form-box">
             <div class="form-value">
                 <form action="" autocomplete="off">
-                    <h2>Sistema de Gestión Politécnico Misiones N°1</h2>
+                
+                    <h2><img src="../imagenes/politecnico.png" style="width: 50%;"></h2>
                    
                     <?php include'./controlar_login.php';?>
                     <div class="inputbox">
@@ -33,9 +34,7 @@
                     </div>
                     
                     <button type="submit" name="enviar" class="submit-button">Iniciar Sesión</button>
-                    <div class="register">
-                        <p> <a href="./login-register.php">Crear Cuenta </a></p>
-                    </div>
+                    
                 </form>
                
             </div>

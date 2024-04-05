@@ -90,7 +90,7 @@ if (empty($_SESSION["id"])){header('Location: ./login/login.php');}
     
     
 </nav>
-  <button id="btnMostrarEstudiantes">Estudiantes</button>
+  <button id="btnMostrarEstudiantes">Alumnos Retirados antes de tiempo</button>
    <!-- Modal para la tabla de estudiantes -->
    <div id="estudiantesModal" class="estudiantes-modal">
     <div class="modal-content-estudiantes">
@@ -99,31 +99,33 @@ if (empty($_SESSION["id"])){header('Location: ./login/login.php');}
             <table id="tabla">
         <thead>
             <tr>
-                <th>Legajo</th>
-                <th>Apellido</th>
                 <th>Nombre</th>
-                <th>DNI</th>
-                <th>Celular</th>
-                <th>Acciones</th>
+                <th>Apellido</th>
+                <th>Legajo</th>
+                <th>Preceptor</th>
+                <th>Carrera</th>
+                <th>Motivo</th>
+                <th>Fecha</th>
             </tr>
         </thead>
         <tbody>
             <?php
-            $sql1 = "select *
-            from alumno 
-            where estado = '1'";
+              $sql1 = "SELECT a2.nombre_alumno,a2.apellido_alumno,a2.legajo,p.nombre_profe,c.nombre_carrera,a.fecha,a.motivo
+              FROM alumnos_rat a
+              INNER JOIN alumno a2 on a2.legajo = a.alumno_legajo
+              INNER JOIN profesor p on p.idProrfesor = a.profesor_idProrfesor
+              INNER JOIN carreras c on c.idCarrera = a.carreras_idCarrera";
             $query1 = mysqli_query($conexion, $sql1);
             while ($datos = mysqli_fetch_assoc($query1)) {
                 ?>
                 <tr>
-                    <td><?php echo $datos['legajo']; ?></td>
-                    <td><?php echo $datos['apellido_alumno']; ?></td>
                     <td><?php echo $datos['nombre_alumno']; ?></td>
-                    <td><?php echo $datos['dni_alumno']; ?></td>
-                    <td><?php echo $datos['celular']; ?></td>
-                    <td><a href="./Profesor/modificar_alumno.php?legajo=<?php echo $datos['legajo']; ?>" class="modificar-button"><i class="fas fa-pencil-alt"></i></a>
-                   <a href="./Profesor/borrado_logico_alumno.php?legajo=<?php echo $datos['legajo']; ?>" class="borrar-button"><i class="fas fa-trash-alt"></i></a>
-                   <a href="./Profesor/porcentajes_de_asistencia.php?legajo=<?php echo $datos['legajo']; ?>" class="accion-button"><i class="fas fa-exclamation"></i></a></td>
+                    <td><?php echo $datos['apellido_alumno']; ?></td>
+                    <td><?php echo $datos['legajo']; ?></td>
+                    <td><?php echo $datos['nombre_profe']; ?></td>
+                    <td><?php echo $datos['nombre_carrera']; ?></td>
+                    <td><?php echo $datos['motivo']; ?></td>
+                    <td><?php echo $datos['fecha']; ?></td>
 
 
 
@@ -156,14 +158,10 @@ if (empty($_SESSION["id"])){header('Location: ./login/login.php');}
     <select name="selectAlumno" id="selectAlumno">
         <option value="">Seleccionar alumno</option>
     </select>
-     <select name="" id="">
-            <option hidden>Seleccione Carrera del Alumno</option>
-            <?php while($carreras=mysqli_fetch_assoc($query_carrera)){ ?>
-            <option value="<?php echo $carreras['carreras_idCarrera'] ?>"> <?php echo $carreras['nombre_carrera'] ?></option>
-            <?php } ?>
-     </select>
-     <input type="text" name="" placeholder="Motivo de Retirado" >
-
+    <input type="hidden" id="carrera" name="carrera" value="">
+    <input hidden name="profesor" value="<?php echo $_SESSION["id"]; ?>" >
+     <input type="text" name="motivo" placeholder="Motivo de Retirado" >
+              <input type="date" name="fecha" id="">
       <input type="submit" class="form-container__input" name="enviar" value="Enviar" onclick="mostrarAlertaExitosa(); closeSuccessMessage();">
     </form>
     
@@ -338,35 +336,29 @@ $(document).ready(function() {
     });
 
     // Función para filtrar los selectores al escribir en los inputs
-    $('#filtroAlumno, #filtroMateria').on('input', function() {
+    $('#filtroAlumno').on('input', function() {
         var alumno = $('#filtroAlumno').val();
-        var materia = $('#filtroMateria').val();
 
         // Llamar a la función para actualizar los selectores
-        actualizarSelects(alumno, materia);
+        actualizarSelects(alumno);
     });
 
-    function actualizarSelects(alumno, materia) {
+    function actualizarSelects(alumno) {
         $.ajax({
             url: 'obtener_opciones.php',
             method: 'POST',
-            data: { alumno: alumno, materia: materia },
+            data: { alumno: alumno },
             dataType: 'json', // Especificar que esperamos datos JSON en la respuesta
             success: function(response) {
                 actualizarSelectAlumnos(response.alumnos);
 
-                // Limpiar y llenar select de materia
-                var selectMateria = $('#selectMateria');
-                selectMateria.empty(); // Vaciar el select para llenarlo de nuevo
-
-                // Agregar una opción por cada materia recibida
-                response.materias.forEach(function(materia) {
-                    var option = $('<option>', {
-                        value: materia.idMaterias,
-                        text: materia.Nombre + ' (' + materia.idMaterias + ')'
-                    });
-                    selectMateria.append(option);
-                });
+                // Actualizar el valor del input hidden con el id de la carrera del primer alumno
+                var carreraHidden = $('#carrera');
+                if (response.alumnos.length > 0) {
+                    carreraHidden.val(response.alumnos[0].carreras_idCarrera);
+                } else {
+                    carreraHidden.val(''); // Si no hay alumnos, vaciar el valor del input hidden
+                }
             },
             error: function(xhr, status, error) {
                 console.error(xhr.responseText);
@@ -382,7 +374,30 @@ $(document).ready(function() {
         $('#selectAlumno').val(alumnoSeleccionado);
         // El valor de la materia ya es el ID, no es necesario cambiarlo
     });
+
+    // Evento change para el select de alumno
+    $('#selectAlumno').change(function() {
+        // Obtener el valor seleccionado en el select de alumno
+        var legajoAlumno = $(this).val();
+
+        // Enviar una solicitud AJAX para obtener la carrera del alumno
+        $.ajax({
+            url: 'obtener_carrera.php', // Ruta al script PHP que obtiene la carrera
+            method: 'POST',
+            data: { legajo: legajoAlumno }, // Datos a enviar al servidor
+            dataType: 'json', // Especificar que esperamos datos JSON en la respuesta
+            success: function(response) {
+                // Rellenar el campo de carrera con el valor obtenido
+                $('#carrera').val(response.carrera);
+            },
+            error: function(xhr, status, error) {
+                console.error(xhr.responseText);
+            }
+        });
+    });
 });
+
+
 
 </script>
 </body>

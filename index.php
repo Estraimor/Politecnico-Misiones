@@ -1,6 +1,20 @@
 <?php
 session_start();
-if (empty($_SESSION["id"])){header('Location: ./login/login.php');}
+
+// Set inactivity limit in seconds
+$inactivity_limit = 10;
+
+// Check if the user has been inactive for too long
+if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)) {
+    // User has been inactive, so destroy the session and redirect to login page
+    session_unset();
+    session_destroy();
+    header("Location: ./login/login.php");
+    exit; // Terminar el script después de redireccionar
+} else {
+    // Update the session time to the current time
+    $_SESSION['time'] = time();
+}
 ?>
 <?php include'./conexion/conexion.php'; ?>
 
@@ -300,6 +314,24 @@ document.addEventListener("DOMContentLoaded", function() {
 var myTable = document.querySelector("#tabla");
 var dataTable = new DataTable(tabla);
   
+
+
+//------------------------------------------- Cierre de session automatica-------------------------------//
+$(document).ready(function() {
+        setInterval(function() {
+            $.ajax({
+                url: 'update_session_time.php',
+                type: 'GET',
+                success: function(response) {
+                    // Si la solicitud es exitosa, no necesitas hacer nada aquí
+                },
+                error: function(xhr, status, error) {
+                    // Manejar errores si es necesario
+                }
+            });
+        }, 60000); // Actualiza la sesión cada 60 segundos
+    });
 </script>
+
 </body>
 </html>
