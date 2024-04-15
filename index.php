@@ -1,8 +1,9 @@
 <?php
 session_start();
+if (empty($_SESSION["id"])){header('Location: ./login/login.php');}
 
 // Set inactivity limit in seconds
-$inactivity_limit = 10;
+$inactivity_limit = 1200;
 
 // Check if the user has been inactive for too long
 if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)) {
@@ -45,10 +46,13 @@ if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)
             <a href="index.php" class="home-button">Inicio</a>
             <button class="btn-new-member" id="btn-new-member">Nuevo Estudiante</button>
             <button class="btn-situacion-academica">
-              <a href="./Profesor/notas/login_notas/index_notas.php" class="btn-link">Situación Académica</a>
+              <a href="../proximamente/proximamente.php" class="btn-link">Situación Académica</a>
             </button>
             <button class="btn-preceptores">
               <a href="./preceptores.php">Preceptores</a>
+            </button>
+            <button class="btn-preceptores">
+              <a href="../proximamente/proximamente.php">Profesores</a>
             </button>
           </div>
 
@@ -95,7 +99,7 @@ if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)
       </li>
     </ul>
     <div class="nav-right">
-        <a href="./login/cerrar_sesion.php" class="btn-logout">Cerrar sesión</a>
+        <a href="../login/cerrar_sesion.php" class="btn-logout">Cerrar sesión</a>
     </div>
     
     
@@ -120,9 +124,10 @@ if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)
         </thead>
         <tbody>
             <?php
-            $sql1 = "select *
-            from alumno 
-            where estado = '1'";
+            $sql1 = "SELECT * FROM inscripcion_asignatura ia 
+            INNER JOIN alumno a on ia.alumno_legajo = a.legajo 
+            INNER JOIN preceptores p ON p.carreras_idCarrera = ia.carreras_idCarrera 
+             WHERE  a.estado = '1' -- and p.profesor_idProrfesor = {$_SESSION["id"]} ";
             $query1 = mysqli_query($conexion, $sql1);
             while ($datos = mysqli_fetch_assoc($query1)) {
                 ?>
@@ -133,8 +138,8 @@ if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)
                     <td><?php echo $datos['dni_alumno']; ?></td>
                     <td><?php echo $datos['celular']; ?></td>
                     <td><a href="./Profesor/modificar_alumno.php?legajo=<?php echo $datos['legajo']; ?>" class="modificar-button"><i class="fas fa-pencil-alt"></i></a>
-                   <a href="./Profesor/borrado_logico_alumno.php?legajo=<?php echo $datos['legajo']; ?>" class="borrar-button"><i class="fas fa-trash-alt"></i></a>
-                   <a href="./Profesor/porcentajes_de_asistencia.php?legajo=<?php echo $datos['legajo']; ?>" class="accion-button"><i class="fas fa-exclamation"></i></a></td>
+                        <a href="#" onclick="return confirmarBorrado('<?php echo $datos['legajo']; ?>')" class="borrar-button"><i class="fas fa-trash-alt"></i></a>
+                        <a href="./Profesor/porcentajes_de_asistencia.php?legajo=<?php echo $datos['legajo']; ?>" class="accion-button"><i class="fas fa-exclamation"></i></a></td>
 
 
 
@@ -181,13 +186,7 @@ if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)
 </div>
 
 
-<div class="nav-welcome-container">
 
-<div id="welcome-box" class="welcome-box">
-  <h1 class="welcome-box__h1">Bienvenido/a</h1>
-  <p class="welcome-box__p">¡Selecciona una carrera para tomar asistencia!</p>
-</div>
-</div>
 
 <script>
 
@@ -314,24 +313,20 @@ document.addEventListener("DOMContentLoaded", function() {
 var myTable = document.querySelector("#tabla");
 var dataTable = new DataTable(tabla);
   
-
-
 //------------------------------------------- Cierre de session automatica-------------------------------//
-$(document).ready(function() {
-        setInterval(function() {
-            $.ajax({
-                url: 'update_session_time.php',
-                type: 'GET',
-                success: function(response) {
-                    // Si la solicitud es exitosa, no necesitas hacer nada aquí
-                },
-                error: function(xhr, status, error) {
-                    // Manejar errores si es necesario
-                }
-            });
-        }, 60000); // Actualiza la sesión cada 60 segundos
-    });
-</script>
 
+    function confirmarBorrado(legajo) {
+    var respuesta = confirm("¿Estás seguro de que quieres borrar este alumno?");
+    if (respuesta) {
+        // Realizar el borrado lógico directamente sin redirección previa
+        window.location.href = "./Profesor/Borrado_logico_alumno.php?legajo=" + legajo;
+    }
+    return false; // Evita que el navegador siga el enlace en caso de cancelar la confirmación
+}
+
+
+
+
+</script>
 </body>
 </html>

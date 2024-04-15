@@ -82,7 +82,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         // Redirigir después de procesar los datos
-        header("Location: controlador_profes.php");
+        header("Location: index_notas.php");
         exit(); // Terminar la ejecución del script después de redirigir
     }
 }

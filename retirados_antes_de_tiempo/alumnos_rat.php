@@ -26,13 +26,13 @@ if (empty($_SESSION["id"])){header('Location: ./login/login.php');}
 <div id="success-message" class="success-message" style="display: none;"></div>
 <div class="background">
 
-<button class="toggle-menu-button" id="toggle-menu-button" onclick="toggleMenu()">
+<button class="toggle-menu-button" id="" onclick="toggleMenu()">
   <span id="toggle-menu-icon">☰</span>
 </button>
 <nav class="navbar">
           <div class="nav-left">  
             <a href="index.php" class="home-button">Inicio</a>
-            <button class="btn-new-member" id="btn-new-member">Alumno RAT</button>
+            <button class="btn-new-member" id="">Estudiantes retirados</button>
             <button class="btn-situacion-academica">
               <a href="../Profesor/notas/login_notas/index_notas.php" class="btn-link">Situación Académica</a>
             </button>
@@ -90,13 +90,13 @@ if (empty($_SESSION["id"])){header('Location: ./login/login.php');}
     
     
 </nav>
-  <button id="btnMostrarEstudiantes">Alumnos Retirados antes de tiempo</button>
+  <button id="">Estudiantes Retirados antes de tiempo</button>
    <!-- Modal para la tabla de estudiantes -->
-   <div id="estudiantesModal" class="estudiantes-modal">
-    <div class="modal-content-estudiantes">
-    <span class="modal-close-estudiantes close-modal-button" id="closeEstudiantesModal">&times; Cerrar</span>
-        <div id="tablaContainerEstudiantes">
-            <table id="tabla">
+   <div id="" class="">
+    <div class="">
+    <span class="" id="">&times;</span>
+        <div id="">
+            <table id="">
         <thead>
             <tr>
                 <th>Nombre</th>
@@ -139,9 +139,9 @@ if (empty($_SESSION["id"])){header('Location: ./login/login.php');}
             </div>
         </div>
     </div>
-  <div id="modal" class="modal">
-  <div class="modal-content">
-  <span class="close" onclick="closeModal()">&times;</span>
+  <div id="" class="">
+  <div class="">
+  <span class="close">&times;</span>
 <?php
   $sql_carreras="SELECT c.nombre_carrera,p.carreras_idCarrera 
   FROM preceptores p 
@@ -150,7 +150,7 @@ if (empty($_SESSION["id"])){header('Location: ./login/login.php');}
   $query_carrera=mysqli_query($conexion,$sql_carreras);
   ?>
 
-    <h2 class="form-container__h2">Alumno Retirado Antes de Tiempo</h2>
+    <h2 class="form-container__h2">Estudiante retirado antes de Tiempo</h2>
     <form action="./guardar_alumnos_rat.php" id="miFormulario" method="post">
       
             
@@ -162,7 +162,7 @@ if (empty($_SESSION["id"])){header('Location: ./login/login.php');}
     <input hidden name="profesor" value="<?php echo $_SESSION["id"]; ?>" >
      <input type="text" name="motivo" placeholder="Motivo de Retirado" >
               <input type="date" name="fecha" id="">
-      <input type="submit" class="form-container__input" name="enviar" value="Enviar" onclick="mostrarAlertaExitosa(); closeSuccessMessage();">
+      <input type="submit" class="form-container__input" name="enviar" value="Enviar" >
     </form>
     
   </div>

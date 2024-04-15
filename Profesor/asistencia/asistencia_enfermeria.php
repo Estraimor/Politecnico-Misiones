@@ -250,10 +250,10 @@ if (empty($_SESSION["id"])){header('Location: ../../login/login.php');}
     <span id="closeComisionA" class="close-comision-a" onclick="closeModalComisionA()">&times;</span>
     <h1>Comisión A</h1> <!-- Título "Comisión A" -->
     <form action="./guardar_asistencia_enfermeria.php" method="post" onsubmit="showModalMessage()">
-    <div class="date-picker">
-    
-    <input type="hidden" id="fecha" name="fecha" readonly>
-</div>
+    <div class="date-picker" style="display: none;">
+            <input type="hidden" id="fecha" name="fecha" readonly>
+           
+        </div>
         <div class="table-responsive">
                <?php
       $sql_materias="select m.idMaterias ,m.Nombre ,c.nombre_carrera  from materias m

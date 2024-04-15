@@ -50,7 +50,7 @@ a{
 }
 .nav-options{
   position: relative;
-  left: -365px;
+  left: -325px;
 }
 
 .nav-left,  .nav-right {
@@ -1346,3 +1346,18 @@ cursor: pointer;
   }
 }
 
+.justificado-box {
+  display: none; /* Inicialmente oculto */
+}
+
+.justificado-popup {
+  display: none; /* Inicialmente oculto */
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  padding: 20px;
+  border: 1px solid #ccc;
+  z-index: 1000; /* Asegúrate de que esté sobre otros elementos */
+}

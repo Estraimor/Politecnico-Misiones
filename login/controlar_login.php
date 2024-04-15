@@ -3,7 +3,7 @@ session_start();
 include '../conexion/conexion.php';
 
 // Set inactivity limit in seconds
-$inactivity_limit = 500;
+$inactivity_limit = 1200;
 
 // Check if user has submitted the form
 if (isset($_POST['enviar'])) {
@@ -29,35 +29,44 @@ if (isset($_POST['enviar'])) {
             // Redireccionar según el rol del usuario using switch case
             switch ($datos->rol) {
                 case 1:
-                    header("Location:../Profesor/notas/login_notas/index_notas.php"); // Redirigir a la página de asistencia
+                    header("Location:../index.php"); // Rol Administracion
                     break;
                 case 2:
-                    header("Location:../Profesor/notas/login_notas/index_notas.php"); // Redirigir a la página de asistencia
+                    header("Location:../index.php"); // Rol Programadores
                     break;
                 case 3:
-                    header("Location:../index.php"); // Redirigir a la página principal
+                    header("Location:../indexs/preceptor_1.php"); // Manu
                     break;
+                    case 4:
+                         header("Location:../indexs/preceptor_2.php"); // Mariela
+                        break;
+                        case 5:
+                             header("Location:../indexs/preceptor_3.php"); // Carla kensel
+                            break;
+                            case 6: 
+                                 header("Location:../indexs/preceptor_4.php"); // Jorge
+                                break;
+                                case 7: 
+                                     header("Location:../indexs/preceptor_5.php"); // Carla Paola
+                                    break;
+                                    case 8:
+                                         header("Location:../indexs/preceptor_6.php"); // Luciano 
+                                        break;
+                                        case 9:
+                                             header("Location:../index.php"); // Redirigir a la página principal
+                                            break;
                 default:
                     echo '<div class="alert alert-danger" role="alert">!! ACCESO DENEGADO!!</div>';
             }
         } else {
-            echo '<div class="alert alert-danger" role="alert">!! ACCESO DENEGADO!!</div>';
+            echo '<div class="alert alert-danger" role="alert">!! DATOS INCORRECTOS!!</div>';
         }
     } else {
         echo '<div class="alert alert-danger" role="alert">!! HAY CAMPOS VACÍOS!!</div>';
     }
-} else {
-    // Check if the user has been inactive for too long
-    if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)) {
-        // User has been inactive, so destroy the session and redirect to login page
-        session_unset();
-        session_destroy();
-        header("Location: login.php");
-    } else {
-        // Update the session time to the current time
-        $_SESSION['time'] = time();
-    }
 }
+ 
+  
 ?>
 <script>
 setInterval(function() {

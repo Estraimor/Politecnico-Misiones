@@ -1,0 +1,326 @@
+.modal-informes-asistencia {
+    display: none; /* Oculto por defecto */
+    position: fixed; /* Fijo en la pantalla */
+    z-index: 1; /* Sobre otros elementos */
+    left: 0;
+    top: 0;
+    width: 100%; /* Ancho completo */
+    height: 100%; /* Alto completo */
+    overflow: auto; /* Permitir desplazamiento si es necesario */
+    background-color: rgba(0,0,0,0.4); /* Fondo semi-transparente */
+}
+
+/* Fondo blanco del contenido del modal y centrado */
+.modal-content-informes-asistencia {
+    position: relative;
+    background-color: #fff; /* Fondo blanco */
+    margin: 5% auto; /* Margen superior y centrado horizontalmente */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 30%; /* Puedes ajustar este valor para el ancho deseado */
+    border-radius: 5px; /* Bordes redondeados */
+    display: flex; /* Usando Flexbox para centrar el contenido */
+    flex-direction: column; /* Los elementos se apilan verticalmente */
+    align-items: center; /* Centra horizontalmente el contenido en el contenedor flex */
+}
+
+/* Estilos para los botones */
+.boton-submit-informes {
+    background-color: red; /* Fondo rojo */
+    color: white; /* Texto blanco */
+    border: none; /* Sin borde */
+    padding: 10px 20px; /* Espaciado interno */
+    margin-top: 20px; /* Margen superior */
+    cursor: pointer; /* Cursor tipo puntero */
+    border-radius: 5px; /* Bordes redondeados */
+}
+
+.boton-submit-informes:hover {
+    background-color: darkred; /* Fondo más oscuro al pasar el mouse */
+}
+
+/* Estilos para los inputs y el select */
+.input_fecha, .form-input-informes {
+    padding: 10px; /* Espaciado interno */
+    margin: 10px 0; /* Margen superior e inferior */
+    border: 1px solid #ccc; /* Borde gris */
+    border-radius: 5px; /* Bordes redondeados */
+    width: 80%; /* Iguala el ancho */
+    box-sizing: border-box; /* Incluye padding y borde en el cálculo del ancho */
+}
+
+/* Ajustar el ancho del select para que no sea tan ancho */
+.form-input-informes {
+    width: 80%; /* O el ancho que prefieras */
+}
+
+/* Ajuste para que todo el texto esté centrado */
+.modal-content-informes-asistencia h2,
+.modal-content-informes-asistencia label {
+    text-align: center; /* Centrar texto */
+    width: 100%; /* Asegura que ocupe todo el ancho disponible */
+}
+
+.cerrar-modal-informes-asistencia {
+    position: absolute; /* Posicionamiento absoluto respecto a su contenedor relativo */
+    top: 10px; /* Espacio desde el top del contenedor */
+    right: 15px; /* Espacio desde el right del contenedor */
+    font-size: 25px; /* Tamaño de la 'X' */
+    font-weight: bold; /* Hacer la 'X' más visible */
+    color: #aaa; /* Color de la 'X' */
+    cursor: pointer; /* Cambia el cursor a puntero para indicar interactividad */
+}
+
+.cerrar-modal-informes-asistencia:hover,
+.cerrar-modal-informes-asistencia:focus {
+    color: black; /* Cambia el color al pasar el mouse o enfocar */
+    text-decoration: none; /* Remueve cualquier subrayado */
+}
+
+
+.retiradosantes-modal, .modal-retirados-enviar {
+    display: none; /* Ocultar modales por defecto */
+    position: fixed; /* Mantenerlos sobre el contenido */
+    z-index: 1; /* Situarlos por encima de todo */
+    left: 0;
+    top: 0;
+    width: 100%; /* Ancho total */
+    height: 100%; /* Alto total */
+    overflow: auto; /* Habilitar scroll si es necesario */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Negro con opacidad */
+  }
+  
+  .modal-content-retirados, .modal-content-retirados-enviar {
+    background-color: #fefefe;
+    margin: 15% auto; /* 15% desde la parte superior y centrado horizontalmente */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%; /* Puede variar según prefieras */
+  }
+  
+  /* El botón cerrar (x) */
+  .close, .modal-close-retirados {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+  }
+  
+  .close:hover,
+  .close:focus,
+  .modal-close-retirados:hover,
+  .modal-close-retirados:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+
+
+
+
+  /* Estilos básicos para el modal de estudiantes retirados */
+  .modal-retirados {
+    display: none; /* Asegura que el modal esté oculto al cargar la página */
+    position: fixed;
+    z-index: 555555555555555;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.8);
+  }
+  
+  /* Estilo para el contenido del modal */
+  .modal-content-retirados {
+    background-color: #fefefe; /* Fondo blanco */
+    margin: 15% auto; /* 15% desde la parte superior y centrado horizontalmente */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 50%; /* O ajusta según tus necesidades */
+    opacity: 0.95; /* Ligeramente transparente */
+  }
+  
+  /* Estilos para inputs y select dentro del modal */
+  #miFormularioRetirados input[type="text"],
+  #miFormularioRetirados input[type="date"],
+  #miFormularioRetirados select {
+    width: 100%; /* Ajusta al 100% del contenedor */
+    padding: 12px 20px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+  }
+  
+  #miFormularioRetirados input[type="submit"] {
+    background-color: red;
+    color: white;
+    padding: 14px 20px;
+    margin: 8px 0;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+  }
+  
+  #miFormularioRetirados input[type="submit"]:hover {
+    opacity: 0.8;
+  }
+
+  #close-retirados {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+  }
+  
+  #close-retirados:hover,
+  #close-retirados:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+
+  /* Estilos del fondo y contenedor del modal */
+.modal-retirados-tiempo {
+  display: none;
+  position: fixed;
+  z-index: 100000000000000000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content-retirados-tiempo {
+  background-color: #fff;
+  margin: 5% auto; /* Ajusta el margen superior para centrar verticalmente */
+  padding: 20px;
+  border-radius: 8px; /* Bordes redondeados para un look suave */
+  width: 60%; /* Ancho del modal */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sombra sutil para profundidad */
+}
+
+/* Estilo del botón de cierre */
+.close {
+  color: #777;
+  float: right;
+  font-size: 28px;
+  font-weight: normal;
+}
+
+.close:hover,
+.close:focus {
+  color: #333;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* Estilos para la tabla */
+#tablaRetiradosTiempo {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+#tablaRetiradosTiempo th, #tablaRetiradosTiempo td {
+  text-align: left;
+  padding: 8px;
+}
+
+#tablaRetiradosTiempo th {
+  background-color: #d51313; /* Fondo ligeramente gris para los encabezados */
+  color: #ffffff;
+}
+
+#tablaRetiradosTiempo tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+/* Mejoras en la legibilidad para la tabla */
+#tablaRetiradosTiempo td {
+  color: #1e1e1e; /* Color de texto suavizado */
+}
+
+/* Botón principal */
+#btnOpenModalRetiradosTiempo {
+  background-color: #ff0000; /* Ajusta este color según tu paleta */
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+#btnOpenModalRetiradosTiempo:hover {
+  background-color: #e04444; /* Color al pasar el mouse */
+}
+
+
+
+/* Botones */
+.btn-justificacion {
+  background-color: red;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+/* Modal */
+.modal-justificacion {
+  display: none;
+  position: fixed;
+  z-index: 5555555555555555555555;
+  padding-top: 100px;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.8);
+}
+
+/* Modal content */
+.modal-content-justificacion {
+  background-color: white;
+  margin: auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
+  max-width: 500px;
+  opacity: 1;
+}
+
+/* Cerrar modal */
+.close-justificacion {
+  color: #aaaaaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close-justificacion:hover,
+.close-justificacion:focus {
+  color: #000;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* Estilos específicos del formulario */
+.form-container__h2 {
+  text-align: center;
+}
+
+#selectAlumno,
+#selectMateria,
+#fecha {
+  width: 10
+ }
+ 

@@ -122,8 +122,9 @@ try {
 
     while ($datos = mysqli_fetch_assoc($query_asistencia)) {
         echo "<tr>
-                <td>{$datos['nombre_alumno']}</td>
+                <td>$contador++</td>
                 <td>{$datos['apellido_alumno']}</td>
+                <td>{$datos['nombre_alumno']}</td>
                 <td>{$datos['1_Horario']}</td>
                 <td>{$datos['2_Horario']}</td>
                 <td>{$datos['fecha']}</td>

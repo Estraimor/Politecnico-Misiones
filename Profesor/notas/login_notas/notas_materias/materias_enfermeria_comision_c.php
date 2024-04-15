@@ -30,7 +30,7 @@ if (empty($_SESSION["id"])){header('Location: ../login/login.php');}
     <nav class="navbar">
       
     <div class="nav-left">  
-    <a href="../index_notas.php" class="home-button">Inicio</a>
+    <a href="../../../../profesores_notas/notas_generales.php" class="home-button">Inicio</a>
       
      
       </div>

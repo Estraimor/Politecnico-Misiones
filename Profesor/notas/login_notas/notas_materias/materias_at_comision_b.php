@@ -30,7 +30,7 @@ if (empty($_SESSION["id"])){header('Location: ../login/login.php');}
     <nav class="navbar">
       
     <div class="nav-left">  
-    <a href="../index_notas.php" class="home-button">Inicio</a>
+    <a href="../../../../profesores_notas/notas_generales.php" class="home-button">Inicio</a>
       
      
       </div>
@@ -51,37 +51,37 @@ if (empty($_SESSION["id"])){header('Location: ../login/login.php');}
         <h1>Eliga una Materia para asignar las notas</h1>
         <div class="hilera">
             <h2>1er año</h2>
-            <button class="boton">Taller de Oralidad</button>
-            <button class="boton">Biología Humana</button>
-            <button class="boton">Introducción a la investigación en salud</button>
-            <button class="boton">Fundamentos de la Psicología general y de la intervención</button>
-            <button class="boton">Introducción al Campo de la Salud</button>
-            <button class="boton">Practicas Profesionalizantes I</button>
-            <button class="boton">Seminario I: Tecnología de la Información y la Comunicación</button>
+            <button class="boton"><a href="../prueba_tabla.php?materia=faltanumero&carrera=31">Taller de Oralidad</a></button>
+            <button class="boton"><a href="../prueba_tabla.php?materia=faltanumero&carrera=31">Biología Humana</a></button>
+            <button class="boton"><a href="../prueba_tabla.php?materia=faltanumero&carrera=31">Introducción a la investigación en salud</a></button>
+            <button class="boton"><a href="../prueba_tabla.php?materia=faltanumero&carrera=31">Fundamentos de la Psicología general y de la intervención</a></button>
+            <button class="boton"><a href="../prueba_tabla.php?materia=faltanumero&carrera=31">Introducción al Campo de la Salud</a></button>
+            <button class="boton"><a href="../prueba_tabla.php?materia=faltanumero&carrera=31">Practicas Profesionalizantes I</a></button>
+            <button class="boton"><a href="../prueba_tabla.php?materia=faltanumero&carrera=31">Seminario I: Tecnología de la Información y la Comunicación</a></button>
 
            
         </div>
         <div class="hilera">
             <h2>2do Año</h2>
-            <button class="boton">Modalidades de Intervención en el Acompañante Terapéutico</button>
-            <button class="boton">Dinámica Grupal</button>
-            <button class="boton">Teoría Psicosocial y Comunitaria</button>
-            <button class="boton">Psicología Evolutiva</button>
-            <button class="boton">Psicopatología</button>
-            <button class="boton">Práctica Profesionalizantes II</button>
-            <button class="boton">Seminario II: Sistemas Familiares</button>
-            <button class="boton">Seminario III: Trastornos crónicos y Degenerativos</button>
+            <button class="boton"><a href="../prueba_tabla.php?materia=faltanumero&carrera=41">Modalidades de Intervención en el Acompañante Terapéutico</a></button>
+            <button class="boton"><a href="../prueba_tabla.php?materia=faltanumero&carrera=41">Dinámica Grupal</a></button>
+            <button class="boton"><a href="../prueba_tabla.php?materia=faltanumero&carrera=41">Teoría Psicosocial y Comunitaria</a></button>
+            <button class="boton"><a href="../prueba_tabla.php?materia=faltanumero&carrera=41">Psicología Evolutiva</a></button>
+            <button class="boton"><a href="../prueba_tabla.php?materia=faltanumero&carrera=41">Psicopatología</a></button>
+            <button class="boton"><a href="../prueba_tabla.php?materia=faltanumero&carrera=41">Práctica Profesionalizantes II</a></button>
+            <button class="boton"><a href="../prueba_tabla.php?materia=faltanumero&carrera=41">Seminario II: Sistemas Familiares</a></button>
+            <button class="boton"><a href="../prueba_tabla.php?materia=faltanumero&carrera=41">Seminario III: Trastornos crónicos y Degenerativos</a></button>
             
         </div>
         <div class="hilera">
             <h2>3er año</h2>
-            <button class="boton">Ética y Deontología Profesional</button>
-            <button class="boton">Corrientes Psicológicas Contemporáneas</button>
-            <button class="boton">Principios Médicos y de Psicofarmacología</button>
-            <button class="boton">Acompañamiento Terapéutico en la Niñez y la Adolescencia</button>
-            <button class="boton">Acompañamiento Terapéutico del Adulto y Adulto Mayor</button>
-            <button class="boton">Práctica Profesionalizantes III</button>
-            <button class="boton">Seminario IV: Integración Escolar</button>
+            <button class="boton"><a href="../prueba_tabla.php?materia=faltanumero&carrera=44">Ética y Deontología Profesional</a></button>
+            <button class="boton"><a href="../prueba_tabla.php?materia=faltanumero&carrera=44">Corrientes Psicológicas Contemporáneas</a></button>
+            <button class="boton"><a href="../prueba_tabla.php?materia=faltanumero&carrera=44">Principios Médicos y de Psicofarmacología</a></button>
+            <button class="boton"><a href="../prueba_tabla.php?materia=faltanumero&carrera=44">Acompañamiento Terapéutico en la Niñez y la Adolescencia</a></button>
+            <button class="boton"><a href="../prueba_tabla.php?materia=faltanumero&carrera=44">Acompañamiento Terapéutico del Adulto y Adulto Mayor</a></button>
+            <button class="boton"><a href="../prueba_tabla.php?materia=faltanumero&carrera=44">Práctica Profesionalizantes III</a></button>
+            <button class="boton"><a href="../prueba_tabla.php?materia=faltanumero&carrera=44">Seminario IV: Integración Escolar</a></button>
           
             
         </div>

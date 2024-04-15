@@ -74,3 +74,43 @@ body, html {
 .sub-dropdown:hover .sub-dropdown-content { display: block; }
 
 .btn-cerrar-sesion { margin-left: auto; }
+.nav-welcome-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centra horizontalmente */
+    padding-top: 40px; /* Ajusta el espaciado superior */
+  }
+  .welcome-box {
+    background-color: #000;
+    opacity: 75%;
+    margin-top: 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    text-align: center;
+    display: inline-block;
+    position: relative;
+    z-index: 1; 
+    
+  }
+  #welcome-box {
+    transition: opacity 0.3s ease-in-out;
+  }
+  
+  #welcome-box.hide {
+    opacity: 0;
+    pointer-events: none; /* Evita que los elementos sean interactivos mientras están ocultos */
+  }
+  
+  .welcome-box__h1 {
+  font-size: 24px;
+  color: #ffffff;
+  margin-bottom: 10px;
+  }
+  
+  .welcome-box__p {
+  font-size: 14px;
+  color: #ffffff;
+  margin: 0;
+  }
+  

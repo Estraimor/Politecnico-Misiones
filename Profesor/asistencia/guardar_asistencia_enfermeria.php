@@ -70,6 +70,6 @@ if (isset($_POST['Enviar'])) {
         }
     }
 
-     header('Location: ../../index.php');
+    header('Location: ../../indexs/controlador_preceptor.php');
     }
 ?>

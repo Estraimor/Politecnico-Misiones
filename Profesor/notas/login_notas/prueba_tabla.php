@@ -195,7 +195,7 @@ if(mysqli_num_rows($query_porcentajes_2do_horario) > 0) {
     </table>
     
     <button type="submit" name="enviar" class="boton-enviar">Confirmar</button>
-    <button class="boton-enviar"><a href="controlador_profes.php">Cancelar</a></button>
+    <button class="boton-enviar"><a href="./index_notas.php">Cancelar</a></button>
     
 </form>
 

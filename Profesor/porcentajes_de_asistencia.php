@@ -49,94 +49,183 @@ if (empty($_SESSION["id"])){header('Location: ../login/login.php');}
   
   
    <?php
-   $legajo = $_GET['legajo'];
+
+
+
+$legajo = $_GET['legajo'];
 try {
-  $html = '<table border="1">
-              <tr>
-                  <th>Carrera</th>
-                  <th>Porcentaje Presente (1er Materia)</th>
-                  <th>Porcentaje Ausente (1er Materia)</th>
-                  <th>Porcentaje Falta Justificada (1er Materia)</th>
-                  <th>Porcentaje Presente (2do Materia)</th>
-                  <th>Porcentaje Ausente (2do Materia)</th>
-                  <th>Porcentaje Falta Justificada (2do Materia)</th>
-              </tr>';
+    // Generar tabla de datos del alumno
+    $html_datos_alumno = '<table border="1">
+                            <tr>
+                                <th>Apellido</th>
+                                <th>Nombre</th>
+                                <th>DNI</th>
+                                <th>Legajo</th>
+                                <th>Edad</th>
+                                <th>Observaciones</th>
+                                <th>Trabajo</th>
+                                <th>Celular</th>
+                                <th>Carrera</th>
+                            </tr>';
 
-  // Obtener los ID de carrera asociados al alumno
-  $sql_id_carrera = "SELECT distinct inscripcion_asignatura_carreras_idCarrera , c.nombre_carrera 
-  FROM asistencia a
-  inner join carreras c on a.inscripcion_asignatura_carreras_idCarrera = c.idCarrera 
-  WHERE inscripcion_asignatura_alumno_legajo = '$legajo'
-";
-  $query_id_carrera = mysqli_query($conexion, $sql_id_carrera);
+    // Consulta para obtener datos del alumno
+    $sql_datos_alumno = "SELECT *
+                            FROM alumno a
+                            INNER JOIN inscripcion_asignatura ia ON ia.alumno_legajo = a.legajo
+                            INNER JOIN carreras c ON c.idCarrera = ia.carreras_idCarrera 
+                        WHERE legajo = '$legajo'";
+    $query_datos_alumno = mysqli_query($conexion, $sql_datos_alumno);
 
-  if (!$query_id_carrera) {
-      throw new Exception("Error al obtener los ID de carrera: " . mysqli_error($conexion));
-  }
+    if (!$query_datos_alumno) {
+        throw new Exception("Error al obtener los datos del alumno: " . mysqli_error($conexion));
+    }
 
-  while ($row_id_carrera = mysqli_fetch_assoc($query_id_carrera)) {
-      $id_carrera = $row_id_carrera['inscripcion_asignatura_carreras_idCarrera'];
-      $carrea=$row_id_carrera['nombre_carrera'];
+    $row_datos_alumno = mysqli_fetch_assoc($query_datos_alumno);
 
-      // Consulta para calcular el porcentaje de presentes para cada ID de carrera y cada horario
-      $sql_porcentaje_presentes = "SELECT 
-                                      (SUM(1_Horario = 'Presente') / COUNT(1_Horario)) * 100 AS porcentaje_presentes_1er_horario,
-                                      (SUM(2_Horario = 'Presente') / COUNT(2_Horario)) * 100 AS porcentaje_presentes_2do_horario
-                                  FROM asistencia 
-                                  WHERE 
-                                      inscripcion_asignatura_alumno_legajo = '$legajo'
-                                      AND inscripcion_asignatura_carreras_idCarrera = '$id_carrera'";
-      $query_porcentaje_presentes = mysqli_query($conexion, $sql_porcentaje_presentes);
+    // Agregar los datos del alumno a la tabla HTML
+    $html_datos_alumno .= "<tr>
+                            <td>{$row_datos_alumno['apellido_alumno']}</td>
+                            <td>{$row_datos_alumno['nombre_alumno']}</td>
+                            <td>{$row_datos_alumno['dni_alumno']}</td>
+                            <td>$legajo</td>
+                            <td>{$row_datos_alumno['edad']}</td>
+                            <td>{$row_datos_alumno['observaciones']}</td>
+                            <td>{$row_datos_alumno['Trabaja_Horario']}</td>
+                            <td>{$row_datos_alumno['celular']}</td>
+                            <td>{$row_datos_alumno['nombre_carrera']}</td>
+                          </tr>";
 
-      if (!$query_porcentaje_presentes) {
-          throw new Exception("Error al calcular el porcentaje de presentes: " . mysqli_error($conexion));
-      }
+    $html_datos_alumno .= '</table>';
 
-      $row_porcentaje_presentes = mysqli_fetch_assoc($query_porcentaje_presentes);
-      $porcentaje_presentes_1er_horario = $row_porcentaje_presentes['porcentaje_presentes_1er_horario'];
-      $porcentaje_presentes_2do_horario = $row_porcentaje_presentes['porcentaje_presentes_2do_horario'];
+    // Imprimir tabla de datos del alumno
+    echo $html_datos_alumno;
 
-      // Consulta para calcular el porcentaje de ausentes y justificados para cada ID de carrera y cada horario
-      $sql_porcentaje_ausentes_y_justificados = "SELECT 
-                                                      (SUM(1_Horario = 'ausente') / COUNT(1_Horario)) * 100 AS porcentaje_ausentes_1er_horario,
-                                                      (SUM(1_Horario = 'justificada') / COUNT(1_Horario)) * 100 AS porcentaje_justificados_1er_horario,
-                                                      (SUM(2_Horario = 'ausente') / COUNT(2_Horario)) * 100 AS porcentaje_ausentes_2do_horario,
-                                                      (SUM(2_Horario = 'justificada') / COUNT(2_Horario)) * 100 AS porcentaje_justificados_2do_horario
-                                                  FROM asistencia 
-                                                  WHERE 
-                                                      inscripcion_asignatura_alumno_legajo = '$legajo'
-                                                      AND inscripcion_asignatura_carreras_idCarrera = '$id_carrera'";
-      $query_porcentaje_ausentes_y_justificados = mysqli_query($conexion, $sql_porcentaje_ausentes_y_justificados);
+    // Generar tabla de asistencias
+    $html_asistencias = '<table border="1">
+                            <tr>
+                                <th>Materia</th>
+                                <th>Porcentaje Presente (1er Horario)</th>
+                                <th>Porcentaje Ausente (1er Horario)</th>
+                                <th>Porcentaje Presente (2do Horario)</th>
+                                <th>Porcentaje Ausente (2do Horario)</th>
+                            </tr>';
 
-      if (!$query_porcentaje_ausentes_y_justificados) {
-          throw new Exception("Error al calcular el porcentaje de ausentes y justificados: " . mysqli_error($conexion));
-      }
+    // Obtener los ID de carrera asociados al alumno
+    $sql_id_carrera = "SELECT 
+                            a.inscripcion_asignatura_carreras_idCarrera,
+                            c.nombre_carrera,
+                            m.Nombre,
+                            SUM(CASE WHEN a.1_Horario = 'Presente' THEN 1 ELSE 0 END) AS asistencias_1er_horario,
+                            SUM(CASE WHEN a.1_Horario = 'Ausente' THEN 1 ELSE 0 END) AS ausencias_1er_horario,
+                            SUM(CASE WHEN a.2_Horario = 'Presente' THEN 1 ELSE 0 END) AS asistencias_2do_horario,
+                            SUM(CASE WHEN a.2_Horario = 'Ausente' THEN 1 ELSE 0 END) AS ausencias_2do_horario,
+                            COUNT(*) AS total_clases
+                        FROM 
+                            asistencia a
+                        INNER JOIN 
+                            carreras c ON a.inscripcion_asignatura_carreras_idCarrera = c.idCarrera
+                        INNER JOIN 
+                            materias m ON a.materias_idMaterias = m.idMaterias
+                        WHERE 
+                            a.inscripcion_asignatura_alumno_legajo = '$legajo'
+                        GROUP BY 
+                            a.inscripcion_asignatura_carreras_idCarrera, c.nombre_carrera, m.Nombre";
 
-      $row_porcentaje_ausentes_y_justificados = mysqli_fetch_assoc($query_porcentaje_ausentes_y_justificados);
-      $porcentaje_ausentes_1er_horario = $row_porcentaje_ausentes_y_justificados['porcentaje_ausentes_1er_horario'];
-      $porcentaje_justificados_1er_horario = $row_porcentaje_ausentes_y_justificados['porcentaje_justificados_1er_horario'];
-      $porcentaje_ausentes_2do_horario = $row_porcentaje_ausentes_y_justificados['porcentaje_ausentes_2do_horario'];
-      $porcentaje_justificados_2do_horario = $row_porcentaje_ausentes_y_justificados['porcentaje_justificados_2do_horario'];
+    $query_id_carrera = mysqli_query($conexion, $sql_id_carrera);
 
-      // Agregar los resultados a la tabla HTML
-      $html .= "<tr>
-                  <td>$carrea</td>
-                  <td>$porcentaje_presentes_1er_horario%</td>
-                  <td>$porcentaje_ausentes_1er_horario%</td>
-                  <td>$porcentaje_justificados_1er_horario%</td>
-                  <td>$porcentaje_presentes_2do_horario%</td>
-                  <td>$porcentaje_ausentes_2do_horario%</td>
-                  <td>$porcentaje_justificados_2do_horario%</td>
-              </tr>";
-  }
+    if (!$query_id_carrera) {
+        throw new Exception("Error al obtener los ID de carrera: " . mysqli_error($conexion));
+    }
 
-  $html .= '</table>';
+    while ($row_id_carrera = mysqli_fetch_assoc($query_id_carrera)) {
+        // Calcular porcentaje de asistencia y ausencia para cada horario
+        $porcentaje_asistencia_1er_horario = $row_id_carrera['asistencias_1er_horario'] * 100.0 / $row_id_carrera['total_clases'];
+        $porcentaje_ausencia_1er_horario = $row_id_carrera['ausencias_1er_horario'] * 100.0 / $row_id_carrera['total_clases'];
+        $porcentaje_asistencia_2do_horario = $row_id_carrera['asistencias_2do_horario'] * 100.0 / $row_id_carrera['total_clases'];
+        $porcentaje_ausencia_2do_horario = $row_id_carrera['ausencias_2do_horario'] * 100.0 / $row_id_carrera['total_clases'];
 
-  echo $html;
+        // Agregar fila a la tabla de asistencias
+        $html_asistencias .= "<tr>
+                                <td>{$row_id_carrera['Nombre']}</td>
+                                <td>{$porcentaje_asistencia_1er_horario}</td>
+                                <td>{$porcentaje_ausencia_1er_horario}</td>
+                                <td>{$porcentaje_asistencia_2do_horario}</td>
+                                <td>{$porcentaje_ausencia_2do_horario}</td>
+                            </tr>";
+    }
+
+    $html_asistencias .= '</table>';
+
+    // Imprimir tabla de asistencias
+    echo $html_asistencias;
+
+    // Generar tabla de justificaciones del alumno
+    $html_justificaciones = '<h2 style="color:white;">Justificaciones</h2>';
+    $html_justificaciones .= '<table border="1">
+                                <tr>
+                                    <th>Carrera</th>
+                                    <th>Apellido</th>
+                                    <th>Nombre</th>
+                                    <th>Materia</th>
+                                    <th>Motivo</th>
+                                    <th>Fecha</th>
+                                </tr>';
+
+    // Consulta para obtener las justificaciones del alumno
+    $sql_justificaciones = "SELECT 
+                                c.nombre_carrera,
+                                a2.nombre_alumno,
+                                a2.apellido_alumno,
+                                m.Nombre AS materia,
+                                a.Motivo,
+                                a.fecha 
+                            FROM 
+                                alumnos_justificados a
+                            INNER JOIN 
+                                carreras c ON c.idCarrera = a.inscripcion_asignatura_carreras_idCarrera
+                            INNER JOIN 
+                                alumno a2 ON a.inscripcion_asignatura_alumno_legajo = a2.legajo
+                            INNER JOIN 
+                                materias m ON m.idMaterias = a.materias_idMaterias
+                            WHERE 
+                                a.inscripcion_asignatura_alumno_legajo = '$legajo'";
+
+    $query_justificaciones = mysqli_query($conexion, $sql_justificaciones);
+
+    if (!$query_justificaciones) {
+        throw new Exception("Error al obtener las justificaciones: " . mysqli_error($conexion));
+    }
+
+    while ($row_justificacion = mysqli_fetch_assoc($query_justificaciones)) {
+        // Agregar fila a la tabla de justificaciones
+        $html_justificaciones .= "<tr>
+                                    <td>{$row_justificacion['nombre_carrera']}</td>
+                                    <td>{$row_justificacion['apellido_alumno']}</td>
+                                    <td>{$row_justificacion['nombre_alumno']}</td>
+                                    <td>{$row_justificacion['materia']}</td>
+                                    <td>{$row_justificacion['Motivo']}</td>
+                                    <td>{$row_justificacion['fecha']}</td>
+                                </tr>";
+    }
+
+    $html_justificaciones .= '</table>';
+
+    // Imprimir tabla de justificaciones
+    echo $html_justificaciones;
+
 } catch (Exception $e) {
-  echo "Error: " . $e->getMessage();
+    echo "Error: " . $e->getMessage();
 }
+
+
+
+
+
+
+
+
 ?>
+
 <script>
 
 

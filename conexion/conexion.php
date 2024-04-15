@@ -1,7 +1,7 @@
 <?php
 $server='localhost';
-$user='root';
-$pass='';
+$user='u756746073_root';
+$pass='POLITECNICOmisiones2023.';
 $bd='u756746073_politecnico';
 $conexion=mysqli_connect($server,$user,$pass,$bd, '3306');
 

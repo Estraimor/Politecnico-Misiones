@@ -1,6 +1,21 @@
 <?php
 session_start();
 if (empty($_SESSION["id"])){header('Location: ../../login/login.php');}
+
+// Set inactivity limit in seconds
+$inactivity_limit = 1200;
+
+// Check if the user has been inactive for too long
+if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)) {
+    // User has been inactive, so destroy the session and redirect to login page
+    session_unset();
+    session_destroy();
+    header("Location: ../../login/login.php");
+    exit; // Terminar el script después de redireccionar
+} else {
+    // Update the session time to the current time
+    $_SESSION['time'] = time();
+}
 ?>
 <?php include'../../conexion/conexion.php'; ?>
 
@@ -25,7 +40,7 @@ if (empty($_SESSION["id"])){header('Location: ../../login/login.php');}
   <nav class="navbar">
       
     <div class="nav-left">  
-    <a href="../preceptor_2.php" class="home-button">Inicio</a>
+    <a href="../preceptor_2.php" class="home-button">Menu Principal</a>
       <button class="btn-new-member" id="btn-new-member">Nuevo Estudiante</button>
       
       </div>
@@ -50,7 +65,7 @@ if (empty($_SESSION["id"])){header('Location: ../../login/login.php');}
 
 
     <div class="nav-right">
-        <a href="../login/cerrar_sesion.php" class="btn-logout">Cerrar sesión</a>
+        <a href="../../login/cerrar_sesion.php" class="btn-logout">Cerrar sesión</a>
     </div>
   </nav>
   <div id="modal" class="modal">
@@ -102,8 +117,9 @@ if (empty($_SESSION["id"])){header('Location: ../../login/login.php');}
             <table class="table-comision-a">
                 <thead>
                     <tr>
-                        <th rowspan="2">Nombre</th>
+                        <th rowspan="2">N°</th>
                         <th rowspan="2">Apellido</th>
+                        <th rowspan="2">Nombre</th>
                         <th rowspan="2">Primera Hora</th>
                         <th rowspan="2">Segunda Hora</th>
                         <th colspan="4">Fecha</th>
@@ -129,12 +145,13 @@ if (empty($_SESSION["id"])){header('Location: ../../login/login.php');}
         <div class="date-picker">
           <label for="fechaB">Selecciona una fecha:</label>
             <input type="date" id="fechaB" name="fecha" onchange="showAsistenciaComisionB()">
-       
+        
         </div>
         <div class="table-responsive">
             <table class="table-comision-a">
                 <thead>
                     <tr>
+                        <th rowspan="2">N°</th>
                         <th rowspan="2">Nombre</th>
                         <th rowspan="2">Apellido</th>
                         <th rowspan="2">Primera Hora</th>
@@ -153,7 +170,7 @@ if (empty($_SESSION["id"])){header('Location: ../../login/login.php');}
 <br>
 <br>
 
-<button id="open-attendance-button" onclick="openAttendanceModal()">Abrir Asistencia de 1er Año</button>
+<button id="open-attendance-button" onclick="openAttendanceModal()">Tomar Asistencia AT 1er Año</button>
 
 
   <div id="attendance-modal-asistencia" class="attendance-modal" style="display: none;">
@@ -175,10 +192,9 @@ if (empty($_SESSION["id"])){header('Location: ../../login/login.php');}
     <span id="closeComisionA" class="close-comision-a" onclick="closeModalComisionA()">&times;</span>
     <h1>Comisión A</h1> <!-- Título "Comisión A" -->
     <!-- form lo movi un poco mas arrinba encapsulando la fecha -->
-    <form action="./guardar_asistencia_enfermeria" method="post" onsubmit="showModalMessage()">
-        <div class="date-picker">
-            <label for="fecha">Selecciona una fecha:</label>
-            <input type="date" id="fecha" name="fecha">
+    <form action="../../Profesor/asistencia/guardar_asistencia_enfermeria.php" method="post" onsubmit="showModalMessage()">
+    <div class="date-picker" style="display: none;">
+            <input type="hidden" id="fecha" name="fecha" readonly>
            
         </div>
         <div class="table-responsive">
@@ -198,9 +214,10 @@ while ($materia = mysqli_fetch_assoc($query_materias)) {
 }
 ?>
 <tr>
+<th rowspan="2">N°</th>
+<th rowspan="2">Apellido</th>
     <th rowspan="2">Nombre</th>
-    <th rowspan="2">Apellido</th>
-    <th colspan="3">
+    <th colspan="2">
         <select name="materia1" id="" class="form-container__input">
             <option hidden>Primera Materia</option>
             <?php foreach ($materias as $materia) { ?>
@@ -208,7 +225,7 @@ while ($materia = mysqli_fetch_assoc($query_materias)) {
             <?php } ?>
         </select>
     </th>
-    <th colspan="3">
+    <th colspan="2">
         <select name="materia2" id="" class="form-container__input">
             <option hidden>Segunda Materia</option>
             <?php foreach ($materias as $materia) { ?>
@@ -221,24 +238,27 @@ while ($materia = mysqli_fetch_assoc($query_materias)) {
             <tr>
                 <th>Presente</th>
                 <th>Ausente</th>
-                <th>Justificado</th>
+                
                 <th>Presente</th>
                 <th>Ausente</th>
-                <th>Justificado</th>
+              
             </tr>
+            
                         </thead>
                         <tbody>
     <?php
+    $contador = 1;
     $sql = "SELECT ia.alumno_legajo , a2.nombre_alumno, a2.apellido_alumno, a2.dni_alumno
     FROM asistencia a 
     RIGHT JOIN inscripcion_asignatura ia ON a.inscripcion_asignatura_idinscripcion_asignatura = ia.idinscripcion_asignatura 
     INNER JOIN alumno a2 ON ia.alumno_legajo = a2.legajo   
-    WHERE ia.carreras_idCarrera = '27'";
+    WHERE ia.carreras_idCarrera = '27' and a2.estado = '1'";
     $query = mysqli_query($conexion, $sql);
     while ($datos = mysqli_fetch_assoc($query)) {
         ?>
         
         <tr>
+        <td><?php echo $contador++; ?></td>
     <td><?php echo $datos['nombre_alumno']; ?></td>
     <td><?php echo $datos['apellido_alumno']; ?></td>
     
@@ -248,12 +268,10 @@ while ($materia = mysqli_fetch_assoc($query_materias)) {
     </td>
 
     <td class="checkbox-cell">
-        <input type="checkbox" name="ausentePrimera[]" value="<?php echo $datos['alumno_legajo']; ?>">
+    <input type="checkbox" name="ausentePrimera[]" value="<?php echo $datos['alumno_legajo']; ?>" >
     </td>
 
-    <td class="checkbox-cell">
-        <input type="checkbox" name="justificadaPrimera[]" value="<?php echo $datos['alumno_legajo']; ?>">
-    </td>
+   
 
     <!-- Segunda hora -->
     <td class="checkbox-cell">
@@ -261,12 +279,10 @@ while ($materia = mysqli_fetch_assoc($query_materias)) {
     </td>
 
     <td class="checkbox-cell">
-        <input type="checkbox" name="ausenteSegunda[]" value="<?php echo $datos['alumno_legajo']; ?>">
+    <input type="checkbox" name="ausenteSegunda[]" value="<?php echo $datos['alumno_legajo']; ?>" >
     </td>
 
-    <td class="checkbox-cell">
-        <input type="checkbox" name="justificadaSegunda[]" value="<?php echo $datos['alumno_legajo']; ?>">
-    </td>
+    
 </tr>
 
 
@@ -278,8 +294,16 @@ while ($materia = mysqli_fetch_assoc($query_materias)) {
 </tbody>
         
         </table>
+        <form id="justificadoForm" action="justificados.php" method="post">
+    <input type="hidden" id="legajo" name="legajo" value="">
+    <input type="hidden" id="materia" name="materia" value="">
+    <input type="hidden" id="carrera" name="carrera" value="">
+    <input type="hidden" id="fecha" name="fecha" value="">
+    <input type="hidden" id="motivo" name="motivo" value="">
+</form>
+
         <input type="hidden" name="idcarrera" value="27">
-        <input type="submit" name="Enviar" value="Enviar" class="btn-enviar">
+        <input type="submit" name="Enviar" value="Confirmar" class="btn-enviar">
             </form>
         </div>
     </div>
@@ -289,14 +313,15 @@ while ($materia = mysqli_fetch_assoc($query_materias)) {
     <div class="modal-content-comision-a">
     <span id="closeComisionB" class="close-comision-b" onclick="closeModalComisionB()">&times;</span>
     <h1>Comisión B</h1> <!-- Título "Comisión A" -->
-    <form action="./guardar_asistencia_enfermeria.php" method="post" onsubmit="showModalMessage()">
-        <div class="date-picker">
-            <label for="fecha">Selecciona una fecha:</label>
-            <input type="date" id="fecha" name="fecha">
+    <!-- form lo movi un poco mas arrinba encapsulando la fecha -->
+    <form action="../../Profesor/asistencia/guardar_asistencia_enfermeria.php" method="post" onsubmit="showModalMessage()">
+    <div class="date-picker" style="display: none;">
+            <input type="hidden" id="fecha" name="fecha" readonly>
            
         </div>
         <div class="table-responsive">
-               <?php
+      
+                <?php
       $sql_materias="select m.idMaterias ,m.Nombre ,c.nombre_carrera  from materias m
       inner join carreras c on m.carreras_idCarrera = c.idCarrera
       where c.idCarrera = '31'
@@ -311,9 +336,10 @@ while ($materia = mysqli_fetch_assoc($query_materias)) {
 }
 ?>
 <tr>
+<th rowspan="2">N°</th>
+<th rowspan="2">Apellido</th>
     <th rowspan="2">Nombre</th>
-    <th rowspan="2">Apellido</th>
-    <th colspan="3">
+    <th colspan="2">
         <select name="materia1" id="" class="form-container__input">
             <option hidden>Primera Materia</option>
             <?php foreach ($materias as $materia) { ?>
@@ -321,7 +347,7 @@ while ($materia = mysqli_fetch_assoc($query_materias)) {
             <?php } ?>
         </select>
     </th>
-    <th colspan="3">
+    <th colspan="2">
         <select name="materia2" id="" class="form-container__input">
             <option hidden>Segunda Materia</option>
             <?php foreach ($materias as $materia) { ?>
@@ -334,24 +360,27 @@ while ($materia = mysqli_fetch_assoc($query_materias)) {
             <tr>
                 <th>Presente</th>
                 <th>Ausente</th>
-                <th>Justificado</th>
+                
                 <th>Presente</th>
                 <th>Ausente</th>
-                <th>Justificado</th>
+              
             </tr>
+            
                         </thead>
                         <tbody>
     <?php
+    $contador = 1;
     $sql = "SELECT ia.alumno_legajo , a2.nombre_alumno, a2.apellido_alumno, a2.dni_alumno
     FROM asistencia a 
     RIGHT JOIN inscripcion_asignatura ia ON a.inscripcion_asignatura_idinscripcion_asignatura = ia.idinscripcion_asignatura 
-    INNER JOIN alumno a2 ON ia.alumno_legajo = a2.legajo  
-    WHERE ia.carreras_idCarrera = '31'";
+    INNER JOIN alumno a2 ON ia.alumno_legajo = a2.legajo   
+    WHERE ia.carreras_idCarrera = '31' and a2.estado = '1' ";
     $query = mysqli_query($conexion, $sql);
     while ($datos = mysqli_fetch_assoc($query)) {
         ?>
         
-       <tr>
+        <tr>
+        <td><?php echo $contador++; ?></td>
     <td><?php echo $datos['nombre_alumno']; ?></td>
     <td><?php echo $datos['apellido_alumno']; ?></td>
     
@@ -361,12 +390,10 @@ while ($materia = mysqli_fetch_assoc($query_materias)) {
     </td>
 
     <td class="checkbox-cell">
-        <input type="checkbox" name="ausentePrimera[]" value="<?php echo $datos['alumno_legajo']; ?>">
+    <input type="checkbox" name="ausentePrimera[]" value="<?php echo $datos['alumno_legajo']; ?>" class="ausente-checkbox">
     </td>
 
-    <td class="checkbox-cell">
-        <input type="checkbox" name="justificadaPrimera[]" value="<?php echo $datos['alumno_legajo']; ?>">
-    </td>
+   
 
     <!-- Segunda hora -->
     <td class="checkbox-cell">
@@ -374,21 +401,31 @@ while ($materia = mysqli_fetch_assoc($query_materias)) {
     </td>
 
     <td class="checkbox-cell">
-        <input type="checkbox" name="ausenteSegunda[]" value="<?php echo $datos['alumno_legajo']; ?>">
+    <input type="checkbox" name="ausenteSegunda[]" value="<?php echo $datos['alumno_legajo']; ?>" class="ausente-checkbox">
     </td>
-      
-    <td class="checkbox-cell">
-        <input type="checkbox" name="justificadaSegunda[]" value="<?php echo $datos['alumno_legajo']; ?>">
-    </td>
+
+    
 </tr>
+
+
+
+
         <?php
     }
     ?>
 </tbody>
         
         </table>
+        <form id="justificadoForm" action="justificados.php" method="post">
+    <input type="hidden" id="legajo" name="legajo" value="">
+    <input type="hidden" id="materia" name="materia" value="">
+    <input type="hidden" id="carrera" name="carrera" value="">
+    <input type="hidden" id="fecha" name="fecha" value="">
+    <input type="hidden" id="motivo" name="motivo" value="">
+</form>
+
         <input type="hidden" name="idcarrera" value="31">
-        <input type="submit" name="Enviar" value="Enviar" class="btn-enviar">
+        <input type="submit" name="Enviar" value="Confirmar" class="btn-enviar">
             </form>
         </div>
     </div>
@@ -396,10 +433,8 @@ while ($materia = mysqli_fetch_assoc($query_materias)) {
 
     
 <script>
-    var tabla = document.querySelector("#tabla");
-    var dataTable = new DataTable(tabla);
-</script>
-<script>
+  
+
 function toggleMenu() {
   const navbar = document.querySelector(".navbar");
   navbar.classList.toggle("show-menu");
@@ -461,23 +496,7 @@ document.addEventListener('keydown', function(event) {
   }
 });
 
-document.getElementById("tu-formulario").addEventListener("submit", function(event) {
-  event.preventDefault();
 
-  // Lógica de procesamiento del formulario.
-
-  var envioExitoso = true;
-
-  if (envioExitoso) {
-    document.getElementById("envio-exitoso").value = "1";
-  }
-
-  if (envioExitoso) {
-    var successMessage = document.getElementById("success-message");
-    successMessage.textContent = "Los datos se enviaron correctamente.";
-    successMessage.style.display = "block";
-  }
-});
 
 // Función para abrir el modal de asistencia
 function openAttendanceModal() {
@@ -634,22 +653,7 @@ function showDatePicker() {
 }
 const tableRows = document.querySelectorAll('.table-comision-a tbody tr');
 
-tableRows.forEach(row => {
-  const checkboxesInRow = row.querySelectorAll('.checkbox-cell input[type="checkbox"]');
 
-  checkboxesInRow.forEach(checkbox => {
-    checkbox.addEventListener('change', function() {
-      if (this.checked) {
-        // Desmarca los otros checkboxes en la misma fila
-        checkboxesInRow.forEach(otherCheckbox => {
-          if (otherCheckbox !== this) {
-            otherCheckbox.checked = false;
-          }
-        });
-      }
-    });
-  });
-});
 
 // ajax para recargar la fecha en el mismo modal (Comisión A)
 function showAsistencia() {
@@ -706,6 +710,45 @@ function showAsistenciaComisionC() {
         }
     });
 }
+// Esperar a que el contenido del DOM se cargue completamente.
+document.addEventListener('DOMContentLoaded', function() {
+    // Crear un nuevo objeto de fecha para obtener la fecha actual.
+    var today = new Date();
+    // Obtener el año, mes y día de la fecha actual.
+    var year = today.getFullYear();
+    var month = ('0' + (today.getMonth() + 1)).slice(-2); // Añade un cero si es necesario (formato MM).
+    var day = ('0' + today.getDate()).slice(-2); // Añade un cero si es necesario (formato DD).
+    // Formatear la fecha al formato aceptado por el input de tipo fecha (YYYY-MM-DD).
+    var formattedDate = year + '-' + month + '-' + day;
+    // Establecer el valor del input de fecha al día actual.
+    document.getElementById('fecha').value = formattedDate;
+  });
+ 
+ 
+
+
+
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Selecciona todos los checkboxes
+    const checkboxes = document.querySelectorAll('.table-comision-a tbody .checkbox-cell input[type="checkbox"]');
+
+    checkboxes.forEach((checkbox) => {
+        checkbox.addEventListener('change', function() {
+            // Encuentra todos los checkboxes en la misma fila
+            const rowCheckboxes = Array.from(this.closest('tr').querySelectorAll('.checkbox-cell input[type="checkbox"]'));
+            // Cuenta cuántos checkboxes en la misma fila están marcados
+            const checkedCount = rowCheckboxes.filter(cb => cb.checked).length;
+
+            // Si hay más de 2 checkboxes marcados, desmarca el actual
+            if (checkedCount > 2) {
+                this.checked = false;
+                alert('Solo puedes seleccionar hasta 2 opciones por fila.');
+            }
+        });
+    });
+});
 </script>
 </body>
 </html>

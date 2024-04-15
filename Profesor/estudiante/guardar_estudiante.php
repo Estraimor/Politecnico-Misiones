@@ -2,8 +2,8 @@
 
 
 $server='localhost';
-$user='root';
-$pass='';
+$user='u756746073_root';
+$pass='POLITECNICOmisiones2023.';
 $bd='u756746073_politecnico';
 $conexion=mysqli_connect($server,$user,$pass,$bd, '3306');
 
@@ -84,10 +84,11 @@ if ($fecha_nacimiento_dt instanceof DateTime) {
              echo '<div class="alert alert-danger" role="alert">
                  ¡Ya existe un alumno con las mismas variables!
              </div>';
+             header("Location: ../controlador_preceptormodificar.php");
          } else {
              // Insertar el nuevo alumno en la base de datos
-             $sql_insertar = "INSERT INTO alumno (nombre_alumno, apellido_alumno, dni_alumno,celular, estado, legajo,edad,observaciones,Trabaja_Horario) 
-             VALUES ('$nombre_alu', '$apellido_alu', '$dni_alu','$celular', '1', '$legajo','$edad','$observaciones','$trabajo_hs')";
+             $sql_insertar = "INSERT INTO alumno (nombre_alumno, apellido_alumno, dni_alumno,legajo,Trabaja_Horario,edad,observaciones,celular,estado) 
+             VALUES ('$nombre_alu', '$apellido_alu', '$dni_alu', '$legajo','$trabajo_hs','$edad','$observaciones','$celular','1')";
              $query_insertar = mysqli_query($conexion, $sql_insertar);
 
 
@@ -110,6 +111,7 @@ if ($fecha_nacimiento_dt instanceof DateTime) {
         echo '<div class="alert alert-danger" role="alert">
             ¡Campos Vacíos!
          </div>';
+          header("Location: ../controlador_preceptormodificar.php");
         
     }
  }

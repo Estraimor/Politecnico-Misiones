@@ -1,6 +1,21 @@
 <?php
 session_start();
 if (empty($_SESSION["id"])){header('Location: ../login/login.php');}
+
+// Set inactivity limit in seconds
+$inactivity_limit = 1200;
+
+// Check if the user has been inactive for too long
+if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)) {
+    // User has been inactive, so destroy the session and redirect to login page
+    session_unset();
+    session_destroy();
+    header("Location: ../login/login.php");
+    exit; // Terminar el script después de redireccionar
+} else {
+    // Update the session time to the current time
+    $_SESSION['time'] = time();
+}
 ?>
 <?php include'../conexion/conexion.php'; ?>
 
@@ -35,7 +50,7 @@ if (empty($_SESSION["id"])){header('Location: ../login/login.php');}
 
 
     <div class="nav-right">
-    <a href="../index.php" class="home-button">Inicio</a>
+    <a href="./controlador_preceptormodificar.php" class="home-button">Inicio</a>
         <a href="../login/cerrar_sesion.php" class="btn-logout">Cerrar sesión</a>
     </div>
   </nav>

@@ -23,7 +23,7 @@ if (isset($_POST['Enviar'])){
 
     
 
-      header('Location: ../index.php');
+      header('Location: controlador_preceptormodificar.php');
 
 }
 ?>
