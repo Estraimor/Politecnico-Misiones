@@ -29,6 +29,9 @@ if (isset($_SESSION["roles"])) {
         case 8:
             header("Location: ../indexs/preceptor_6.php"); // Luciano 
             exit();
+        case 9:
+            header("Location: ../index_bruno.php"); // Bruno 
+            exit();
         default:
             echo '<div class="alert alert-danger" role="alert">!! ACCESO DENEGADO!!</div>';
     }

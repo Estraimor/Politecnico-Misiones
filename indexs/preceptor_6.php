@@ -24,7 +24,7 @@ if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SGPM-Carla Gimenez</title>
+    <title>SGPM-Pazzis Brzezicki</title>
     <link rel="stylesheet" type="text/css" href="../estilos.css">
     <link rel="stylesheet" type="text/css" href="../normalize.css">
     <link rel="stylesheet" type="text/css" href="./cssinforme.css">
@@ -93,6 +93,7 @@ if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)
                 <th>Nombre</th>
                 <th>DNI</th>
                 <th>Celular</th>
+                <th>Carrera</th>
                 <th>Acciones</th>
             </tr>
         </thead>
@@ -101,6 +102,7 @@ if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)
             $sql1 = "SELECT * FROM inscripcion_asignatura ia 
             INNER JOIN alumno a on ia.alumno_legajo = a.legajo 
             INNER JOIN preceptores p ON p.carreras_idCarrera = ia.carreras_idCarrera 
+            INNER JOIN carreras c on ia.carreras_idCarrera = c.idCarrera
             WHERE p.profesor_idProrfesor = {$_SESSION["id"]} and a.estado = '1' ";
             $query1 = mysqli_query($conexion, $sql1);
             while ($datos = mysqli_fetch_assoc($query1)) {
@@ -111,6 +113,7 @@ if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)
                     <td><?php echo $datos['nombre_alumno']; ?></td>
                     <td><?php echo $datos['dni_alumno']; ?></td>
                     <td><?php echo $datos['celular']; ?></td>
+                    <td><?php echo $datos['nombre_carrera']; ?></td>
                     <td><a href="../Profesor/modificar_alumno.php?legajo=<?php echo $datos['legajo']; ?>" class="modificar-button"><i class="fas fa-pencil-alt"></i></a>
 <a href="#" onclick="return confirmarBorrado('<?php echo $datos['legajo']; ?>')" class="borrar-button"><i class="fas fa-trash-alt"></i></a>
                    <a href="../Profesor/porcentajes_de_asistencia.php?legajo=<?php echo $datos['legajo']; ?>" class="accion-button"><i class="fas fa-exclamation"></i></a></td>
@@ -213,7 +216,7 @@ if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)
       <input type="hidden" id="carrera" name="carrera" value="">
       <input hidden name="profesor" value="<?php echo $_SESSION["id"]; ?>">
       <input type="text" name="motivo" placeholder="Motivo de Retirado">
-      <input type="date" name="fecha" id="fechaRetirados">
+      <input type="datetime-local" class="form-container__input" name="fecha" id="fechaRetirados" >
       <input type="submit" class="form-container__input" name="enviar" value="Confirmar">
     </form>
   </div>
@@ -233,7 +236,7 @@ if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)
                       <th>Apellido</th>
                         <th>Nombre</th>
                         <th>Legajo</th>
-                        <th>Preceptor</th>
+                        
                         <th>Carrera</th>
                         <th>Materia</th>
                         <th>Motivo</th>
@@ -256,7 +259,7 @@ if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)
                     <td><?php echo $datos['apellido_alumno']; ?></td>
                     <td><?php echo $datos['nombre_alumno']; ?></td>
                     <td><?php echo $datos['legajo']; ?></td>
-                    <td><?php echo $datos['nombre_profe']; ?></td>
+                 
                     <td><?php echo $datos['nombre_carrera']; ?></td>
                     <td><?php echo $datos['Nombre']; ?></td>
                     <td><?php echo $datos['motivo']; ?></td>
@@ -319,9 +322,12 @@ if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)
       <select id="selectMateria" name="materia">
       <option value="">Seleccione Materia</option>
     </select>
+    <select id="selectMateria" name="materia2">
+      <option value="">Seleccione Materia</option>
+    </select>
       <input type="hidden" id="carrera" name="carrera" value="">
       <input hidden name="profesor" value="<?php echo $_SESSION["id"]; ?>">
-      <input type="text" name="motivo" placeholder="Motivo de Retirado">
+      <input type="text" name="motivo" placeholder="Motivo de Falta Justificada">
       <input type="date" name="fecha" id="fechaRetirados">
       <input type="submit" class="form-container__input" name="enviar" value="Confirmar">
     </form>
@@ -332,8 +338,8 @@ if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)
 <div class="nav-welcome-container">
 
 <div id="welcome-box" class="welcome-box">
-  <h1 class="welcome-box__h1">¡Bienvenido!</h1>
-  <p class="welcome-box__p">Prec. y Programador Luciano Barros</p>
+  <h1 class="welcome-box__h1">¡Bienvenida!</h1>
+  <p class="welcome-box__p">Prec. Pazzis Brzezicki</p>
 </div>
 </div>
 
@@ -734,8 +740,18 @@ function abrirModalJustificacion() {
 function cerrarModalJustificacion() {
   document.getElementsByClassName("modal-justificacion")[0].style.display = "none";
 }
+// dataTables de Alumnos //
+var myTable = document.querySelector("#tablaRetiradosTiempo");
+var dataTable = new DataTable(tablaRetiradosTiempo);
 
-
+ function confirmarBorrado(legajo) {
+    var respuesta = confirm("¿Estás seguro de que quieres borrar este alumno?");
+    if (respuesta) {
+        // Realizar el borrado lógico directamente sin redirección previa
+        window.location.href = "../Profesor/Borrado_logico_alumno.php?legajo=" + legajo;
+    }
+    return false; // Evita que el navegador siga el enlace en caso de cancelar la confirmación
+}
 
 </script>
 </body>

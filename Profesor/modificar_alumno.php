@@ -67,7 +67,7 @@ if (isset($_GET['legajo'])) {
         <input type="number" name="dni_alumno" placeholder="DNI (sin puntos)" value="<?php echo $datos['dni_alumno']; ?>" class="input-text"><br>
         <input type="number" name="celular" placeholder="Celular" value="<?php echo $datos['celular']; ?>" class="input-text"><br>
         <input type="text" name="legajo" placeholder="N° Legajo" value="<?php echo $datos['legajo']; ?>" class="input-text"><br>
-        <input type="date" name="edad" placeholder="Edad" value="<?php echo $datos['edad']; ?>" class="input-text"><br>
+        <input type="text" name="edad" placeholder="Edad" value="<?php echo $datos['edad']; ?>" class="input-text"><br>
         <input type="text" name="observaciones" placeholder="Observaciones" value="<?php echo $datos['observaciones']; ?>" class="input-text"><br>
         <input type="text" name="Trabaja_Horario" placeholder="Trabaja_Horario" value="<?php echo $datos['Trabaja_Horario']; ?>" class="input-text"><br>
         <select id="carreras" name="carreras" class="input-text" required>

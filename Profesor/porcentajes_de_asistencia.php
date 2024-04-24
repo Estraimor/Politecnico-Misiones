@@ -30,7 +30,7 @@ if (empty($_SESSION["id"])){header('Location: ../login/login.php');}
     <nav class="navbar">
       
     <div class="nav-left">  
-    <a href="../index.php" class="home-button">Inicio</a>
+    <a href="controlador_preceptormodificar.php" class="home-button">Inicio</a>
       
      
       </div>
@@ -42,6 +42,7 @@ if (empty($_SESSION["id"])){header('Location: ../login/login.php');}
   
   
 </ul>
+
  <div class="nav-right">
         <a href="../login/cerrar_sesion.php" class="btn-logout">Cerrar sesión</a>
     </div>
@@ -53,9 +54,16 @@ if (empty($_SESSION["id"])){header('Location: ../login/login.php');}
 
 
 $legajo = $_GET['legajo'];
+
+?>
+<a href="imprimir_alumno.php?legajo=<?php echo $legajo; ?>" class="accion-button"><i class="fa-solid fa-print"></i></a>
+<br>
+<br>
+<?php
 try {
+    $html_datos_alumno = '<h2 style="color:white; text-shadow: 2px 1px 2px black;">Datos del alumno</h2><br>';
     // Generar tabla de datos del alumno
-    $html_datos_alumno = '<table border="1">
+    $html_datos_alumno .= '<table border="1">
                             <tr>
                                 <th>Apellido</th>
                                 <th>Nombre</th>
@@ -101,7 +109,8 @@ try {
     echo $html_datos_alumno;
 
     // Generar tabla de asistencias
-    $html_asistencias = '<table border="1">
+    $html_asistencias = '<br><h2 style="color:white; text-shadow: 2px 1px 2px black;">Asistencias</h2><br>';
+    $html_asistencias .= '<table border="1">
                             <tr>
                                 <th>Materia</th>
                                 <th>Porcentaje Presente (1er Horario)</th>
@@ -145,7 +154,8 @@ try {
         $porcentaje_ausencia_2do_horario = $row_id_carrera['ausencias_2do_horario'] * 100.0 / $row_id_carrera['total_clases'];
 
         // Agregar fila a la tabla de asistencias
-        $html_asistencias .= "<tr>
+        $html_asistencias .= "
+                            <tr>
                                 <td>{$row_id_carrera['Nombre']}</td>
                                 <td>{$porcentaje_asistencia_1er_horario}</td>
                                 <td>{$porcentaje_ausencia_1er_horario}</td>
@@ -160,13 +170,11 @@ try {
     echo $html_asistencias;
 
     // Generar tabla de justificaciones del alumno
-    $html_justificaciones = '<h2 style="color:white;">Justificaciones</h2>';
+    $html_justificaciones = '<br><h2 style="color:white; text-shadow: 2px 1px 2px black;">Justificaciones</h2><br>';
     $html_justificaciones .= '<table border="1">
                                 <tr>
-                                    <th>Carrera</th>
-                                    <th>Apellido</th>
-                                    <th>Nombre</th>
                                     <th>Materia</th>
+                                    <th>Materia2</th>
                                     <th>Motivo</th>
                                     <th>Fecha</th>
                                 </tr>';
@@ -177,6 +185,7 @@ try {
                                 a2.nombre_alumno,
                                 a2.apellido_alumno,
                                 m.Nombre AS materia,
+                                m.Nombre AS materia2,
                                 a.Motivo,
                                 a.fecha 
                             FROM 
@@ -199,10 +208,8 @@ try {
     while ($row_justificacion = mysqli_fetch_assoc($query_justificaciones)) {
         // Agregar fila a la tabla de justificaciones
         $html_justificaciones .= "<tr>
-                                    <td>{$row_justificacion['nombre_carrera']}</td>
-                                    <td>{$row_justificacion['apellido_alumno']}</td>
-                                    <td>{$row_justificacion['nombre_alumno']}</td>
                                     <td>{$row_justificacion['materia']}</td>
+                                    <td>{$row_justificacion['materia2']}</td>
                                     <td>{$row_justificacion['Motivo']}</td>
                                     <td>{$row_justificacion['fecha']}</td>
                                 </tr>";
@@ -213,9 +220,62 @@ try {
     // Imprimir tabla de justificaciones
     echo $html_justificaciones;
 
+    // Generar tabla de ratificaciones del alumno
+    $html_ratificaciones = '<br><h2 style="color:white; text-shadow: 2px 1px 2px black;">Días que se retiró antes de tiempo</h2><br>';
+    $html_ratificaciones .= '<table border="1">
+                            <tr>
+                                <th>Materia</th>
+                                <th>Motivo</th>
+                                <th>Fecha</th>
+                            </tr>';
+
+    // Consulta para obtener las ratificaciones del alumno
+    $sql_ratificaciones = "SELECT 
+                                a2.legajo, 
+                                a2.apellido_alumno,
+                                a2.nombre_alumno,
+                                c.nombre_carrera,
+                                m.Nombre AS materia,
+                                p.nombre_profe,
+                                a.motivo,
+                                a.fecha 
+                            FROM 
+                                alumnos_rat a
+                            INNER JOIN 
+                                alumno a2 ON a.alumno_legajo = a2.legajo
+                            INNER JOIN 
+                                carreras c ON a.carreras_idCarrera = c.idCarrera
+                            INNER JOIN 
+                                materias m ON a.materias_idMaterias = m.idMaterias
+                            INNER JOIN 
+                                profesor p ON a.profesor_idProrfesor = p.idProrfesor
+                            WHERE 
+                                a.alumno_legajo = '$legajo'";
+
+    $query_ratificaciones = mysqli_query($conexion, $sql_ratificaciones);
+
+    if (!$query_ratificaciones) {
+        throw new Exception("Error al obtener las ratificaciones: " . mysqli_error($conexion));
+    }
+
+    while ($row_ratificacion = mysqli_fetch_assoc($query_ratificaciones)) {
+        // Agregar fila a la tabla de ratificaciones
+        $html_ratificaciones .= "<tr>
+                                    <td>{$row_ratificacion['materia']}</td>
+                                    <td>{$row_ratificacion['motivo']}</td>
+                                    <td>{$row_ratificacion['fecha']}</td>
+                                </tr>";
+    }
+
+    $html_ratificaciones .= '</table>';
+
+    // Imprimir tabla de ratificaciones
+    echo $html_ratificaciones;
+
 } catch (Exception $e) {
     echo "Error: " . $e->getMessage();
 }
+
 
 
 

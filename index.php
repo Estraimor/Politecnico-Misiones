@@ -32,6 +32,7 @@ if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-Bz5/BqJ8SCxmeLEjmo5fD5fgONMAewh+PxQv0tRnm5IsJf5M9bGqDlVCS5c3X7CQZLjdvFtJ+zaOhtlUlm7XjA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link href="https://unpkg.com/vanilla-datatables@latest/dist/vanilla-dataTables.min.css" rel="stylesheet" type="text/css">
     <script src="https://unpkg.com/vanilla-datatables@latest/dist/vanilla-dataTables.min.js" type="text/javascript"></script>
+    <link rel="stylesheet" type="text/css" href="./indexs/cssinforme.css">
 
 </head>
 <body>
@@ -56,48 +57,7 @@ if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)
             </button>
           </div>
 
-    <ul class="nav-options">
-      <li class="dropdown">
-        <a href="#" class="dropbtn"> Elegir carrera <i class="fas fa-chevron-down"></i></a>
-          <div class="dropdown-content">
-              <div class="submenu">
-                <a href="#" class="submenu-trigger">Enfermeria <i class="fas fa-chevron-right"></i></a>
-                  <div class="sub-dropdown-content">
-                    <a href="./Profesor/asistencia/asistencia_enfermeria.php">Primer Año</a>
-                    <a href="./Profesor/asistencia/asistencia_enfermeria2ano.php">Segundo Año</a>
-                    <a href="./Profesor/asistencia/asistencia_enfermeria3ano.php">Tercer Año</a>
-                  </div>
-              </div>
-              <div class="submenu">
-                <a href="#" class="submenu-trigger">Acompañamiento Terapeutico <i class="fas fa-chevron-right"></i></a>
-                  <div class="sub-dropdown-content">
-                    <a href="./Profesor/asistencia/asistencia_acompanante_terapeutico1ano.php">Primer Año</a>
-                    <a href="./Profesor/asistencia/asistencia_acompanante_terapeutico2ano.php">Segundo Año</a>
-                    <a href="./Profesor/asistencia/asistencia_acompanante_terapeutico1ano.php">Tercer Año</a>
-                  </div>
-              </div>
-              <div class="submenu">
-                <a href="#" class="submenu-trigger">Comercialización y Marketing <i class="fas fa-chevron-right"></i></a>
-                  <div class="sub-dropdown-content">
-                    <a href="./Profesor/asistencia/asistencia_comercializacion_marketing1ano.php">Primer Año</a>
-                    <a href="./Profesor/asistencia/asistencia_comercializacion_marketing2ano.php">Segundo Año</a>
-                    <a href="./Profesor/asistencia/asistencia_comercializacion_marketing3ano.php">Tercer Año</a>
-                  </div>
-              </div>
-              <div class="submenu">
-                <a href="#" class="submenu-trigger">Automatización y Robótica  <i class="fas fa-chevron-right"></i></a>
-                  <div class="sub-dropdown-content">
-                    <a href="./Profesor/asistencia/asistencia_automatizacion_robotica1ano.php">Primer Año</a>
-                    <a href="./Profesor/asistencia/asistencia_automatizacion_robotica2ano.php  ">Segundo Año</a>
-                    <a href="#">Tercer Año</a>
-                  </div>
-              </div>
-                    <a href="asistencia_programacion_web.php" class="submenu-trigger">FP-Programación Web</a>
-                    <a href="#" class="submenu-trigger">FP-Marketing y Venta Digital</a>
-                    <a href="#" class="submenu-trigger">FP-Redes Informáticas</a>
- 
-      </li>
-    </ul>
+  
     <div class="nav-right">
         <a href="../login/cerrar_sesion.php" class="btn-logout">Cerrar sesión</a>
     </div>
@@ -110,6 +70,8 @@ if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)
    <div id="estudiantesModal" class="estudiantes-modal">
     <div class="modal-content-estudiantes">
     <span class="modal-close-estudiantes close-modal-button" id="closeEstudiantesModal">&times; Cerrar</span>
+    <button id="btnMostrarInformesAsistencia" class="boton-informes-asistencia">Informes de Asistencias</button>
+    <button id="btnImprimirListaEstudiantes" class="boton-informes-asistencia" >Guardar Lista de Estudiantes</button>
         <div id="tablaContainerEstudiantes">
             <table id="tabla">
         <thead>
@@ -119,6 +81,7 @@ if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)
                 <th>Nombre</th>
                 <th>DNI</th>
                 <th>Celular</th>
+                <th>Carrera</th>
                 <th>Acciones</th>
             </tr>
         </thead>
@@ -127,7 +90,8 @@ if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)
             $sql1 = "SELECT * FROM inscripcion_asignatura ia 
             INNER JOIN alumno a on ia.alumno_legajo = a.legajo 
             INNER JOIN preceptores p ON p.carreras_idCarrera = ia.carreras_idCarrera 
-             WHERE  a.estado = '1' -- and p.profesor_idProrfesor = {$_SESSION["id"]} ";
+            INNER JOIN carreras c on ia.carreras_idCarrera = c.idCarrera
+             WHERE  a.estado = '1'";
             $query1 = mysqli_query($conexion, $sql1);
             while ($datos = mysqli_fetch_assoc($query1)) {
                 ?>
@@ -137,10 +101,11 @@ if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)
                     <td><?php echo $datos['nombre_alumno']; ?></td>
                     <td><?php echo $datos['dni_alumno']; ?></td>
                     <td><?php echo $datos['celular']; ?></td>
+                    <td><?php echo $datos['nombre_carrera']; ?></td>
                     <td><a href="./Profesor/modificar_alumno.php?legajo=<?php echo $datos['legajo']; ?>" class="modificar-button"><i class="fas fa-pencil-alt"></i></a>
                         <a href="#" onclick="return confirmarBorrado('<?php echo $datos['legajo']; ?>')" class="borrar-button"><i class="fas fa-trash-alt"></i></a>
                         <a href="./Profesor/porcentajes_de_asistencia.php?legajo=<?php echo $datos['legajo']; ?>" class="accion-button"><i class="fas fa-exclamation"></i></a></td>
-
+                        
 
 
                 </tr>
@@ -185,7 +150,57 @@ if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)
   </div>
 </div>
 
-
+<div id="modalInformesAsistencia" class="modal-informes-asistencia">
+    <div class="modal-content-informes-asistencia">
+    <span class="cerrar-modal-informes-asistencia">&times;</span>
+        <h2>Generar Excel de Asistencias</h2>
+        <br>
+        <form action="./indexs/generar_excel.php" method="post">
+            <label for="fecha_inicio">Fecha de inicio:</label>
+            <input type="date" id="fecha_inicio" class="input_fecha" name="fecha_inicio">
+            <br><br>
+            <label for="fecha_fin">Fecha de fin:</label>
+            <input type="date" id="fecha_fin" class="input_fecha" name="fecha_fin">
+            <br><br>
+            <?php
+       $sql_mater="SELECT * 
+       FROM preceptores p 
+       INNER JOIN carreras c on p.carreras_idCarrera = c.idCarrera
+       -- WHERE p.profesor_idProrfesor = '{$_SESSION["id"]}'  ";
+       $peticion=mysqli_query($conexion,$sql_mater);
+       ?>
+            <select name="carrera" class="form-input-informes">
+                <option hidden>Selecciona una carrera</option>
+                <?php while($informacion=mysqli_fetch_assoc($peticion)){ ?>
+          <option value="<?php echo $informacion['idCarrera'] ?>"><?php echo $informacion['nombre_carrera'] ?></option>
+          <?php }?>
+            </select>
+            <br><br>
+            <input type="submit" value="Generar Excel" class="boton-submit-informes">
+        </form>
+    </div>
+</div>
+<div id="modal-lista-estudiantes" class="modal-lista-estudiantes" style="display: none; position: fixed; z-index: 155555555555; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4);">
+    <div class="modal-content-lista-estudiantes" style="background-color: rgba(255, 255, 255, 0.9); margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);">
+        <span class="close-modal-button" id="closeListaEstudiantesModal" style="color: #aaa; float: right; font-size: 28px; font-weight: bold;">&times;</span>
+        <h2>Informe de Estudiantes</h2>
+        <form action="./indexs/generar_exel_alumnos.php" method="post">
+            <?php
+            $sql_mater = "select * from preceptores p 
+            INNER JOIN carreras c on c.idCarrera = p.carreras_idCarrera
+            -- WHERE p.profesor_idProrfesor = {$_SESSION["id"]} ";
+            $peticion = mysqli_query($conexion, $sql_mater);
+            ?>      
+            <select name="carrera" class="form-container__input"> 
+                <option hidden>Selecciona una carrera</option>
+                <?php while ($informacion = mysqli_fetch_assoc($peticion)) { ?>
+                    <option value="<?php echo $informacion['idCarrera'] ?>"><?php echo $informacion['nombre_carrera'] ?></option>
+                <?php } ?>
+            </select>
+            <input type="submit" value="Generar Lista de Estudiantes" style="background-color: red; color: white; padding: 10px 20px; margin: 8px 0; border: none; cursor: pointer; width: 100%;">
+        </form>
+    </div>
+</div>
 
 
 <script>
@@ -313,7 +328,7 @@ document.addEventListener("DOMContentLoaded", function() {
 var myTable = document.querySelector("#tabla");
 var dataTable = new DataTable(tabla);
   
-//------------------------------------------- Cierre de session automatica-------------------------------//
+
 
     function confirmarBorrado(legajo) {
     var respuesta = confirm("¿Estás seguro de que quieres borrar este alumno?");
@@ -324,7 +339,61 @@ var dataTable = new DataTable(tabla);
     return false; // Evita que el navegador siga el enlace en caso de cancelar la confirmación
 }
 
+// JavaScript para manejar la apertura y cierre de modales
+document.addEventListener('DOMContentLoaded', function() {
+    var modalEstudiantes = document.getElementById('estudiantesModal');
+    var btnImprimirListaEstudiantes = document.getElementById('btnImprimirListaEstudiantes');
+    var modalListaEstudiantes = document.getElementById('modal-lista-estudiantes');
+    var closeListaEstudiantesModal = document.getElementById('closeListaEstudiantesModal');
 
+    // Abrir el modal de lista de estudiantes
+    btnImprimirListaEstudiantes.onclick = function() {
+        modalEstudiantes.style.display = "none";
+        modalListaEstudiantes.style.display = "block";
+    }
+
+    // Cerrar el modal de lista de estudiantes
+    closeListaEstudiantesModal.onclick = function() {
+        modalListaEstudiantes.style.display = "none";
+    }
+
+    // Cerrar modal si se hace clic fuera de él
+    window.onclick = function(event) {
+        if (event.target == modalListaEstudiantes) {
+            modalListaEstudiantes.style.display = "none";
+        }
+    }
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+    var btnMostrarInformesAsistencia = document.getElementById('btnMostrarInformesAsistencia');
+    var modalInformesAsistencia = document.getElementById('modalInformesAsistencia');
+    var cerrarModalInformesAsistencia = document.getElementsByClassName('cerrar-modal-informes-asistencia')[0];
+    // Referencias adicionales
+    var welcomeBox = document.getElementById('welcome-box');
+    var estudiantesModal = document.getElementById('estudiantesModal'); // Referencia al modal de estudiantes para poder cerrarlo
+
+    btnMostrarInformesAsistencia.onclick = function() {
+        modalInformesAsistencia.style.display = "block";
+        // Oculta el welcome-box y el modal de estudiantes
+        welcomeBox.style.display = "none";
+        estudiantesModal.style.display = "none";
+    }
+
+    cerrarModalInformesAsistencia.onclick = function() {
+        modalInformesAsistencia.style.display = "none";
+        // Muestra el welcome-box cuando se cierra el modal de informes
+        welcomeBox.style.display = "block";
+    }
+
+    window.onclick = function(event) {
+        if (event.target == modalInformesAsistencia) {
+            modalInformesAsistencia.style.display = "none";
+            // Asegúrate de que el welcome-box también se muestre cuando se cierra el modal haciendo clic fuera de él
+            welcomeBox.style.display = "block";
+        }
+    }
+});
 
 
 </script>

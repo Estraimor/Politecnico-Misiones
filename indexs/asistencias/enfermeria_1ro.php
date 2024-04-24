@@ -41,7 +41,7 @@ if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)
       
     <div class="nav-left">  
     <a href="../preceptor_1.php" class="home-button">Inicio</a>
-      <button class="btn-new-member" id="btn-new-member">Nuevo Estudiante</button>
+ 
       
       </div>
       

@@ -39,7 +39,7 @@ if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)
   <nav class="navbar">
     <div class="nav-left">  
     <a href="../preceptor_6.php" class="home-button">Menu Principal</a>
-      <button class="btn-new-member" id="btn-new-member">Nuevo Estudiante</button>
+  
       
       </div>
     
@@ -149,8 +149,8 @@ if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)
                 <thead>
                     <tr>
                         <th rowspan="2">N°</th>
-                        <th rowspan="2">Nombre</th>
                         <th rowspan="2">Apellido</th>
+                        <th rowspan="2">Nombre</th>
                         <th rowspan="2">Primera Hora</th>
                         <th rowspan="2">Segunda Hora</th>
                         <th colspan="4">Fecha</th>
@@ -249,15 +249,17 @@ while ($materia = mysqli_fetch_assoc($query_materias)) {
     FROM asistencia a 
     RIGHT JOIN inscripcion_asignatura ia ON a.inscripcion_asignatura_idinscripcion_asignatura = ia.idinscripcion_asignatura 
     INNER JOIN alumno a2 ON ia.alumno_legajo = a2.legajo   
-    WHERE ia.carreras_idCarrera = '40' and a2.estado = '1' ";
+    WHERE ia.carreras_idCarrera = '40' and a2.estado = '1'
+    ORDER BY a2.apellido_alumno";
     $query = mysqli_query($conexion, $sql);
     while ($datos = mysqli_fetch_assoc($query)) {
         ?>
         
         <tr>
         <td><?php echo $contador++; ?></td>
-    <td><?php echo $datos['nombre_alumno']; ?></td>
-    <td><?php echo $datos['apellido_alumno']; ?></td>
+        <td><?php echo $datos['apellido_alumno']; ?></td>
+        <td><?php echo $datos['nombre_alumno']; ?></td>
+    
     
     <!-- Primera hora -->
     <td class="checkbox-cell">
@@ -371,15 +373,17 @@ while ($materia = mysqli_fetch_assoc($query_materias)) {
     FROM asistencia a 
     RIGHT JOIN inscripcion_asignatura ia ON a.inscripcion_asignatura_idinscripcion_asignatura = ia.idinscripcion_asignatura 
     INNER JOIN alumno a2 ON ia.alumno_legajo = a2.legajo   
-    WHERE ia.carreras_idCarrera = '41' and a2.estado = '1' ";
+    WHERE ia.carreras_idCarrera = '41' and a2.estado = '1'
+    ORDER BY a2.apellido_alumno";
     $query = mysqli_query($conexion, $sql);
     while ($datos = mysqli_fetch_assoc($query)) {
         ?>
         
         <tr>
         <td><?php echo $contador++; ?></td>
-    <td><?php echo $datos['nombre_alumno']; ?></td>
-    <td><?php echo $datos['apellido_alumno']; ?></td>
+        <td><?php echo $datos['apellido_alumno']; ?></td>
+        <td><?php echo $datos['nombre_alumno']; ?></td>
+    
     
     <!-- Primera hora -->
     <td class="checkbox-cell">

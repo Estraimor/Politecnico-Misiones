@@ -29,31 +29,31 @@ if (isset($_POST['enviar'])) {
             // Redireccionar según el rol del usuario using switch case
             switch ($datos->rol) {
                 case 1:
-                    header("Location:../index.php"); // Rol Administracion
+                    header("Location: ../index.php"); // Rol Administracion
                     break;
                 case 2:
-                    header("Location:../index.php"); // Rol Programadores
+                    header("Location: ../index.php"); // Rol Programadores
                     break;
                 case 3:
-                    header("Location:../indexs/preceptor_1.php"); // Manu
+                    header("Location: ../indexs/preceptor_1.php"); // Manu
                     break;
                     case 4:
-                         header("Location:../indexs/preceptor_2.php"); // Mariela
+                         header("Location: ../indexs/preceptor_2.php"); // Mariela
                         break;
                         case 5:
-                             header("Location:../indexs/preceptor_3.php"); // Carla kensel
+                             header("Location: ../indexs/preceptor_3.php"); // Carla kensel
                             break;
                             case 6: 
-                                 header("Location:../indexs/preceptor_4.php"); // Jorge
+                                 header("Location: ../indexs/preceptor_4.php"); // Jorge
                                 break;
                                 case 7: 
-                                     header("Location:../indexs/preceptor_5.php"); // Carla Paola
+                                     header("Location: ../indexs/preceptor_5.php"); // Carla Paola
                                     break;
                                     case 8:
-                                         header("Location:../indexs/preceptor_6.php"); // Luciano 
+                                         header("Location: ../indexs/preceptor_6.php"); // Pazz 
                                         break;
                                         case 9:
-                                             header("Location:../index.php"); // Redirigir a la página principal
+                                             header("Location: ../index_bruno.php"); // Redirigir a la página principal
                                             break;
                 default:
                     echo '<div class="alert alert-danger" role="alert">!! ACCESO DENEGADO!!</div>';

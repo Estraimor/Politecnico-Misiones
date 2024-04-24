@@ -117,19 +117,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             // Escribir el resumen por fecha y horario al final de la hoja de asistencia
             $row_asistencia++;
 
-            $sheet_asistencia->setCellValue('A' . $row_asistencia, 'Fecha');
-            $sheet_asistencia->setCellValue('B' . $row_asistencia, 'Cantidad Presente 1 Materia');
-            $sheet_asistencia->setCellValue('C' . $row_asistencia, 'Cantidad Ausente 1 Materia');
-            $sheet_asistencia->setCellValue('D' . $row_asistencia, 'Cantidad Justificada 1 Materia');
-            $sheet_asistencia->setCellValue('E' . $row_asistencia, 'Porcentaje de Presentes');
-            $sheet_asistencia->setCellValue('F' . $row_asistencia, 'Porcentaje de Ausentes');
-            $sheet_asistencia->setCellValue('G' . $row_asistencia, 'Porcentaje de Justificados');
-            $sheet_asistencia->setCellValue('H' . $row_asistencia, 'Cantidad Presente 2 Materia');
-            $sheet_asistencia->setCellValue('I' . $row_asistencia, 'Cantidad Ausente 2 Materia');
-            $sheet_asistencia->setCellValue('J' . $row_asistencia, 'Cantidad Justificada 2 Materia');
-            $sheet_asistencia->setCellValue('K' . $row_asistencia, 'Porcentaje de Presentes_2');
-            $sheet_asistencia->setCellValue('L' . $row_asistencia, 'Porcentaje de Ausentes_2');
-            $sheet_asistencia->setCellValue('M' . $row_asistencia, 'Porcentaje de Justificados_2');
+            // Escribir el título encima de los datos de resumen por fecha y horario
+            $sheet_asistencia->setCellValue('A' . ($row_asistencia - 1), 'Título para Fecha');
+            $sheet_asistencia->setCellValue('B' . ($row_asistencia - 1), 'Título para Cantidad Presente 1 Materia');
+            $sheet_asistencia->setCellValue('C' . ($row_asistencia - 1), 'Título para Cantidad Ausente 1 Materia');
+            $sheet_asistencia->setCellValue('D' . ($row_asistencia - 1), 'Título para Cantidad Justificada 1 Materia');
+            $sheet_asistencia->setCellValue('E' . ($row_asistencia - 1), 'Título para Porcentaje de Presentes');
+            $sheet_asistencia->setCellValue('F' . ($row_asistencia - 1), 'Título para Porcentaje de Ausentes');
+            $sheet_asistencia->setCellValue('G' . ($row_asistencia - 1), 'Título para Porcentaje de Justificados');
+            $sheet_asistencia->setCellValue('H' . ($row_asistencia - 1), 'Título para Cantidad Presente 2 Materia');
+            $sheet_asistencia->setCellValue('I' . ($row_asistencia - 1), 'Título para Cantidad Ausente 2 Materia');
+            $sheet_asistencia->setCellValue('J' . ($row_asistencia - 1), 'Título para Cantidad Justificada 2 Materia');
+            $sheet_asistencia->setCellValue('K' . ($row_asistencia - 1), 'Título para Porcentaje de Presentes_2');
+            $sheet_asistencia->setCellValue('L' . ($row_asistencia - 1), 'Título para Porcentaje de Ausentes_2');
+            $sheet_asistencia->setCellValue('M' . ($row_asistencia - 1), 'Título para Porcentaje de Justificados_2');
 
             foreach ($conteo_por_fecha_y_horario as $fecha => $conteo) {
                 $sheet_asistencia->setCellValue('A' . $row_asistencia, $fecha);
@@ -170,34 +171,33 @@ WHERE
             $resultado_justificaciones = mysqli_query($conexion, $consulta_justificaciones);
 
             if ($resultado_justificaciones && mysqli_num_rows($resultado_justificaciones) > 0) {
-    // Crear una nueva hoja para las justificaciones
-    $sheet_justificaciones = new \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet($spreadsheet, 'Justificaciones');
-    $spreadsheet->addSheet($sheet_justificaciones);
+                // Crear una nueva hoja para las justificaciones
+                $sheet_justificaciones = new \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet($spreadsheet, 'Justificaciones');
+                $spreadsheet->addSheet($sheet_justificaciones);
 
-    // Establecer las cabeceras para las justificaciones
-    $sheet_justificaciones->setCellValue('A1', 'Carrera');
-    $sheet_justificaciones->setCellValue('B1', 'Nombre');
-    $sheet_justificaciones->setCellValue('C1', 'Apellido');
-    $sheet_justificaciones->setCellValue('D1', 'Materia');
-    $sheet_justificaciones->setCellValue('E1', 'Motivo');
-    $sheet_justificaciones->setCellValue('F1', 'Fecha');
+                // Establecer las cabeceras para las justificaciones
+                $sheet_justificaciones->setCellValue('A1', 'Carrera');
+                $sheet_justificaciones->setCellValue('B1', 'Nombre');
+                $sheet_justificaciones->setCellValue('C1', 'Apellido');
+                $sheet_justificaciones->setCellValue('D1', 'Materia');
+                $sheet_justificaciones->setCellValue('E1', 'Motivo');
+                $sheet_justificaciones->setCellValue('F1', 'Fecha');
 
-    // Contador de fila para las justificaciones
-    $row_justificaciones = 2;
+                // Contador de fila para las justificaciones
+                $row_justificaciones = 2;
 
-    // Iterar sobre los resultados de las justificaciones y escribirlos en la hoja correspondiente
-    while ($fila_justificacion = mysqli_fetch_assoc($resultado_justificaciones)) {
-        $sheet_justificaciones->setCellValue('A' . $row_justificaciones, $fila_justificacion['nombre_carrera']);
-        $sheet_justificaciones->setCellValue('B' . $row_justificaciones, $fila_justificacion['nombre_alumno']);
-        $sheet_justificaciones->setCellValue('C' . $row_justificaciones, $fila_justificacion['apellido_alumno']);
-        $sheet_justificaciones->setCellValue('D' . $row_justificaciones, $fila_justificacion['materia']);
-        $sheet_justificaciones->setCellValue('E' . $row_justificaciones, $fila_justificacion['Motivo']);
-        $sheet_justificaciones->setCellValue('F' . $row_justificaciones, $fila_justificacion['fecha']);
+                // Iterar sobre los resultados de las justificaciones y escribirlos en la hoja correspondiente
+                while ($fila_justificacion = mysqli_fetch_assoc($resultado_justificaciones)) {
+                    $sheet_justificaciones->setCellValue('A' . $row_justificaciones, $fila_justificacion['nombre_carrera']);
+                    $sheet_justificaciones->setCellValue('B' . $row_justificaciones, $fila_justificacion['nombre_alumno']);
+                    $sheet_justificaciones->setCellValue('C' . $row_justificaciones, $fila_justificacion['apellido_alumno']);
+                    $sheet_justificaciones->setCellValue('D' . $row_justificaciones, $fila_justificacion['materia']);
+                    $sheet_justificaciones->setCellValue('E' . $row_justificaciones, $fila_justificacion['Motivo']);
+                    $sheet_justificaciones->setCellValue('F' . $row_justificaciones, $fila_justificacion['fecha']);
 
-        $row_justificaciones++;
-    }
-}
-
+                    $row_justificaciones++;
+                }
+            }
 
             // Configurar el tipo de contenido y la descarga del archivo
             header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');

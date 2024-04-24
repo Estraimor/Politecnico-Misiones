@@ -50,7 +50,7 @@ a{
 }
 .nav-options{
   position: relative;
-  left: -325px;
+  left: -250px;
 }
 
 .nav-left,  .nav-right {
@@ -1254,7 +1254,7 @@ cursor: pointer;
   margin: 10% auto; /* Reducido el margen superior para centrar mejor */
   padding: 5px;
   border: 1px solid #ddd;
-  width: 60%;
+  width: 80%;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
 }
@@ -1360,4 +1360,43 @@ cursor: pointer;
   padding: 20px;
   border: 1px solid #ccc;
   z-index: 1000; /* Asegúrate de que esté sobre otros elementos */
+}
+
+
+
+
+.modal-student-fp {
+  display: none; /* Ocultar el modal por defecto */
+  position: fixed; /* Permanecer en lugar */
+  z-index: 99999; /* Situarse sobre otros elementos */
+  left: 0;
+  top: 0;
+  width: 100%; /* Ancho total */
+  height: 100%; /* Alto total */
+  overflow: auto; /* Habilitar scroll si es necesario */
+  background-color: rgba(0,0,0,0.8); /* Negro con opacidad */
+}
+
+.modal-content-student-fp {
+  background-color: #fefefe;
+  margin: 12px auto; /* 15% desde la parte superior y centrado */
+  padding: 15px;
+  border: 1px solid #888;
+  width: 50%; /* Ancho */
+
+}
+
+/* Botón para cerrar el modal */
+.close-student-fp {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close-student-fp:hover,
+.close-student-fp:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
 }

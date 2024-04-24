@@ -46,55 +46,12 @@ if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)
             <a href="index.php" class="home-button">Inicio</a>
             <button class="btn-new-member" id="btn-new-member">Nuevo Estudiante</button>
             <button class="btn-situacion-academica">
-              <a href="./Profesor/notas/login_notas/index_notas.php" class="btn-link">Situación Académica</a>
+              <a href="../proximamente/proximamente.php" class="btn-link">Situación Académica</a>
             </button>
-            <button class="btn-preceptores">
-              <a href="#">Preceptores</a>
-            </button>
+          
           </div>
 
-    <ul class="nav-options">
-      <li class="dropdown">
-        <a href="#" class="dropbtn"> Elegir carrera <i class="fas fa-chevron-down"></i></a>
-          <div class="dropdown-content">
-              <div class="submenu">
-                <a href="#" class="submenu-trigger">Enfermeria <i class="fas fa-chevron-right"></i></a>
-                  <div class="sub-dropdown-content">
-                    <a href="./Profesor/asistencia/asistencia_enfermeria.php">Primer Año</a>
-                    <a href="./Profesor/asistencia/asistencia_enfermeria2ano.php">Segundo Año</a>
-                    <a href="./Profesor/asistencia/asistencia_enfermeria3ano.php">Tercer Año</a>
-                  </div>
-              </div>
-              <div class="submenu">
-                <a href="#" class="submenu-trigger">Acompañamiento Terapeutico <i class="fas fa-chevron-right"></i></a>
-                  <div class="sub-dropdown-content">
-                    <a href="./Profesor/asistencia/asistencia_acompanante_terapeutico1ano.php">Primer Año</a>
-                    <a href="./Profesor/asistencia/asistencia_acompanante_terapeutico2ano.php">Segundo Año</a>
-                    <a href="./Profesor/asistencia/asistencia_acompanante_terapeutico1ano.php">Tercer Año</a>
-                  </div>
-              </div>
-              <div class="submenu">
-                <a href="#" class="submenu-trigger">Comercialización y Marketing <i class="fas fa-chevron-right"></i></a>
-                  <div class="sub-dropdown-content">
-                    <a href="./Profesor/asistencia/asistencia_comercializacion_marketing1ano.php">Primer Año</a>
-                    <a href="./Profesor/asistencia/asistencia_comercializacion_marketing2ano.php">Segundo Año</a>
-                    <a href="./Profesor/asistencia/asistencia_comercializacion_marketing3ano.php">Tercer Año</a>
-                  </div>
-              </div>
-              <div class="submenu">
-                <a href="#" class="submenu-trigger">Automatización y Robótica  <i class="fas fa-chevron-right"></i></a>
-                  <div class="sub-dropdown-content">
-                    <a href="./Profesor/asistencia/asistencia_automatizacion_robotica1ano.php">Primer Año</a>
-                    <a href="./Profesor/asistencia/asistencia_automatizacion_robotica2ano.php  ">Segundo Año</a>
-                    <a href="#">Tercer Año</a>
-                  </div>
-              </div>
-                    <a href="asistencia_programacion_web.php" class="submenu-trigger">FP-Programación Web</a>
-                    <a href="#" class="submenu-trigger">FP-Marketing y Venta Digital</a>
-                    <a href="#" class="submenu-trigger">FP-Redes Informáticas</a>
- 
-      </li>
-    </ul>
+   
     <div class="nav-right">
         <a href="../login/cerrar_sesion.php" class="btn-logout">Cerrar sesión</a>
     </div>
@@ -102,53 +59,7 @@ if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)
     
     
 </nav>
-  <button id="btnMostrarEstudiantes">Estudiantes</button>
-   <!-- Modal para la tabla de estudiantes -->
-   <div id="estudiantesModal" class="estudiantes-modal">
-    <div class="modal-content-estudiantes">
-    <span class="modal-close-estudiantes close-modal-button" id="closeEstudiantesModal">&times; Cerrar</span>
-        <div id="tablaContainerEstudiantes">
-            <table id="tabla">
-        <thead>
-            <tr>
-                <th>Legajo</th>
-                <th>Apellido</th>
-                <th>Nombre</th>
-                <th>DNI</th>
-                <th>Celular</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php
-            $sql1 = "select *
-            from alumno 
-            where estado = '1'";
-            $query1 = mysqli_query($conexion, $sql1);
-            while ($datos = mysqli_fetch_assoc($query1)) {
-                ?>
-                <tr>
-                    <td><?php echo $datos['legajo']; ?></td>
-                    <td><?php echo $datos['apellido_alumno']; ?></td>
-                    <td><?php echo $datos['nombre_alumno']; ?></td>
-                    <td><?php echo $datos['dni_alumno']; ?></td>
-                    <td><?php echo $datos['celular']; ?></td>
-                    <td><a href="./Profesor/modificar_alumno.php?legajo=<?php echo $datos['legajo']; ?>" class="modificar-button"><i class="fas fa-pencil-alt"></i></a>
-                   <a href="./Profesor/borrado_logico_alumno.php?legajo=<?php echo $datos['legajo']; ?>" class="borrar-button"><i class="fas fa-trash-alt"></i></a>
-                   <a href="./Profesor/porcentajes_de_asistencia.php?legajo=<?php echo $datos['legajo']; ?>" class="accion-button"><i class="fas fa-exclamation"></i></a></td>
-
-
-
-                </tr>
-                <?php
-            }
-            ?>
-        </tbody>
-        
-    </table>
-            </div>
-        </div>
-    </div>
+ 
   <div id="modal" class="modal">
   <div class="modal-content">
   <span class="close" onclick="closeModal()">&times;</span>

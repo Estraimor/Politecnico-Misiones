@@ -202,7 +202,7 @@
   margin: 5% auto; /* Ajusta el margen superior para centrar verticalmente */
   padding: 20px;
   border-radius: 8px; /* Bordes redondeados para un look suave */
-  width: 60%; /* Ancho del modal */
+  width: 80%; /* Ancho del modal */
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sombra sutil para profundidad */
 }
 
