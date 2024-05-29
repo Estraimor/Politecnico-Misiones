@@ -1,16 +1,13 @@
 <?php
-
 $server='localhost';
-$user='u756746073_root';
-$pass='POLITECNICOmisiones2023.';
+$user='root';
+$pass='';
 $bd='u756746073_politecnico';
 $conexion=mysqli_connect($server,$user,$pass,$bd, '3306');
 
-if ($conexion) { 
-    echo ""; 
-} else { 
-    echo "conexion not connected"; 
-}
+if ($conexion) { echo ""; } else { echo "conexion not connected"; }
+
+
 
 if (isset($_POST['enviar'])) {
     if (!empty($_POST['nombre_alu']) && !empty($_POST['apellido_alu']) && !empty($_POST['dni_alu']) && !empty($_POST['legajo']) && !empty($_POST['celular'])&& !empty($_POST['edad'])&& !empty($_POST['observaciones'])

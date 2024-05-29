@@ -1,5 +1,5 @@
 <?php
-include '../conexion/conexion.php';
+include '../../conexion/conexion.php';
 
 if (isset($_POST['enviar'])) {
     // Obtener los datos del formulario
@@ -29,7 +29,7 @@ if (isset($_POST['enviar'])) {
      if ($query) {
          echo "Datos guardados correctamente.";
        // Redirigir a la página de nuevo_alumnofp.php
-         header("Location: ../Profesor/controlador_preceptormodificar.php");
+         header("Location: ../../Profesor/controlador_preceptormodificar.php");
          exit();
      } else {
          echo "Error al guardar los datos: " . mysqli_error($conexion);

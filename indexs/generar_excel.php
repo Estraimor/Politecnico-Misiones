@@ -1,20 +1,157 @@
 <?php
-require './exel/vendor/autoload.php';
+require './pdf/vendor/setasign/fpdf/fpdf.php';
 
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+include'../conexion/conexion.php';
+$nombre_inst = utf8_decode('Instituto Superior Politécnico Misiones Nº 1');
 
-$server = 'localhost';
-$user = 'u756746073_root';
-$pass = 'POLITECNICOmisiones2023.';
-$bd = 'u756746073_politecnico';
-$conexion = mysqli_connect($server, $user, $pass, $bd, '3306');
+class PDF extends FPDF {
+    function Header() {
+        global $nombre_inst, $carrera, $fechas_con_asistencia;
 
-if ($conexion) {
-    echo "";
-} else {
-    echo "conexion not connected";
+        // Encabezado solo en la primera página
+        if ($this->PageNo() == 1) {
+            $this->SetFillColor(189, 213, 234); // Color del cuadro
+            $this->Rect(10, 7, 190, 50, 'F'); // Rectángulo
+            $this->SetXY(10, 1); // Ajuste de la posición Y
+            $this->SetFont('Arial', 'B', 12);
+            $this->Image('../imagenes/politecnico.png', 15, 15, 37); // Colocar la imagen
+            $this->Cell(0, 35, $nombre_inst, 0, 1, 'C');
+            $this->SetFont('Arial', 'I', 10);
+            // Determinar el subtítulo basado en el valor de $carrera
+            switch ($carrera) {
+                case "18":
+                    $subtitulo = "Enfermeia Primer Año Comision A";
+                    break;
+                case "19":
+                    $subtitulo = "Enfermeria Primer Año Comision B";
+                    break;
+                case "20":
+                    $subtitulo = "Enfermeria Primer Año Comision C";
+                    break;
+                case "33":
+                    $subtitulo = "Enfermeria Segundo Año Comision A";
+                    break;
+                case "34":
+                    $subtitulo = "Enfermeria Segundo Año Comision B";
+                    break;
+                case "35":
+                    $subtitulo = "Enfermeria Segundo Año Comision C";
+                    break;
+                case "36":
+                    $subtitulo = "Enfermeria Tercer Año Comision A";
+                    break;
+                case "37":
+                    $subtitulo = "Enfermeria Tercer Año Comision B";
+                    break;
+                case "39":
+                    $subtitulo = "Enfermeria Tercer Año Comision C";
+                    break;
+                case "27":
+                    $subtitulo = "Acompañante Terapeutico Primer Año Comision A";
+                    break;
+                case "31":
+                    $subtitulo = "Acompañante Terapeutico Primer Año Comision B";
+                    break;
+                case "32":
+                    $subtitulo = "Acompañante Terapeutico Primer Año Comision C";
+                    break;
+                case "40":
+                    $subtitulo = "Acompañante Terapeutico Segundo Año Comision A";
+                    break;
+                case "41":
+                    $subtitulo = "Acompañante Terapeutico Segundo Año Comision B";
+                    break;
+                case "42":
+                    $subtitulo = "Acompañante Terapeutico Segundo Año Comision C";
+                    break;
+                case "43":
+                    $subtitulo = "Acompañante Terapeutico Tercer Año Comision A";
+                    break;
+                case "44":
+                    $subtitulo = "Acompañante Terapeutico Tercer Año Comision B";
+                    break;
+                case "45":
+                    $subtitulo = "Acompañante Terapeutico Tercer Año Comision C";
+                    break;
+                case "46":
+                    $subtitulo = "Automatizacion y Robotica Primer Año Comision A";
+                    break;
+                case "47":
+                    $subtitulo = "Automatizacion y Robotica Primer Año Comision B";
+                    break;
+                case "48":
+                    $subtitulo = "Automatizacion y Robotica Primer Año Comision C";
+                    break;
+                case "49":
+                    $subtitulo = "Automatizacion y Robotica Segundo Año Comision A";
+                    break;
+                case "50":
+                    $subtitulo = "Automatizacion y Robotica Segundo Año Comision B";
+                    break;
+                case "51":
+                    $subtitulo = "Automatizacion y Robotica Segundo Año Comision C";
+                    break;
+                case "52":
+                    $subtitulo = "Automatizacion y Robotica Tercer Año Comision A";
+                    break;
+                case "53":
+                    $subtitulo = "Automatizacion y Robotica Tercer Año Comision B";
+                    break;
+                case "54":
+                    $subtitulo = "Automatizacion y Robotica Tercer Año Comision C";
+                    break;
+                case "55":
+                    $subtitulo = "Comercializacion y Marketing Primer Año Comision A";
+                    break;
+                case "56":
+                    $subtitulo = "Comercializacion y Marketing Primer Año Comision B";
+                    break;
+                case "57":
+                    $subtitulo = "Comercializacion y Marketing Primer Año Comision C";
+                    break;
+                case "58":
+                    $subtitulo = "Comercializacion y Marketing Segundo Año Comision A";
+                    break;
+                case "59":
+                    $subtitulo = "Comercializacion y Marketing Segundo Año Comision B";
+                    break;
+                case "60":
+                    $subtitulo = "Comercializacion y Marketing Segundo Año Comision C";
+                    break;
+                case "61":
+                    $subtitulo = "Comercializacion y Marketing Tercer Año Comision A";
+                    break;
+                case "62":
+                    $subtitulo = "Comercializacion y Marketing Tercer Año Comision B";
+                    break;
+                case "63":
+                    $subtitulo = "Comercializacion y Marketing Tercer Año Comision C";
+                    break;
+                default:
+                    // Si no coincide con ningún caso, mantener el nombre original
+                    break;
+            }
+            $this->Cell(180, 26, utf8_decode($subtitulo), 0, 1, 'C');
+            // Ajuste de la posición para que esté más cerca del encabezado de datos
+            $this->SetY(51); // Posición Y más cerca del encabezado de datos
+            // Imprimir la fecha de inicio y fin
+            $this->Cell(0, 5, 'Fecha de inicio: ' . $_POST['fecha_inicio'] . ' - Fecha de fin: ' . $_POST['fecha_fin'], 0, 1, 'C');
+            // Salto de línea adicional para separar el encabezado del contenido de datos
+            $this->Ln(1);
+        } else {
+            // Encabezado para las páginas siguientes
+            $this->SetFont('Arial', '', 10);
+            $this->Image('../imagenes/politecnico.png', 15, 15, 20); // Colocar la imagen
+            $this->Ln(30);
+            $this->Cell(50, 7, 'Nombres', 1);
+            foreach ($fechas_con_asistencia as $fecha) {
+                $this->Cell(10, 7, date('d/m', strtotime($fecha)), 1, 0, 'C');
+            }
+            $this->Ln();
+        }
+    }
 }
+
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Obtener las fechas de inicio y fin desde el formulario
@@ -22,204 +159,290 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $fecha_fin = isset($_POST['fecha_fin']) ? $_POST['fecha_fin'] : null;
     $carrera = isset($_POST['carrera']) ? $_POST['carrera'] : null;
 
+
+
+
     if ($fecha_inicio && $fecha_fin && $carrera) {
         // Consultar la base de datos para obtener los datos de asistencia entre las fechas especificadas
-        $consulta_asistencia = "SELECT a.idasistencia, a.fecha, CONCAT(a2.nombre_alumno, ' ', a2.apellido_alumno) AS nombre_completo, c.nombre_carrera, m.Nombre, a.1_Horario, a.2_Horario 
+        $consulta_asistencia = "SELECT DISTINCT fecha
         FROM asistencia a 
         INNER JOIN inscripcion_asignatura ia ON ia.alumno_legajo = a.inscripcion_asignatura_alumno_legajo 
         INNER JOIN alumno a2 ON a2.legajo = ia.alumno_legajo INNER JOIN carreras c ON c.idCarrera = ia.carreras_idCarrera 
         INNER JOIN materias m ON m.idMaterias = a.materias_idMaterias 
         WHERE fecha BETWEEN '$fecha_inicio' AND '$fecha_fin' and c.idCarrera = '$carrera';";
-        $resultado_asistencia = $conexion->query($consulta_asistencia);
+        $resultado_fechas = $conexion->query($consulta_asistencia);
+        
+        $fechas_asistencia = [];
+        while ($row = $resultado_fechas->fetch_assoc()) {
+            $fechas_asistencia[] = $row['fecha'];
+        }
+
+        // Obtener las fechas esperadas dentro del rango de fechas de inicio y fin
+        $fechas_esperadas = [];
+        $temp_fecha = $fecha_inicio;
+        while ($temp_fecha <= $fecha_fin) {
+            $fechas_esperadas[] = $temp_fecha;
+            $temp_fecha = date('Y-m-d', strtotime($temp_fecha . ' +1 day'));
+        }
+
+        // Filtrar las fechas de asistencia para eliminar las fechas sin registros
+        $fechas_con_asistencia = array_intersect($fechas_esperadas, $fechas_asistencia);
 
         // Verificar si se obtuvieron resultados de asistencia
-        if ($resultado_asistencia && $resultado_asistencia->num_rows > 0) {
-            // Crear un nuevo objeto Spreadsheet (similar a PHPExcel)
-            $spreadsheet = new Spreadsheet();
+        if ($fechas_con_asistencia) {
+            // Crear un objeto FPDF para el documento PDF
+            $pdf = new PDF();
+            $pdf->AddPage();
 
-            // Agregar una hoja para los datos de asistencia
-            $sheet_asistencia = $spreadsheet->getActiveSheet();
-            $sheet_asistencia->setTitle('Asistencia');
+            // Establecer la fuente y el tamaño del texto
+            $pdf->SetFont('Arial', '', 10);
 
-            // Escribir el encabezado para los datos de asistencia en la primera fila
-            $sheet_asistencia->setCellValue('A1', 'ID Asistencia');
-            $sheet_asistencia->setCellValue('B1', 'Fecha');
-            $sheet_asistencia->setCellValue('C1', 'Nombre Alumno');
-            $sheet_asistencia->setCellValue('D1', 'Carrera');
-            $sheet_asistencia->setCellValue('E1', 'Materia');
-            $sheet_asistencia->setCellValue('F1', '1° Horario');
-            $sheet_asistencia->setCellValue('G1', '2° Horario');
+            // Cabecera del PDF
+            $pdf->SetFillColor(200, 220, 255); // Color de fondo de la cabecera
+            $pdf->SetTextColor(0); // Color del texto de la cabecera
 
-            // Variables para contar presentes, ausentes y justificados por fecha y horario
-            $conteo_por_fecha_y_horario = [];
-
-            // Contador para la fila actual en la hoja de asistencia
-            $row_asistencia = 2;
-
-            // Iterar sobre los resultados de la consulta de asistencia
-            while ($fila_asistencia = $resultado_asistencia->fetch_assoc()) {
-                $sheet_asistencia->setCellValue('A' . $row_asistencia, $fila_asistencia['idasistencia']);
-                $sheet_asistencia->setCellValue('B' . $row_asistencia, $fila_asistencia['fecha']);
-                $sheet_asistencia->setCellValue('C' . $row_asistencia, $fila_asistencia['nombre_completo']);
-                $sheet_asistencia->setCellValue('D' . $row_asistencia, $fila_asistencia['nombre_carrera']); // Corregido: se usa el nombre de la carrera en lugar del id
-                $sheet_asistencia->setCellValue('E' . $row_asistencia, $fila_asistencia['Nombre']); // Corregido: se usa el nombre de la materia en lugar del id
-                $sheet_asistencia->setCellValue('F' . $row_asistencia, $fila_asistencia['1_Horario']);
-                $sheet_asistencia->setCellValue('G' . $row_asistencia, $fila_asistencia['2_Horario']);
-
-                // Incrementar el conteo para la fecha y el horario
-                $fecha_asistencia = $fila_asistencia['fecha'];
-                if (!isset($conteo_por_fecha_y_horario[$fecha_asistencia])) {
-                    $conteo_por_fecha_y_horario[$fecha_asistencia] = ['Presente' => 0, 'Ausente' => 0, 'Justificada' => 0, 'Presente_2' => 0, 'Ausente_2' => 0, 'Justificada_2' => 0];
-                }
-
-                // Incrementar el conteo para el horario 1
-                if ($fila_asistencia['1_Horario'] == 'Presente') {
-                    $conteo_por_fecha_y_horario[$fecha_asistencia]['Presente']++;
-                } elseif ($fila_asistencia['1_Horario'] == 'Ausente') {
-                    $conteo_por_fecha_y_horario[$fecha_asistencia]['Ausente']++;
-                } elseif ($fila_asistencia['1_Horario'] == 'Justificada') {
-                    $conteo_por_fecha_y_horario[$fecha_asistencia]['Justificada']++;
-                }
-
-                // Incrementar el conteo para el horario 2
-                if ($fila_asistencia['2_Horario'] == 'Presente') {
-                    $conteo_por_fecha_y_horario[$fecha_asistencia]['Presente_2']++;
-                } elseif ($fila_asistencia['2_Horario'] == 'Ausente') {
-                    $conteo_por_fecha_y_horario[$fecha_asistencia]['Ausente_2']++;
-                } elseif ($fila_asistencia['2_Horario'] == 'Justificada') {
-                    $conteo_por_fecha_y_horario[$fecha_asistencia]['Justificada_2']++;
-                }
-
-                $row_asistencia++;
+            // Imprimir las fechas en la primera fila del PDF
+            $pdf->Cell(50, 7, 'Nombres', 1); // Celda vacía para la esquina superior izquierda
+            foreach ($fechas_con_asistencia as $fecha) {
+                $pdf->Cell(10, 7, date('d/m', strtotime($fecha)), 1, 0, 'C');
             }
+            $pdf->Ln();
 
-            // Calcular el porcentaje de asistencia para cada fecha y horario
-            foreach ($conteo_por_fecha_y_horario as $fecha => $conteo) {
-                $total_asistencias = $conteo['Presente'] + $conteo['Ausente'] + $conteo['Justificada'];
-                $porcentaje_presentes = $total_asistencias > 0 ? ($conteo['Presente'] / $total_asistencias) * 100 : 0;
-                $porcentaje_ausentes = $total_asistencias > 0 ? ($conteo['Ausente'] / $total_asistencias) * 100 : 0;
-                $porcentaje_justificados = $total_asistencias > 0 ? ($conteo['Justificada'] / $total_asistencias) * 100 : 0;
+            // Consultar la asistencia para las fechas obtenidas
+            // Consultar la asistencia para las fechas obtenidas
+$consulta_asistencia = "SELECT CONCAT(a2.apellido_alumno, ' ', a2.nombre_alumno) AS nombre_completo,
+                        a.fecha AS fecha,
+                        a.1_Horario AS horario_1,
+                        a.2_Horario AS horario_2
+                        FROM asistencia a 
+                        INNER JOIN inscripcion_asignatura ia ON ia.alumno_legajo = a.inscripcion_asignatura_alumno_legajo 
+                        INNER JOIN alumno a2 ON a2.legajo = ia.alumno_legajo 
+                        INNER JOIN carreras c ON c.idCarrera = ia.carreras_idCarrera 
+                        INNER JOIN materias m ON m.idMaterias = a.materias_idMaterias 
+                        WHERE fecha BETWEEN '$fecha_inicio' AND '$fecha_fin' AND c.idCarrera = '$carrera'
+                        ORDER BY a2.apellido_alumno, a2.nombre_alumno, a.fecha;";
 
-                $total_asistencias_2 = $conteo['Presente_2'] + $conteo['Ausente_2'] + $conteo['Justificada_2'];
-                $porcentaje_presentes_2 = $total_asistencias_2 > 0 ? ($conteo['Presente_2'] / $total_asistencias_2) * 100 : 0;
-                $porcentaje_ausentes_2 = $total_asistencias_2 > 0 ? ($conteo['Ausente_2'] / $total_asistencias_2) * 100 : 0;
-                $porcentaje_justificados_2 = $total_asistencias_2 > 0 ? ($conteo['Justificada_2'] / $total_asistencias_2) * 100 : 0;
+$resultado_asistencia = $conexion->query($consulta_asistencia);
 
-                $conteo_por_fecha_y_horario[$fecha]['Porcentaje_Presentes'] = $porcentaje_presentes;
-                $conteo_por_fecha_y_horario[$fecha]['Porcentaje_Ausentes'] = $porcentaje_ausentes;
-                $conteo_por_fecha_y_horario[$fecha]['Porcentaje_Justificados'] = $porcentaje_justificados;
+// Construir un array multidimensional para almacenar la asistencia de cada alumno por fecha
+$asistencias_por_alumno = [];
+while ($fila_asistencia = $resultado_asistencia->fetch_assoc()) {
+    $nombre = utf8_decode($fila_asistencia['nombre_completo']);
+    $fecha = $fila_asistencia['fecha'];
+    $horario_1 = $fila_asistencia['horario_1'];
+    $horario_2 = $fila_asistencia['horario_2'];
 
-                $conteo_por_fecha_y_horario[$fecha]['Porcentaje_Presentes_2'] = $porcentaje_presentes_2;
-                $conteo_por_fecha_y_horario[$fecha]['Porcentaje_Ausentes_2'] = $porcentaje_ausentes_2;
-                $conteo_por_fecha_y_horario[$fecha]['Porcentaje_Justificados_2'] = $porcentaje_justificados_2;
-            }
-
-            // Escribir el resumen por fecha y horario al final de la hoja de asistencia
-            $row_asistencia++;
-
-            // Escribir el título encima de los datos de resumen por fecha y horario
-            $sheet_asistencia->setCellValue('A' . ($row_asistencia - 1), 'Título para Fecha');
-            $sheet_asistencia->setCellValue('B' . ($row_asistencia - 1), 'Título para Cantidad Presente 1 Materia');
-            $sheet_asistencia->setCellValue('C' . ($row_asistencia - 1), 'Título para Cantidad Ausente 1 Materia');
-            $sheet_asistencia->setCellValue('D' . ($row_asistencia - 1), 'Título para Cantidad Justificada 1 Materia');
-            $sheet_asistencia->setCellValue('E' . ($row_asistencia - 1), 'Título para Porcentaje de Presentes');
-            $sheet_asistencia->setCellValue('F' . ($row_asistencia - 1), 'Título para Porcentaje de Ausentes');
-            $sheet_asistencia->setCellValue('G' . ($row_asistencia - 1), 'Título para Porcentaje de Justificados');
-            $sheet_asistencia->setCellValue('H' . ($row_asistencia - 1), 'Título para Cantidad Presente 2 Materia');
-            $sheet_asistencia->setCellValue('I' . ($row_asistencia - 1), 'Título para Cantidad Ausente 2 Materia');
-            $sheet_asistencia->setCellValue('J' . ($row_asistencia - 1), 'Título para Cantidad Justificada 2 Materia');
-            $sheet_asistencia->setCellValue('K' . ($row_asistencia - 1), 'Título para Porcentaje de Presentes_2');
-            $sheet_asistencia->setCellValue('L' . ($row_asistencia - 1), 'Título para Porcentaje de Ausentes_2');
-            $sheet_asistencia->setCellValue('M' . ($row_asistencia - 1), 'Título para Porcentaje de Justificados_2');
-
-            foreach ($conteo_por_fecha_y_horario as $fecha => $conteo) {
-                $sheet_asistencia->setCellValue('A' . $row_asistencia, $fecha);
-                $sheet_asistencia->setCellValue('B' . $row_asistencia, $conteo['Presente']);
-                $sheet_asistencia->setCellValue('C' . $row_asistencia, $conteo['Ausente']);
-                $sheet_asistencia->setCellValue('D' . $row_asistencia, $conteo['Justificada']);
-                $sheet_asistencia->setCellValue('E' . $row_asistencia, $conteo['Porcentaje_Presentes']);
-                $sheet_asistencia->setCellValue('F' . $row_asistencia, $conteo['Porcentaje_Ausentes']);
-                $sheet_asistencia->setCellValue('G' . $row_asistencia, $conteo['Porcentaje_Justificados']);
-                $sheet_asistencia->setCellValue('H' . $row_asistencia, $conteo['Presente_2']);
-                $sheet_asistencia->setCellValue('I' . $row_asistencia, $conteo['Ausente_2']);
-                $sheet_asistencia->setCellValue('J' . $row_asistencia, $conteo['Justificada_2']);
-                $sheet_asistencia->setCellValue('K' . $row_asistencia, $conteo['Porcentaje_Presentes_2']);
-                $sheet_asistencia->setCellValue('L' . $row_asistencia, $conteo['Porcentaje_Ausentes_2']);
-                $sheet_asistencia->setCellValue('M' . $row_asistencia, $conteo['Porcentaje_Justificados_2']);
-                $row_asistencia++;
-            }
-
-            // Consultar las justificaciones para las fechas y la carrera especificadas
-            $consulta_justificaciones = "SELECT 
-    c.nombre_carrera,
-    a2.nombre_alumno,
-    a2.apellido_alumno,
-    m.Nombre AS materia,
-    a.Motivo,
-    a.fecha 
-FROM 
-    alumnos_justificados a
-INNER JOIN 
-    carreras c ON c.idCarrera = a.inscripcion_asignatura_carreras_idCarrera
-INNER JOIN 
-    alumno a2 ON a.inscripcion_asignatura_alumno_legajo = a2.legajo
-INNER JOIN 
-    materias m ON m.idMaterias = a.materias_idMaterias
-WHERE 
-    a.fecha BETWEEN '$fecha_inicio' AND '$fecha_fin' OR a.inscripcion_asignatura_carreras_idCarrera = '$carrera'";
-
-            $resultado_justificaciones = mysqli_query($conexion, $consulta_justificaciones);
-
-            if ($resultado_justificaciones && mysqli_num_rows($resultado_justificaciones) > 0) {
-                // Crear una nueva hoja para las justificaciones
-                $sheet_justificaciones = new \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet($spreadsheet, 'Justificaciones');
-                $spreadsheet->addSheet($sheet_justificaciones);
-
-                // Establecer las cabeceras para las justificaciones
-                $sheet_justificaciones->setCellValue('A1', 'Carrera');
-                $sheet_justificaciones->setCellValue('B1', 'Nombre');
-                $sheet_justificaciones->setCellValue('C1', 'Apellido');
-                $sheet_justificaciones->setCellValue('D1', 'Materia');
-                $sheet_justificaciones->setCellValue('E1', 'Motivo');
-                $sheet_justificaciones->setCellValue('F1', 'Fecha');
-
-                // Contador de fila para las justificaciones
-                $row_justificaciones = 2;
-
-                // Iterar sobre los resultados de las justificaciones y escribirlos en la hoja correspondiente
-                while ($fila_justificacion = mysqli_fetch_assoc($resultado_justificaciones)) {
-                    $sheet_justificaciones->setCellValue('A' . $row_justificaciones, $fila_justificacion['nombre_carrera']);
-                    $sheet_justificaciones->setCellValue('B' . $row_justificaciones, $fila_justificacion['nombre_alumno']);
-                    $sheet_justificaciones->setCellValue('C' . $row_justificaciones, $fila_justificacion['apellido_alumno']);
-                    $sheet_justificaciones->setCellValue('D' . $row_justificaciones, $fila_justificacion['materia']);
-                    $sheet_justificaciones->setCellValue('E' . $row_justificaciones, $fila_justificacion['Motivo']);
-                    $sheet_justificaciones->setCellValue('F' . $row_justificaciones, $fila_justificacion['fecha']);
-
-                    $row_justificaciones++;
-                }
-            }
-
-            // Configurar el tipo de contenido y la descarga del archivo
-            header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-            header('Content-Disposition: attachment;filename="asistencias_' . $fecha_inicio . '_' . $fecha_fin . '.xlsx"');
-            header('Cache-Control: max-age=0');
-
-            // Crear un objeto Writer para guardar el archivo Excel
-            $writer = new Xlsx($spreadsheet);
-            $writer->save('php://output');
-
-            // Finalizar la ejecución del script PHP
-            exit;
-        } else {
-            echo "No se encontraron registros de asistencia entre las fechas especificadas.";
-        }
-    } else {
-        echo "Error: Las fechas de inicio, fin o la carrera no fueron proporcionadas correctamente.";
+    // Si el alumno no está en el array, inicializamos su asistencia
+    if (!isset($asistencias_por_alumno[$nombre])) {
+        $asistencias_por_alumno[$nombre] = [];
     }
 
-    // Cerrar la conexión a la base de datos
-    $conexion->close();
+    // Determinar la asistencia y guardarla en el array de asistencias
+    if ($horario_1 == 'Presente' && $horario_2 == 'Presente') {
+        $asistencia = 'P';
+    } elseif ($horario_1 == 'Presente' && ($horario_2 == 'ausente' || $horario_2 == 'Ausente')) {
+        $asistencia = 'P';
+    } elseif (($horario_1 == 'ausente' || $horario_1 == 'Ausente') && $horario_2 == 'Presente') {
+        $asistencia = 'P';
+    } elseif ($horario_1 == 'Presente' && $horario_2 == '') {
+        $asistencia = 'P';
+    } elseif ($horario_1 == '' && $horario_2 == 'Presente') {
+        $asistencia = 'P';
+    } elseif (($horario_1 == 'ausente' || $horario_1 == 'Ausente') && ($horario_2 == 'ausente' || $horario_2 == 'Ausente')) {
+        $asistencia = 'A';
+    } elseif (($horario_1 == 'ausente' || $horario_1 == 'Ausente') && $horario_2 == '') {
+        $asistencia = 'A';
+    } elseif ($horario_1 == '' && ($horario_2 == 'ausente' || $horario_2 == 'Ausente')) {
+        $asistencia = 'A';
+    } elseif ($horario_1 == '' || $horario_2 == '') {
+        $asistencia = 'P/N';
+    }
+
+    // Almacenar la asistencia para este alumno y esta fecha
+    $asistencias_por_alumno[$nombre][$fecha] = $asistencia;
+}
+$contador = 1;
+// Ancho máximo permitido para el nombre
+$ancho_maximo = 40;
+
+// Imprimir nombres y asistencias
+foreach ($asistencias_por_alumno as $nombre => $asistencias) {
+    // Verificar si el alumno tiene asistencia para alguna de las fechas
+    $tiene_asistencia = false;
+    foreach ($fechas_asistencia as $fecha_asistencia) {
+        if (isset($asistencias[$fecha_asistencia])) {
+            $tiene_asistencia = true;
+            break;
+        }
+    }
+
+    // Si el alumno tiene asistencia para alguna fecha, imprimir su asistencia
+    if ($tiene_asistencia) {
+        // Imprimir el contador
+        $pdf->Cell(6, 7, $contador++, 1); // Imprimir el contador
+
+        // Verificar el ancho del nombre
+        $ancho_nombre = $pdf->GetStringWidth($nombre);
+        
+        // Cortar el nombre si supera el ancho máximo
+        if ($ancho_nombre > $ancho_maximo) {
+            // Calcular cuántos caracteres deben mostrarse según el ancho máximo
+            $caracteres_a_mostrar = floor($ancho_maximo / $pdf->GetStringWidth('A')); // Ancho aproximado de un carácter
+            
+            // Cortar el nombre
+            $nombre_cortado = mb_substr($nombre, 0, $caracteres_a_mostrar); // Usamos mb_substr para manejar correctamente caracteres multibyte
+        } else {
+            $nombre_cortado = $nombre; // El nombre no necesita ser cortado
+        }
+
+        // Imprimir el nombre del alumno
+        $pdf->Cell(44, 7, $nombre_cortado, 1);
+
+        // Imprimir asistencia para cada fecha con asistencia
+        foreach ($fechas_asistencia as $fecha) {
+            $asistencia = isset($asistencias[$fecha]) ? $asistencias[$fecha] : 'A'; // Si no hay asistencia para esta fecha, se marca como ausente
+            $pdf->Cell(10, 7, $asistencia, 1, 0, 'C');
+        }
+        $pdf->Ln(); // Saltar a la siguiente línea
+    }
+}
+    
+          // Obtener el subtítulo según la carrera seleccionada
+ switch ($carrera) {
+                case "18":
+                    $subtitulo = "Enfermeia Primer Año Comision A";
+                    break;
+                case "19":
+                    $subtitulo = "Enfermeria Primer Año Comision B";
+                    break;
+                case "20":
+                    $subtitulo = "Enfermeria Primer Año Comision C";
+                    break;
+                case "33":
+                    $subtitulo = "Enfermeria Segundo Año Comision A";
+                    break;
+                case "34":
+                    $subtitulo = "Enfermeria Segundo Año Comision B";
+                    break;
+                case "35":
+                    $subtitulo = "Enfermeria Segundo Año Comision C";
+                    break;
+                case "36":
+                    $subtitulo = "Enfermeria Tercer Año Comision A";
+                    break;
+                case "37":
+                    $subtitulo = "Enfermeria Tercer Año Comision B";
+                    break;
+                case "39":
+                    $subtitulo = "Enfermeria Tercer Año Comision C";
+                    break;
+                case "27":
+                    $subtitulo = "Acompañante Terapeutico Primer Año Comision A";
+                    break;
+                case "31":
+                    $subtitulo = "Acompañante Terapeutico Primer Año Comision B";
+                    break;
+                case "32":
+                    $subtitulo = "Acompañante Terapeutico Primer Año Comision C";
+                    break;
+                case "40":
+                    $subtitulo = "Acompañante Terapeutico Segundo Año Comision A";
+                    break;
+                case "41":
+                    $subtitulo = "Acompañante Terapeutico Segundo Año Comision B";
+                    break;
+                case "42":
+                    $subtitulo = "Acompañante Terapeutico Segundo Año Comision C";
+                    break;
+                case "43":
+                    $subtitulo = "Acompañante Terapeutico Tercer Año Comision A";
+                    break;
+                case "44":
+                    $subtitulo = "Acompañante Terapeutico Tercer Año Comision B";
+                    break;
+                case "45":
+                    $subtitulo = "Acompañante Terapeutico Tercer Año Comision C";
+                    break;
+                case "46":
+                    $subtitulo = "Automatizacion y Robotica Primer Año Comision A";
+                    break;
+                case "47":
+                    $subtitulo = "Automatizacion y Robotica Primer Año Comision B";
+                    break;
+                case "48":
+                    $subtitulo = "Automatizacion y Robotica Primer Año Comision C";
+                    break;
+                case "49":
+                    $subtitulo = "Automatizacion y Robotica Segundo Año Comision A";
+                    break;
+                case "50":
+                    $subtitulo = "Automatizacion y Robotica Segundo Año Comision B";
+                    break;
+                case "51":
+                    $subtitulo = "Automatizacion y Robotica Segundo Año Comision C";
+                    break;
+                case "52":
+                    $subtitulo = "Automatizacion y Robotica Tercer Año Comision A";
+                    break;
+                case "53":
+                    $subtitulo = "Automatizacion y Robotica Tercer Año Comision B";
+                    break;
+                case "54":
+                    $subtitulo = "Automatizacion y Robotica Tercer Año Comision C";
+                    break;
+                case "55":
+                    $subtitulo = "Comercializacion y Marketing Primer Año Comision A";
+                    break;
+                case "56":
+                    $subtitulo = "Comercializacion y Marketing Primer Año Comision B";
+                    break;
+                case "57":
+                    $subtitulo = "Comercializacion y Marketing Primer Año Comision C";
+                    break;
+                case "58":
+                    $subtitulo = "Comercializacion y Marketing Segundo Año Comision A";
+                    break;
+                case "59":
+                    $subtitulo = "Comercializacion y Marketing Segundo Año Comision B";
+                    break;
+                case "60":
+                    $subtitulo = "Comercializacion y Marketing Segundo Año Comision C";
+                    break;
+                case "61":
+                    $subtitulo = "Comercializacion y Marketing Tercer Año Comision A";
+                    break;
+                case "62":
+                    $subtitulo = "Comercializacion y Marketing Tercer Año Comision B";
+                    break;
+                case "63":
+                    $subtitulo = "Comercializacion y Marketing Tercer Año Comision C";
+                    break;
+                default:
+                    // Si no coincide con ningún caso, mantener el nombre original
+                    break;
+ }
+
+// Generar el nombre del archivo PDF incluyendo el subtítulo
+$nombre_archivo = 'Asistencia_' . $subtitulo . '_' . $fecha_inicio . '_al_' . $fecha_fin . '.pdf';
+$nombre_archivo = utf8_decode($nombre_archivo);
+
+// Configurar el tipo de contenido y la descarga del archivo
+header('Content-Type: application/pdf');
+header('Content-Disposition: attachment;filename="' . $nombre_archivo . '"');
+header('Cache-Control: max-age=0');
+
+// Salida del PDF
+$pdf->Output('D', $nombre_archivo);
+
+// Finalizar la ejecución del script PHP
+exit;
+        } else {
+            echo "No hay registros de asistencia para las fechas especificadas.";
+        }
+    } else {
+        echo "Error: Por favor, seleccione la fecha de inicio, la fecha de fin y la carrera.";
+    }
 } else {
-    echo "Acceso denegado.";
+    echo "Error: Método de solicitud no válido.";
 }
 ?>

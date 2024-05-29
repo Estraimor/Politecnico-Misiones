@@ -1,7 +1,7 @@
 .modal-informes-asistencia {
     display: none; /* Oculto por defecto */
     position: fixed; /* Fijo en la pantalla */
-    z-index: 1; /* Sobre otros elementos */
+    z-index: 1500000000000; /* Sobre otros elementos */
     left: 0;
     top: 0;
     width: 100%; /* Ancho completo */

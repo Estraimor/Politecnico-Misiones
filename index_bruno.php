@@ -64,9 +64,9 @@ if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)
               <div class="submenu">
                 
                     <a href="./FP/asistencia_programador.php" class="submenu-trigger">Programación</a>
-                    <a href="#" class="submenu-trigger">Programación Web</a>
-                    <a href="#" class="submenu-trigger">Marketing y Venta Digital</a>
-                    <a href="#" class="submenu-trigger">Redes Informáticas</a>
+                    <a href="./FP/asistencia_programacion_web.php" class="submenu-trigger">Programación Web</a>
+                    <a href="./FP/asistencia_hmvdigital.php" class="submenu-trigger">Marketing y Venta Digital</a>
+                    <a href="./FP/asistencia_redes.php" class="submenu-trigger">Redes Informáticas</a>
  
       </li>
     </ul>
@@ -83,7 +83,7 @@ if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)
   <div class="modal-content-estudiantes">
     <span class="modal-close-estudiantes close-modal-button" id="closeEstudiantesModal">&times; Cerrar</span>
     <button id="btnMostrarInformesAsistencia" class="boton-informes-asistencia">Informes de Asistencias</button>
-    <button id="btnImprimirListaEstudiantes" class="boton-informes-asistencia">Guardar Lista de Estudiantes</button>
+    <button id="modallistaestudiantestecnicaturas" class="boton-informes-asistencia">Generar Informe estudiantes</button>
     <div id="tablaContainerEstudiantes">
       <table id="tabla">
         <thead>
@@ -133,10 +133,10 @@ if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)
    <button id="btnMostrarEstudiantesFP">EstudiantesFP</button>
 <!-- Modal para la tabla de estudiantes -->
 <div id="estudiantesModalFP" class="estudiantes-modal">
-  <div class="modal-content-estudiantes">
+  <div class="modal-content-estudiantes-FP">
     <span class="modal-close-estudiantes close-modal-button" id="closeEstudiantesModalFP">&times; Cerrar</span>
     <button id="btnMostrarInformesAsistenciaFP" class="boton-informes-asistencia">Informes de Asistencias</button>
-    <button id="btnImprimirListaEstudiantesFP" class="boton-informes-asistencia">Guardar Lista de Estudiantes</button>
+    <button id="abrirInformeFP" class="boton-informes-asistencia">Generar Informe estudiantes</button>
     <div id="tablaContainerEstudiantesFP">
       <table id="tablaFP">
         <thead>
@@ -146,40 +146,54 @@ if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)
             <th>Nombre</th>
             <th>DNI</th>
             <th>Celular</th>
-            <th>Carrera</th>
-            <th>Acciones</th>
+            <th class="ths">Carrera1</th>
+            <th class="ths">Carrera2</th>
+            <th class="ths">Carrera3</th>
+            <th class="ths">Carrera4</th>
+            <th class="ths">Acciones</th>
           </tr>
         </thead>
         <tbody>
-             <?php
-            $sql1 = "SELECT af.nombre_afp,af.apellido_afp,af.legajo_afp,af.dni_afp,af.celular_afp,c.nombre_carrera 
-            FROM alumnos_fp af INNER JOIN carreras c on af.carreras_idCarrera = c.idCarrera 
-            WHERE af.estado = '1';";
-            $query1 = mysqli_query($conexion, $sql1);
-            while ($datos = mysqli_fetch_assoc($query1)) {
-                ?>
-                <tr>
-                    <td><?php echo $datos['legajo_afp']; ?></td>
-                    <td><?php echo $datos['apellido_afp']; ?></td>
-                    <td><?php echo $datos['nombre_afp']; ?></td>
-                    <td><?php echo $datos['dni_afp']; ?></td>
-                    <td><?php echo $datos['celular_afp']; ?></td>
-                    <td><?php echo $datos['nombre_carrera']; ?></td>
-                    <td><a href="./FP/modificar_alumno_FP.php?legajo=<?php echo $datos['legajo_afp']; ?>" class="modificar-button"><i class="fas fa-pencil-alt"></i></a>
-                        <a href="#" onclick="return confirmarBorrado('<?php echo $datos['legajo_afp']; ?>')" class="borrar-button"><i class="fas fa-trash-alt"></i></a>
-                        <a href="./Profesor/porcentajes_de_asistencia.php?legajo=<?php echo $datos['legajo_afp']; ?>" class="accion-button"><i class="fas fa-exclamation"></i></a></td>
-                        
-
-
-                </tr>
-                <?php
-            }
-            ?>
+          <?php
+          $sql1 = "SELECT af.nombre_afp, af.apellido_afp, af.legajo_afp, af.dni_afp, af.celular_afp, 
+                           c1.nombre_carrera AS nombre_carrera1, 
+                           c2.nombre_carrera AS nombre_carrera2, 
+                           c3.nombre_carrera AS nombre_carrera3, 
+                           c4.nombre_carrera AS nombre_carrera4
+                    FROM alumnos_fp af
+                    LEFT JOIN carreras c1 ON af.carreras_idCarrera = c1.idCarrera
+                    LEFT JOIN carreras c2 ON af.carreras_idCarrera1 = c2.idCarrera
+                    LEFT JOIN carreras c3 ON af.carreras_idCarrera2 = c3.idCarrera
+                    LEFT JOIN carreras c4 ON af.carreras_idCarrera3 = c4.idCarrera
+                    WHERE af.estado = '1';";
+          $query1 = mysqli_query($conexion, $sql1);
+          while ($datos = mysqli_fetch_assoc($query1)) {
+          ?>
+            <tr>
+              <td><?php echo $datos['legajo_afp']; ?></td>
+              <td><?php echo $datos['apellido_afp']; ?></td>
+              <td><?php echo $datos['nombre_afp']; ?></td>
+              <td><?php echo $datos['dni_afp']; ?></td>
+              <td><?php echo $datos['celular_afp']; ?></td>
+              <td><?php echo $datos['nombre_carrera1']; ?></td>
+              <td><?php echo $datos['nombre_carrera2']; ?></td>
+              <td><?php echo $datos['nombre_carrera3']; ?></td>
+              <td><?php echo $datos['nombre_carrera4']; ?></td>
+              <td>
+                <a href="./FP/ABM_FP/modificar_alumnoFP.php?legajo=<?php echo $datos['legajo_afp']; ?>" class="modificar-button"><i class="fas fa-pencil-alt"></i></a>
+                <a href="#" onclick="return nombreNuevo('<?php echo $datos['legajo_afp']; ?>')" class="borrar-button"><i class="fas fa-trash-alt"></i></a>
+                <a href="./FP/info_FP.php?legajo=<?php echo $datos['legajo_afp']; ?>" class="accion-button"><i class="fas fa-exclamation"></i></a>
+              </td>
+            </tr>
+          <?php
+          }
+          ?>
         </tbody>
       </table>
     </div>
   </div>
 </div>
+
   <div id="modal" class="modal">
   <div class="modal-content">
   <span class="close" onclick="closeModal()">&times;</span>
@@ -189,21 +203,30 @@ if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)
       <input type="text" class="form-container__input" name="nombre_alu" placeholder="Ingrese el nombre" autocomplete="off" required>
       <input type="text" class="form-container__input" name="apellido_alu" placeholder="Ingrese el apellido" autocomplete="off" required>
       <input type="number" class="form-container__input" name="dni_alu" placeholder="Ingrese el DNI" autocomplete="off" required>
-      <input type="number" class="form-container__input" name="celular" placeholder="Ingrese el celular" autocomplete="off" >
-      <input type="number" class="form-container__input" name="legajo" placeholder="Ingrese el número de legajo" autocomplete="off" required>
-      <input type="date" class="form-container__input" name="edad" placeholder="Ingrese fecha de nacimiento" autocomplete="off" >
+      <input type="number" class="form-container__input" name="celular" placeholder="Ingrese el celular" autocomplete="off">
+      
+     <?php
+        // Consulta para obtener el último número de legajo
+        $sql_legajo = "SELECT MAX(legajo) AS max_legajo FROM alumno";
+        $resultado_legajo = $conexion->query($sql_legajo);
+        $fila_legajo = $resultado_legajo->fetch_assoc();
+        $nuevo_legajo = $fila_legajo['max_legajo'] + 1; // Nuevo legajo es el último más uno
+    ?>
+    <!-- Campo de legajo con el valor obtenido de la base de datos -->
+    <input type="text" name="legajo" placeholder="N° Legajo"  value="<?php echo $nuevo_legajo; ?>" class="form-container__input" >
+      <input type="date" class="form-container__input" name="edad" placeholder="Ingrese fecha de nacimiento" autocomplete="off">
       <input type="text" class="form-container__input" name="observaciones" placeholder="Observaciones" autocomplete="off" required>
       <input type="text" class="form-container__input" name="Trabajo_Horario" placeholder="Trabajo / Horario" autocomplete="off" required>
-            <!-- php para la recorrida de las carreras del select -->
+      <!-- php para la recorrida de las carreras del select -->
       <?php
-       $sql_mater="select * from carreras c ";
-       $peticion=mysqli_query($conexion,$sql_mater);
-       ?>      
+       $sql_mater = "SELECT * FROM carreras";
+       $peticion = mysqli_query($conexion, $sql_mater);
+      ?>      
       <select name="inscripcion_carrera" class="form-container__input"> 
-        <option hidden >Selecciona una carrera </option>
-        <?php while($informacion=mysqli_fetch_assoc($peticion)){ ?>
+        <option hidden>Selecciona una carrera</option>
+        <?php while ($informacion = mysqli_fetch_assoc($peticion)) { ?>
           <option value="<?php echo $informacion['idCarrera'] ?>"><?php echo $informacion['nombre_carrera'] ?></option>
-          <?php }?>
+        <?php }?>
       </select>
 
       <input type="submit" class="form-container__input" name="enviar" value="Enviar" onclick="mostrarAlertaExitosa(); closeSuccessMessage();">
@@ -245,7 +268,7 @@ if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)
 </div>
 
 
-<div id="modal-lista-estudiantes" class="modal-lista-estudiantes" style="display: none; position: fixed; z-index: 155555555555; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4);">
+<div id="modal-lista-estudiantes"   class="modal-lista-estudiantes" style="display: none; position: fixed; z-index: 155555555555; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4);">
     <div class="modal-content-lista-estudiantes" style="background-color: rgba(255, 255, 255, 0.9); margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);">
         <span class="close-modal-button" id="closeListaEstudiantesModal" style="color: #aaa; float: right; font-size: 28px; font-weight: bold;">&times;</span>
         <h2>Informe de Estudiantes</h2>
@@ -273,53 +296,87 @@ if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)
   <div class="modal-content-student-fp">
   
   <?php
-    $sql_mater = "SELECT * FROM carreras c
-    WHERE c.idCarrera IN ('8','14','15','64')";
-    $peticion = mysqli_query($conexion, $sql_mater);
+    
+    // Consulta para obtener las carreras
+    $sql_carreras = "SELECT * FROM carreras c WHERE c.idCarrera IN ('8','14','15','64','65')";
+    $resultado_carreras = mysqli_query($conexion, $sql_carreras);
     $carreras = array(); // Almacenar las carreras en un array
 
-    while ($informacion = mysqli_fetch_assoc($peticion)) {
-        $carreras[] = $informacion; // Añadir cada carrera al array
+    while ($informacion_carrera = mysqli_fetch_assoc($resultado_carreras)) {
+        $carreras[] = $informacion_carrera; // Añadir cada carrera al array
     }
 ?>
     <span class="close-student-fp">&times;</span>
     <form action="./FP/ABM_FP/guardar_alumnofp.php" method="post">
     <h2>Registro de FP</h2>
-        <input type="number" name="legajo" placeholder="Legajo" class="form-container__input" autocomplete="off">
+        <?php
+        // Consulta para obtener el último número de legajo
+        $sql_legajo = "SELECT MAX(legajo_afp) AS max_legajo FROM alumnos_fp";
+        $resultado_legajo = $conexion->query($sql_legajo);
+        $fila_legajo = $resultado_legajo->fetch_assoc();
+        $nuevo_legajo = $fila_legajo['max_legajo'] + 1; // Nuevo legajo es el último más uno
+    ?>
+    <!-- Campo de legajo con el valor obtenido de la base de datos -->
+    <input type="text" name="legajo" placeholder="N° Legajo"  value="<?php echo $nuevo_legajo; ?>" class="form-container__input" >
         <input type="text" name="nombre" placeholder="Nombre" class="form-container__input" autocomplete="off">
         <input type="text" name="apellido" placeholder="Apellido" class="form-container__input" autocomplete="off">
         <input type="number" name="dni" placeholder="DNI" class="form-container__input" autocomplete="off">
         <input type="number" name="celular" placeholder="Celular" class="form-container__input" autocomplete="off">
         <input type="text" name="observaciones" placeholder="Observaciones" class="form-container__input" autocomplete="off">
-        <input type="text" name="trabaja" placeholder="Trabaja" class="form-container__input"autocomplete="off">
+        <input type="text" name="trabaja" placeholder="Trabaja" class="form-container__input" autocomplete="off">
         <!-- PHP code to generate options goes here -->
         <select name="FP1" class="form-container__input">
         <?php foreach ($carreras as $carrera) { ?>
-            <option value="NULL"  hidden selected >Selecciona una carrera</option>
+        <option value="65" hidden selected>Selecciona un curso</option>
             <option value="<?php echo $carrera['idCarrera'] ?>"><?php echo $carrera['nombre_carrera'] ?></option>
             <?php } ?>
         </select>
         <select name="FP2" class="form-container__input">
         <?php foreach ($carreras as $carrera) { ?>
-            <option value="NULL" hidden selected>Selecciona una carrera</option>
+            <option value="65" hidden selected>Selecciona un curso</option>
             <option value="<?php echo $carrera['idCarrera'] ?>"><?php echo $carrera['nombre_carrera'] ?></option>
             <?php } ?>
         </select>
         <select name="FP3" class="form-container__input">
         <?php foreach ($carreras as $carrera) { ?>
-            <option value="NULL" hidden selected>Selecciona una carrera</option>
+            <option value="65" hidden selected>Selecciona un curso</option>
             <option value="<?php echo $carrera['idCarrera'] ?>"><?php echo $carrera['nombre_carrera'] ?></option>
             <?php } ?>
         </select>
         <select name="FP4" class="form-container__input">
         <?php foreach ($carreras as $carrera) { ?>
-            <option value="NULL" hidden selected>Selecciona una carrera</option>
+            <option value="65" hidden selected>Selecciona un curso</option>
             <option value="<?php echo $carrera['idCarrera'] ?>"><?php echo $carrera['nombre_carrera'] ?></option>
             <?php } ?>
         </select>
         <input type="submit" name="enviar" value="Enviar" class="form-container__input">
     </form>
   </div>
+</div>
+
+
+
+
+<div id="modal-lista-estudiantes-FP" class="modal-lista-estudiantes" style="display: none; position: fixed; z-index: 155555555555; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4);">
+    <div class="modal-content-lista-estudiantes" style="background-color: rgba(255, 255, 255, 0.9); margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);">
+        <span class="close-modal-button" id="closeListaEstudiantesModal-FP" style="color: #aaa; float: right; font-size: 28px; font-weight: bold;">&times;</span>
+        <h2>Informe de Estudiantes</h2>
+        <form action="./indexs/generar_exel_alumnos.php" method="post">
+            <?php
+            $sql_mater = "select * from preceptores p 
+            INNER JOIN carreras c on c.idCarrera = p.carreras_idCarrera
+            -- WHERE p.profesor_idProrfesor = {$_SESSION["id"]} ";
+            $peticion = mysqli_query($conexion, $sql_mater);
+            ?>      
+            <select name="carrera" class="form-container__input"> 
+                <option hidden>Selecciona una carrera</option>
+                <?php while ($informacion = mysqli_fetch_assoc($peticion)) { ?>
+                    <option value="<?php echo $informacion['idCarrera'] ?>"><?php echo $informacion['nombre_carrera'] ?></option>
+                <?php } ?>
+            </select>
+            <input type="submit" value="Generar Lista de Estudiantes" style="background-color: red; color: white; padding: 10px 20px; margin: 8px 0; border: none; cursor: pointer; width: 100%;">
+        </form>
+    </div>
 </div>
 
 
@@ -583,6 +640,65 @@ window.onclick = function(event) {
         modal.style.display = "none";
     }
 }
+
+
+document.addEventListener("DOMContentLoaded", function() {
+  var modal = document.getElementById("modal-lista-estudiantes-FP");
+  var btnOpenModal = document.getElementById("abrirInformeFP");
+  var btnCloseModal = document.getElementById("closeListaEstudiantesModal-FP");
+
+  // Evento para abrir el modal
+  btnOpenModal.addEventListener("click", function() {
+      modal.style.display = "block";
+  });
+
+  // Evento para cerrar el modal
+  btnCloseModal.addEventListener("click", function() {
+      modal.style.display = "none";
+  });
+
+  // También cierra el modal si el usuario hace clic fuera del contenido del modal
+  window.onclick = function(event) {
+      if (event.target === modal) {
+          modal.style.display = "none";
+      }
+  }
+});
+
+   // Esta función muestra el modal
+   function mostrarModal() {
+    var modal = document.getElementById('modal-lista-estudiantes');
+    modal.style.display = 'block';
+}
+
+// Esta función oculta el modal
+function cerrarModal() {
+    var modal = document.getElementById('modal-lista-estudiantes');
+    modal.style.display = 'none';
+}
+
+// Asignar eventos al cargar la página
+window.onload = function() {
+    // Asignar el evento click al botón de cierre
+    var botonCierre = document.getElementById('closeListaEstudiantesModal');
+    botonCierre.onclick = function() {
+        cerrarModal();
+    };
+
+    // Asignar evento click al botón que abre el modal
+    var botonAbrir = document.getElementById('modallistaestudiantestecnicaturas');
+    botonAbrir.onclick = function() {
+        mostrarModal();
+    };
+};
+
+// Cerrar el modal al hacer clic fuera de su contenido
+window.onclick = function(event) {
+    var modal = document.getElementById('modal-lista-estudiantes');
+    if (event.target == modal) {
+        cerrarModal();
+    }
+};
 </script>
 </body>
 </html>

@@ -2,18 +2,18 @@
 session_start();
 if (empty($_SESSION["id"])){header('Location: ../login/login.php');}
 ?>
-<?php include'../../../../conexion/conexion.php'; ?>
+<?php include'../conexion/conexion.php'; ?>
 
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SGPM-Bustamante Mariela</title>
-    <link rel="stylesheet" type="text/css" href="../../../../estilos.css">
-    <link rel="stylesheet" type="text/css" href="../../../../normalize.css">
-    <link rel="stylesheet" type="text/css" href="../../../estilos_porcentajes.css">
-    <link rel="icon" href="../../../../politecnico.ico">
+    <title>SGPM</title>
+    <link rel="stylesheet" type="text/css" href="../estilos.css">
+    <link rel="stylesheet" type="text/css" href="../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../Profesor/estilos_porcentajes.css">
+    <link rel="icon" href="../politecnico.ico">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-Bz5/BqJ8SCxmeLEjmo5fD5fgONMAewh+PxQv0tRnm5IsJf5M9bGqDlVCS5c3X7CQZLjdvFtJ+zaOhtlUlm7XjA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link href="https://unpkg.com/vanilla-datatables@latest/dist/vanilla-dataTables.min.css" rel="stylesheet" type="text/css">
@@ -30,7 +30,7 @@ if (empty($_SESSION["id"])){header('Location: ../login/login.php');}
     <nav class="navbar">
       
     <div class="nav-left">  
-    <a href="../BUSTAMANTE_MARIELA_ANDREA.PHP" class="home-button">Inicio</a>
+    <a href="../Profesor/controlador_preceptormodificar.php" class="home-button">Inicio</a>
       
      
       </div>
@@ -42,49 +42,147 @@ if (empty($_SESSION["id"])){header('Location: ../login/login.php');}
   
   
 </ul>
+
  <div class="nav-right">
         <a href="../login/cerrar_sesion.php" class="btn-logout">Cerrar sesión</a>
     </div>
   </nav>
   
-  <div class="contenedor">
-        <h1>Enfermeria 1er Año</h1>
-        <div class="hilera">
-            <h2>Comisión A</h2>
-            <button class="boton"><a href="../prueba_tabla.php?materia=286&carrera=27"> Taller de Oralidad </a></button>
-            <button class="boton"><a href="../prueba_tabla.php?materia=287&carrera=27"> Biología Humana </a></button>
-            <button class="boton"><a href="../prueba_tabla.php?materia=288&carrera=27"> Introducción a la investigación en salud </a></button>
-            <button class="boton"><a href="../prueba_tabla.php?materia=289&carrera=27"> Fundamentos de la Psicología general y de la intervención </a></button>
-            <button class="boton"><a href="../prueba_tabla.php?materia=290&carrera=27"> Introducción al Campo de la Salud </a></button>
-            <button class="boton"><a href="../prueba_tabla.php?materia=291&carrera=27"> Practicas Profesionalizantes I </a></button>
-            <button class="boton"><a href="../prueba_tabla.php?materia=309&carrera=27"> Seminario I: Tecnología de la Información y la Comunicación </a></button>
-           
-        </div>
-         <div class="hilera">
-            <h2>Comisión B</h2>
-            <button class="boton"><a href="../prueba_tabla.php?materia=304&carrera=40">Modalidades de Intervención en el Acompañante Terapéutico</a></button>
-            <button class="boton"><a href="../prueba_tabla.php?materia=305&carrera=40">Dinámica Grupal</a></button>
-            <button class="boton"><a href="../prueba_tabla.php?materia=306&carrera=40">Teoría Psicosocial y Comunitaria</a></button>
-            <button class="boton"><a href="../prueba_tabla.php?materia=307&carrera=40">Psicología Evolutiva</a></button>
-            <button class="boton"><a href="../prueba_tabla.php?materia=308&carrera=40">>Psicopatología</a></button>
-            <button class="boton"><a href="../prueba_tabla.php?materia=310&carrera=40">Práctica Profesionalizantes II</a></button>
-            <button class="boton"><a href="../prueba_tabla.php?materia=311&carrera=40">Seminario II: Sistemas Familiares</a></button>
-            <button class="boton"><a href="../prueba_tabla.php?materia=312&carrera=40">Seminario III: Trastornos crónicos y Degenerativos</a></button>
-            
-        </div>
-        <div class="hilera">
-            <h2>Comisión C</h2>
-            <button class="boton"><a href="../prueba_tabla.php?materia=331&carrera=43">Ética y Deontología Profesional</a></button>
-            <button class="boton"><a href="../prueba_tabla.php?materia=332&carrera=43">Corrientes Psicológicas Contemporáneas</a></button>
-            <button class="boton"><a href="../prueba_tabla.php?materia=333&carrera=43">Principios Médicos y de Psicofarmacología</a></button>
-            <button class="boton"><a href="../prueba_tabla.php?materia=334&carrera=43">Acompañamiento Terapéutico en la Niñez y la Adolescencia</a></button>
-            <button class="boton"><a href="../prueba_tabla.php?materia=335&carrera=43">Acompañamiento Terapéutico del Adulto y Adulto Mayor</a></button>
-            <button class="boton"><a href="../prueba_tabla.php?materia=336&carrera=43">Práctica Profesionalizantes III</a></button>
-            <button class="boton"><a href="../prueba_tabla.php?materia=337&carrera=43">Seminario IV: Integración Escolar</a></button>
-          
-            
-        </div>
-    </div>
+  
+   <?php
+
+
+
+$legajo = $_GET['legajo'];
+
+?>
+<a href="imprimir_alumno.php?legajo=<?php echo $legajo; ?>" class="accion-button"><i class="fa-solid fa-print"></i></a>
+<br>
+<br>
+<?php
+try {
+    $html_datos_alumno = '<h2 style="color:white; text-shadow: 2px 1px 2px black;">Datos del alumno</h2><br>';
+$html_datos_alumno .= '<table border="1">
+                            <tr>
+                                <th>Apellido</th>
+                                <th>Nombre</th>
+                                <th>DNI</th>
+                                <th>Legajo</th>
+                                <th>Observaciones</th>
+                                <th>Trabajo</th>
+                                <th>Celular</th>
+                                <th>Carrera1</th>
+                                <th>Carrera2</th>
+                                <th>Carrera3</th>
+                                <th>Carrera4</th>
+                            </tr>';
+
+$sql_datos_alumno = "SELECT *, 
+    c1.nombre_carrera AS nombre_carrera1, 
+    c2.nombre_carrera AS nombre_carrera2, 
+    c3.nombre_carrera AS nombre_carrera3, 
+    c4.nombre_carrera AS nombre_carrera4
+FROM alumnos_fp af
+LEFT JOIN carreras c1 ON af.carreras_idCarrera = c1.idCarrera
+LEFT JOIN carreras c2 ON af.carreras_idCarrera1 = c2.idCarrera
+LEFT JOIN carreras c3 ON af.carreras_idCarrera2 = c3.idCarrera
+LEFT JOIN carreras c4 ON af.carreras_idCarrera3 = c4.idCarrera
+WHERE legajo_afp  = '$legajo';";
+$query_datos_alumno = mysqli_query($conexion, $sql_datos_alumno);
+
+if (!$query_datos_alumno) {
+    throw new Exception("Error al obtener los datos del alumno: " . mysqli_error($conexion));
+}
+
+$row_datos_alumno = mysqli_fetch_assoc($query_datos_alumno);
+
+$html_datos_alumno .= "<tr>
+                            <td>{$row_datos_alumno['apellido_afp']}</td>
+                            <td>{$row_datos_alumno['nombre_afp']}</td>
+                            <td>{$row_datos_alumno['dni_afp']}</td>
+                            <td>$legajo</td>
+                            <td>{$row_datos_alumno['observaciones_afp']}</td>
+                            <td>{$row_datos_alumno['trabaja_fp']}</td>
+                            <td>{$row_datos_alumno['celular_afp']}</td>
+                            <td>{$row_datos_alumno['nombre_carrera1']}</td>
+                            <td>{$row_datos_alumno['nombre_carrera2']}</td>
+                            <td>{$row_datos_alumno['nombre_carrera3']}</td>
+                            <td>{$row_datos_alumno['nombre_carrera4']}</td>
+                          </tr>";
+
+$html_datos_alumno .= '</table>';
+
+// Imprimir tabla de datos del alumno
+echo $html_datos_alumno;
+
+
+    // Generar tabla de asistencias
+    $html_asistencias = '<br><h2 style="color:white; text-shadow: 2px 1px 2px black;">Asistencias</h2><br>';
+    $html_asistencias .= '<table border="1">
+                            <tr>
+                                <th>Materia</th>
+                                <th>Porcentaje Presente (1er Horario)</th>
+                                <th>Porcentaje Ausente (1er Horario)</th>
+                            </tr>';
+
+    // Obtener los ID de carrera asociados al alumno
+    $sql_id_carrera = "SELECT 
+    afp.carreras_idCarrera,
+    c.nombre_carrera,
+    m.Nombre,
+    SUM(CASE WHEN afp.1_horario = 'Presente' THEN 1 ELSE 0 END) AS asistencias_1er_horario,
+    SUM(CASE WHEN afp.1_horario = 'Ausente' THEN 1 ELSE 0 END) AS ausencias_1er_horario,
+    COUNT(*) AS total_clases
+FROM 
+    asistencia_FP afp
+INNER JOIN 
+    carreras c ON afp.carreras_idCarrera = c.idCarrera
+INNER JOIN 
+    materias m ON afp.materias_idMaterias = m.idMaterias
+WHERE 
+     afp.alumnos_fp_legajo_afp = '$legajo'
+GROUP BY 
+    afp.carreras_idCarrera, c.nombre_carrera, m.Nombre;";
+
+    $query_id_carrera = mysqli_query($conexion, $sql_id_carrera);
+
+    if (!$query_id_carrera) {
+        throw new Exception("Error al obtener los ID de carrera: " . mysqli_error($conexion));
+    }
+
+    while ($row_id_carrera = mysqli_fetch_assoc($query_id_carrera)) {
+        // Calcular porcentaje de asistencia y ausencia para cada horario
+        $porcentaje_asistencia_1er_horario = $row_id_carrera['asistencias_1er_horario'] * 100.0 / $row_id_carrera['total_clases'];
+        $porcentaje_ausencia_1er_horario = $row_id_carrera['ausencias_1er_horario'] * 100.0 / $row_id_carrera['total_clases'];
+        
+
+        // Agregar fila a la tabla de asistencias
+        $html_asistencias .= "
+                            <tr>
+                                <td>{$row_id_carrera['Nombre']}</td>
+                                <td>{$porcentaje_asistencia_1er_horario}</td>
+                                <td>{$porcentaje_ausencia_1er_horario}</td>
+                            </tr>";
+    }
+
+    $html_asistencias .= '</table>';
+
+    // Imprimir tabla de asistencias
+    echo $html_asistencias;
+
+} catch (Exception $e) {
+    echo "Error: " . $e->getMessage();
+}
+
+
+
+
+
+
+
+
+
+?>
 
 <script>
 

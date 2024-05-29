@@ -29,7 +29,7 @@ if (isset($_POST['enviar'])) {
             // Redireccionar según el rol del usuario using switch case
             switch ($datos->rol) {
                 case 1:
-                    header("Location: ../index.php"); // Rol Administracion
+                    header("Location: ../index_secretario.php"); // Rol Administracion
                     break;
                 case 2:
                     header("Location: ../index.php"); // Rol Programadores
@@ -46,14 +46,17 @@ if (isset($_POST['enviar'])) {
                             case 6: 
                                  header("Location: ../indexs/preceptor_4.php"); // Jorge
                                 break;
-                                case 7: 
-                                     header("Location: ../indexs/preceptor_5.php"); // Carla Paola
+                                case 8: 
+                                     header("Location: ../indexs/preceptor_5.php"); // Pazz
                                     break;
-                                    case 8:
-                                         header("Location: ../indexs/preceptor_6.php"); // Pazz 
+                                    case 11:
+                                         header("Location: ../indexs/preceptor_6.php"); // Rocio 
                                         break;
                                         case 9:
                                              header("Location: ../index_bruno.php"); // Redirigir a la página principal
+                                            break;
+                                             case 10:
+                                             header("Location: ../profesores/index-p.php"); // Redirigir a la página principal
                                             break;
                 default:
                     echo '<div class="alert alert-danger" role="alert">!! ACCESO DENEGADO!!</div>';

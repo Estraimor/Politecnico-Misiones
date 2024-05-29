@@ -1400,3 +1400,38 @@ cursor: pointer;
   text-decoration: none;
   cursor: pointer;
 }
+.modal-content-estudiantes-FP {
+  background-color: #fff;
+  margin: 10% auto; /* Reducido el margen superior para centrar mejor */
+  padding: 5px;
+  border: 1px solid #ddd;
+  width: 95%;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+}
+
+.modal-content-estudiantes-FP table {
+  width: 100%;
+/* Esto ayuda a mantener fijo el ancho de las columnas */
+}
+
+.modal-content-estudiantes-FP th, 
+.modal-content-estudiantes-FP td {
+  max-width: 120px; /* Ajusta este valor según necesites */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap; /* Esto evita que el texto se ajuste a varias líneas */
+  padding: 8px;
+  text-align: LEFT;
+}
+
+/* Especifica estilos por clase para columnas que puedan tener más ancho */
+.modal-content-estudiantes-FP .ths {
+  max-width: 190px; /* O cualquier otro ancho según la necesidad de estas columnas */
+}
+
+.modal-content-estudiantes .legajo {
+  max-width: none; /* Elimina cualquier límite de ancho máximo */
+  white-space: auto; /* Permite que el contenido defina el ancho de la columna */
+  text-align: center;
+}

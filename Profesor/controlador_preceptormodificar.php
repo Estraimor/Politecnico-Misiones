@@ -6,7 +6,7 @@ if (isset($_SESSION["roles"])) {
     // Redireccionar según el rol del usuario usando switch case
     switch ($_SESSION["roles"]) {
         case 1:
-            header("Location: ../index.php"); // Administracion
+            header("Location: ../index_secretario.php"); // Administracion
             exit();
         case 2:
             header("Location: ../index.php"); // Programador
@@ -23,10 +23,10 @@ if (isset($_SESSION["roles"])) {
         case 6: 
             header("Location: ../indexs/preceptor_4.php"); // Jorge
             exit();
-        case 7: 
+        case 8: 
             header("Location: ../indexs/preceptor_5.php"); // Carla Paola
             exit(); 
-        case 8:
+        case 11:
             header("Location: ../indexs/preceptor_6.php"); // Luciano 
             exit();
         case 9:

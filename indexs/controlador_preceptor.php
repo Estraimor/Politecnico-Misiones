@@ -17,11 +17,11 @@ if (isset($_SESSION["roles"]) ) {
         case 6: 
             header("Location: ./preceptor_4.php"); // Jorge
             exit();
-        case 7: 
-            header("Location: ./preceptor_5.php"); // Carla Paola
+        case 8: 
+            header("Location: ./preceptor_5.php"); // Pazz
             exit();
-        case 8:
-            header("Location: ./preceptor_6.php"); // Luciano 
+        case 11:
+            header("Location: ./preceptor_6.php"); // Rocio 
             exit();
         default:
             echo '<div class="alert alert-danger" role="alert">!! ACCESO DENEGADO!!</div>';

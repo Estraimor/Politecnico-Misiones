@@ -1,9 +1,23 @@
 <?php
 session_start();
 if (empty($_SESSION["id"])){header('Location: ../login/login.php');}
+
+// Set inactivity limit in seconds
+$inactivity_limit = 1200;
+
+// Check if the user has been inactive for too long
+if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)) {
+    // User has been inactive, so destroy the session and redirect to login page
+    session_unset();
+    session_destroy();
+    header("Location: ../login/login.php");
+    exit; // Terminar el script después de redireccionar
+} else {
+    // Update the session time to the current time
+    $_SESSION['time'] = time();
+}
 ?>
 <?php include'../conexion/conexion.php'; ?>
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -109,65 +123,54 @@ try {
     echo $html_datos_alumno;
 
     // Generar tabla de asistencias
-    $html_asistencias = '<br><h2 style="color:white; text-shadow: 2px 1px 2px black;">Asistencias</h2><br>';
-    $html_asistencias .= '<table border="1">
-                            <tr>
-                                <th>Materia</th>
-                                <th>Porcentaje Presente (1er Horario)</th>
-                                <th>Porcentaje Ausente (1er Horario)</th>
-                                <th>Porcentaje Presente (2do Horario)</th>
-                                <th>Porcentaje Ausente (2do Horario)</th>
-                            </tr>';
+$html_asistencias = '<br><h2 style="color:white; text-shadow: 2px 1px 2px black;">Asistencias</h2><br>';
+$html_asistencias .= '<table border="1">
+                        <tr>
+                            <th>Materia</th>
+                            <th>Porcentaje Presente</th>
+                            <th>Porcentaje Ausente</th>
+                        </tr>';
 
-    // Obtener los ID de carrera asociados al alumno
-    $sql_id_carrera = "SELECT 
-                            a.inscripcion_asignatura_carreras_idCarrera,
-                            c.nombre_carrera,
-                            m.Nombre,
-                            SUM(CASE WHEN a.1_Horario = 'Presente' THEN 1 ELSE 0 END) AS asistencias_1er_horario,
-                            SUM(CASE WHEN a.1_Horario = 'Ausente' THEN 1 ELSE 0 END) AS ausencias_1er_horario,
-                            SUM(CASE WHEN a.2_Horario = 'Presente' THEN 1 ELSE 0 END) AS asistencias_2do_horario,
-                            SUM(CASE WHEN a.2_Horario = 'Ausente' THEN 1 ELSE 0 END) AS ausencias_2do_horario,
-                            COUNT(*) AS total_clases
-                        FROM 
-                            asistencia a
-                        INNER JOIN 
-                            carreras c ON a.inscripcion_asignatura_carreras_idCarrera = c.idCarrera
-                        INNER JOIN 
-                            materias m ON a.materias_idMaterias = m.idMaterias
-                        WHERE 
-                            a.inscripcion_asignatura_alumno_legajo = '$legajo'
-                        GROUP BY 
-                            a.inscripcion_asignatura_carreras_idCarrera, c.nombre_carrera, m.Nombre";
+// Obtener los datos de asistencia combinando ambos horarios
+$sql_asistencias = "SELECT 
+                        m.Nombre,
+                        (SUM(CASE WHEN a.1_Horario = 'Presente' OR a.2_Horario = 'Presente' THEN 1 ELSE 0 END) + SUM(CASE WHEN a.1_Horario = 'Presente' AND a.2_Horario = 'Presente' THEN 1 ELSE 0 END)) AS asistencias,
+                        (SUM(CASE WHEN a.1_Horario = 'Ausente' OR a.2_Horario = 'Ausente' THEN 1 ELSE 0 END) + SUM(CASE WHEN a.1_Horario = 'Ausente' AND a.2_Horario = 'Ausente' THEN 1 ELSE 0 END)) AS ausencias,
+                        COUNT(*) AS total_clases
+                    FROM 
+                        asistencia a
+                    INNER JOIN 
+                        materias m ON a.materias_idMaterias = m.idMaterias
+                    WHERE 
+                        a.inscripcion_asignatura_alumno_legajo = '$legajo'
+                    GROUP BY 
+                        m.Nombre";
 
-    $query_id_carrera = mysqli_query($conexion, $sql_id_carrera);
+$query_asistencias = mysqli_query($conexion, $sql_asistencias);
 
-    if (!$query_id_carrera) {
-        throw new Exception("Error al obtener los ID de carrera: " . mysqli_error($conexion));
-    }
+if (!$query_asistencias) {
+    throw new Exception("Error al obtener las asistencias: " . mysqli_error($conexion));
+}
 
-    while ($row_id_carrera = mysqli_fetch_assoc($query_id_carrera)) {
-        // Calcular porcentaje de asistencia y ausencia para cada horario
-        $porcentaje_asistencia_1er_horario = $row_id_carrera['asistencias_1er_horario'] * 100.0 / $row_id_carrera['total_clases'];
-        $porcentaje_ausencia_1er_horario = $row_id_carrera['ausencias_1er_horario'] * 100.0 / $row_id_carrera['total_clases'];
-        $porcentaje_asistencia_2do_horario = $row_id_carrera['asistencias_2do_horario'] * 100.0 / $row_id_carrera['total_clases'];
-        $porcentaje_ausencia_2do_horario = $row_id_carrera['ausencias_2do_horario'] * 100.0 / $row_id_carrera['total_clases'];
+while ($row_asistencias = mysqli_fetch_assoc($query_asistencias)) {
+    // Calcular porcentaje de asistencia y ausencia
+    $porcentaje_asistencia = $row_asistencias['asistencias'] * 100.0 / $row_asistencias['total_clases'];
+    $porcentaje_ausencia = $row_asistencias['ausencias'] * 100.0 / $row_asistencias['total_clases'];
 
-        // Agregar fila a la tabla de asistencias
-        $html_asistencias .= "
-                            <tr>
-                                <td>{$row_id_carrera['Nombre']}</td>
-                                <td>{$porcentaje_asistencia_1er_horario}</td>
-                                <td>{$porcentaje_ausencia_1er_horario}</td>
-                                <td>{$porcentaje_asistencia_2do_horario}</td>
-                                <td>{$porcentaje_ausencia_2do_horario}</td>
-                            </tr>";
-    }
+    // Agregar fila a la tabla de asistencias
+    $html_asistencias .= "
+                        <tr>
+                            <td>{$row_asistencias['Nombre']}</td>
+                            <td>{$porcentaje_asistencia}</td>
+                            <td>{$porcentaje_ausencia}</td>
+                        </tr>";
+}
 
-    $html_asistencias .= '</table>';
+$html_asistencias .= '</table>';
 
-    // Imprimir tabla de asistencias
-    echo $html_asistencias;
+// Imprimir tabla de asistencias
+echo $html_asistencias;
+
 
     // Generar tabla de justificaciones del alumno
     $html_justificaciones = '<br><h2 style="color:white; text-shadow: 2px 1px 2px black;">Justificaciones</h2><br>';

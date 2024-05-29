@@ -250,6 +250,7 @@ while ($materia = mysqli_fetch_assoc($query_materias)) {
     RIGHT JOIN inscripcion_asignatura ia ON a.inscripcion_asignatura_idinscripcion_asignatura = ia.idinscripcion_asignatura 
     INNER JOIN alumno a2 ON ia.alumno_legajo = a2.legajo   
     WHERE ia.carreras_idCarrera = '40' and a2.estado = '1'
+    GROUP BY a2.nombre_alumno , a2.apellido_alumno
     ORDER BY a2.apellido_alumno";
     $query = mysqli_query($conexion, $sql);
     while ($datos = mysqli_fetch_assoc($query)) {
@@ -374,6 +375,7 @@ while ($materia = mysqli_fetch_assoc($query_materias)) {
     RIGHT JOIN inscripcion_asignatura ia ON a.inscripcion_asignatura_idinscripcion_asignatura = ia.idinscripcion_asignatura 
     INNER JOIN alumno a2 ON ia.alumno_legajo = a2.legajo   
     WHERE ia.carreras_idCarrera = '41' and a2.estado = '1'
+    GROUP BY a2.nombre_alumno , a2.apellido_alumno
     ORDER BY a2.apellido_alumno";
     $query = mysqli_query($conexion, $sql);
     while ($datos = mysqli_fetch_assoc($query)) {

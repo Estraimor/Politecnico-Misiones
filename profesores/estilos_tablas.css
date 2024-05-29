@@ -1,0 +1,83 @@
+body {
+            background-color: white;
+        }
+        
+        table {
+            border-collapse: collapse;
+            margin: 5px; /* Ajusta el valor según necesites */
+        }
+        td, th {
+            border: 3px solid #ddd;
+            padding: 8px;
+        }
+        .numero {
+            text-align: right;
+        }
+        .columna-roja {
+            background-color: rgba(255,0,0,0.7);
+            color: white;
+        }
+        .estilo-select {
+        border-radius: 5px; /* Bordes redondeados */
+        border: 1px solid #ccc; /* Borde sólido, ligero */
+        background-color: #f8f8f8; /* Color de fondo claro */
+        color: #333; /* Color del texto */
+        padding: 5px; /* Espacio interno alrededor del contenido */
+        
+        /* Para mejorar la apariencia en diferentes navegadores, puedes necesitar más estilos específicos */
+    }
+    
+    /* Estilo para enfocar el select, es decir, cuando el usuario lo selecciona */
+    .estilo-select:focus {
+        border-color: #666; /* Cambia el color del borde cuando el select está enfocado */
+        outline: none; /* Elimina el outline por defecto para que se vea mejor */
+    }
+    input[type="text"], input[type="number"], input[type="email"], input[type="password"] {
+    width: 110%; /* Ajusta el ancho al contenedor */
+    padding: 8px 12px; /* Espaciado interno para hacer el input más grande */
+    margin: 8px 0; /* Espacio exterior para separarlo de otros elementos */
+    display: inline-block; /* Para que ocupe todo el ancho disponible */
+    border: 1px solid #ccc; /* Borde de color gris claro */
+    border-radius: 4px; /* Bordes redondeados */
+    box-sizing: border-box; /* Para que padding y border no aumenten el ancho total */
+    background-color: #fff; /* Fondo blanco */
+    color: #333; /* Texto de color oscuro */
+}
+
+input[type="text"]:focus, input[type="number"]:focus, input[type="email"]:focus, input[type="password"]:focus {
+    border-color: #66afe9; /* Cambia el color del borde al enfocar */
+    outline: none; /* Remueve el outline predeterminado */
+    box-shadow: 0 0 8px rgba(102, 175, 233, .6); /* Sombra suave alrededor del input enfocado */
+}
+input[type="number"]::-webkit-inner-spin-button, 
+input[type="number"]::-webkit-outer-spin-button { 
+  -webkit-appearance: none; 
+  margin: 0; 
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+.boton-enviar {
+        background-color: #ff3333; /* Color rojo */
+        border: none;
+        color: white;
+        padding: 10px 20px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin: 4px 2px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .boton-enviar:hover {
+        background-color: #cc2900; /* Rojo un poco más oscuro */
+    }
+
+    .boton-enviar:active {
+        background-color: #991f00; /* Rojo aún más oscuro */
+    }
+    

@@ -58,7 +58,7 @@
 <script>
     function volverAlMenuPrincipal() {
         // Aquí puedes redirigir al usuario al menú principal. Por ejemplo:
-        window.location.href = '../index.php';
+        window.location.href = '../Profesor/controlador_preceptormodificar.php';
     }
 </script>
 

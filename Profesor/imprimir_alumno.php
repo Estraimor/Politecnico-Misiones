@@ -1,38 +1,80 @@
 <?php
-require '../indexs/exel/vendor/autoload.php';
-
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+require '../indexs/pdf/vendor/setasign/fpdf/fpdf.php';
 
 include '../conexion/conexion.php';
 
 $legajo = $_GET['legajo'];
-// Definir el nombre del archivo
-$filename = 'datos_alumno_' . $legajo . '.xlsx';
+
+// Obtener nombre del alumno
+$sql_nombre_alumno = "SELECT nombre_alumno FROM alumno WHERE legajo  = '$legajo'";
+$query_nombre_alumno = mysqli_query($conexion, $sql_nombre_alumno);
+$row_nombre_alumno = mysqli_fetch_assoc($query_nombre_alumno);
+$nombre_alumno = $row_nombre_alumno['nombre_alumno'];
+$nombre_inst = utf8_decode('Instituto Superior Politécnico Misiones Nº 1');
+// Nombre del archivo PDF con el nombre del alumno y su legajo
+$nombre_archivo = "datos_alumno_$nombre_alumno-$legajo.pdf";
+
+
+class PDF extends FPDF
+{
+    // Cabecera de página
+    function Header()
+    {
+        global $nombre_inst;
+        // Espacio antes del encabezado de los datos
+        $this->Ln(30); // Aumentar el valor para más espacio
+
+        // Calcular la posición horizontal para centrar el rectángulo
+        $xRect = ($this->GetPageWidth() - 190) / 2;
+
+        // Color del rectángulo
+        $this->SetFillColor(189, 213, 234); // Color BDD5EA
+
+        // Encabezado solo en la primer página
+        if ($this->PageNo() == 1) {
+            // Dibujar rectángulo centrado
+            $this->Rect($xRect, 10, 190, 47, 'F');
+            // Título solo en la primer página
+            $this->SetFont('Arial', 'B', 16);
+            $this->SetTextColor(20, 13, 79); // Cambiar a color oscuro
+            // Coordenadas para centrar verticalmente en el rectángulo
+            $this->SetXY($xRect, 20);
+            $this->Cell(210, 10, $nombre_inst, 0, 1, 'C');
+
+            // Subtítulo solo en la primer página
+            $this->SetFont('Arial', '', 14);
+            // Coordenadas para centrar verticalmente en el rectángulo
+            $this->SetXY($xRect, 30);
+
+            // Logo
+            $this->Image('../imagenes/politecnico.png', 15, 15, 37);
+            // Arial bold 15
+            $this->SetFont('Arial', 'B', 15);
+            // Título
+            // Nombre del alumno y legajo
+            $this->Cell(0, 40, 'Alumno: ' . $GLOBALS['nombre_alumno'] . '  Legajo: ' . $GLOBALS['legajo'], 0, 1, 'C');
+            // Salto de línea
+            $this->Ln(10);
+        }
+    }
+
+    // Pie de página
+    function Footer()
+    {
+        // Posición: a 1,5 cm del final
+        $this->SetY(-15);
+        // Arial italic 8
+        $this->SetFont('Arial', 'I', 8);
+        // Número de página
+        $this->Cell(0, 10, 'Página ' . $this->PageNo(), 0, 0, 'C');
+    }
+}
+
 try {
-    // Crear una nueva instancia de Spreadsheet
-    $spreadsheet = new Spreadsheet();
-
-    // Crear hojas de cálculo para cada sección
-    $sheet_alumno = $spreadsheet->createSheet(0);
-    $sheet_alumno->setTitle('Datos del Alumno');
-    $sheet_asistencias = $spreadsheet->createSheet(1);
-    $sheet_asistencias->setTitle('Asistencias');
-    $sheet_justificaciones = $spreadsheet->createSheet(2);
-    $sheet_justificaciones->setTitle('Justificaciones');
-    $sheet_ratificaciones = $spreadsheet->createSheet(3);
-    $sheet_ratificaciones->setTitle('Reirado antes de tiempo');
-
-    // Escribir datos del alumno en la hoja correspondiente
-    $sheet_alumno->setCellValue('A1', 'Apellido');
-    $sheet_alumno->setCellValue('B1', 'Nombre');
-    $sheet_alumno->setCellValue('C1', 'DNI');
-    $sheet_alumno->setCellValue('D1', 'Legajo');
-    $sheet_alumno->setCellValue('E1', 'Edad');
-    $sheet_alumno->setCellValue('F1', 'Observaciones');
-    $sheet_alumno->setCellValue('G1', 'Trabajo');
-    $sheet_alumno->setCellValue('H1', 'Celular');
-    $sheet_alumno->setCellValue('I1', 'Carrera');
+    // Crear instancia de FPDF
+    $pdf = new PDF();
+    $pdf->AliasNbPages();
+    $pdf->AddPage();
 
     // Consulta para obtener datos del alumno
     $sql_datos_alumno = "SELECT *
@@ -46,181 +88,95 @@ try {
         throw new Exception("Error al obtener los datos del alumno: " . mysqli_error($conexion));
     }
 
-    $rowIndex = 2; // Empieza en la fila 2 para evitar sobreescribir los encabezados
-    while ($row_datos_alumno = mysqli_fetch_assoc($query_datos_alumno)) {
-        // Escribir datos del alumno en la hoja correspondiente
-        $sheet_alumno->setCellValue('A' . $rowIndex, $row_datos_alumno['apellido_alumno'] ?? '');
-        $sheet_alumno->setCellValue('B' . $rowIndex, $row_datos_alumno['nombre_alumno'] ?? '');
-        $sheet_alumno->setCellValue('C' . $rowIndex, $row_datos_alumno['dni_alumno'] ?? '');
-        $sheet_alumno->setCellValue('D' . $rowIndex, $legajo);
-        $sheet_alumno->setCellValue('E' . $rowIndex, $row_datos_alumno['edad'] ?? '');
-        $sheet_alumno->setCellValue('F' . $rowIndex, $row_datos_alumno['observaciones'] ?? '');
-        $sheet_alumno->setCellValue('G' . $rowIndex, $row_datos_alumno['Trabaja_Horario'] ?? '');
-        $sheet_alumno->setCellValue('H' . $rowIndex, $row_datos_alumno['celular'] ?? '');
-        $sheet_alumno->setCellValue('I' . $rowIndex, $row_datos_alumno['nombre_carrera'] ?? '');
-        $rowIndex++;
+      if ($row_datos_alumno = mysqli_fetch_assoc($query_datos_alumno)) {
+        $pdf->SetFont('Arial', '', 18);
+        $pdf->Cell(0, 10, 'Datos del Estudiante' , 0, 1);
+        $pdf->SetFont('Arial', '', 12);
+        $pdf->Cell(0, 10, 'Apellido: ' . utf8_decode($row_datos_alumno['apellido_alumno']), 0, 1);
+        $pdf->Cell(0, 10, 'Nombre: ' . utf8_decode($row_datos_alumno['nombre_alumno']), 0, 1);
+        $pdf->Cell(0, 10, 'DNI: ' . utf8_decode($row_datos_alumno['dni_alumno']), 0, 1);
+        $pdf->Cell(0, 10, 'Edad: ' . utf8_decode($row_datos_alumno['edad']), 0, 1);
+        $pdf->Cell(0, 10, 'Observaciones: ' . utf8_decode($row_datos_alumno['observaciones']), 0, 1);
+        $pdf->Cell(0, 10, 'Trabajo: ' . utf8_decode($row_datos_alumno['Trabaja_Horario']), 0, 1);
+        $pdf->Cell(0, 10, 'Celular: ' . utf8_decode($row_datos_alumno['celular']), 0, 1);
+        $pdf->Cell(0, 10, 'Carrera: ' . utf8_decode($row_datos_alumno['nombre_carrera']), 0, 1);
     }
 
-    // Escribir tabla de asistencias en la hoja correspondiente
-    $sheet_asistencias->setCellValue('A1', 'Materia');
-    $sheet_asistencias->setCellValue('B1', 'Porcentaje Presente (1er Horario)');
-    $sheet_asistencias->setCellValue('C1', 'Porcentaje Ausente (1er Horario)');
-    $sheet_asistencias->setCellValue('D1', 'Porcentaje Presente (2do Horario)');
-    $sheet_asistencias->setCellValue('E1', 'Porcentaje Ausente (2do Horario)');
+    // Consulta para obtener datos de asistencias
+$sql_asistencias = "SELECT 
+                        m.Nombre,
+                        (SUM(CASE WHEN a.1_Horario = 'Presente' OR a.2_Horario = 'Presente' THEN 1 ELSE 0 END) + SUM(CASE WHEN a.1_Horario = 'Presente' AND a.2_Horario = 'Presente' THEN 1 ELSE 0 END)) AS asistencias,
+                        (SUM(CASE WHEN a.1_Horario = 'Ausente' OR a.2_Horario = 'Ausente' THEN 1 ELSE 0 END) + SUM(CASE WHEN a.1_Horario = 'Ausente' AND a.2_Horario = 'Ausente' THEN 1 ELSE 0 END)) AS ausencias,
+                        COUNT(*) AS total_clases
+                    FROM 
+                        asistencia a
+                    INNER JOIN 
+                        materias m ON a.materias_idMaterias = m.idMaterias
+                    WHERE 
+                        a.inscripcion_asignatura_alumno_legajo = '$legajo'
+                    GROUP BY 
+                        m.Nombre";
 
-    // Obtener los ID de carrera asociados al alumno
-    $sql_id_carrera = "SELECT 
-                            a.inscripcion_asignatura_carreras_idCarrera,
-                            c.nombre_carrera,
-                            m.Nombre,
-                            SUM(CASE WHEN a.1_Horario = 'Presente' THEN 1 ELSE 0 END) AS asistencias_1er_horario,
-                            SUM(CASE WHEN a.1_Horario = 'Ausente' THEN 1 ELSE 0 END) AS ausencias_1er_horario,
-                            SUM(CASE WHEN a.2_Horario = 'Presente' THEN 1 ELSE 0 END) AS asistencias_2do_horario,
-                            SUM(CASE WHEN a.2_Horario = 'Ausente' THEN 1 ELSE 0 END) AS ausencias_2do_horario,
-                            COUNT(*) AS total_clases
-                        FROM 
-                            asistencia a
-                        INNER JOIN 
-                            carreras c ON a.inscripcion_asignatura_carreras_idCarrera = c.idCarrera
-                        INNER JOIN 
-                            materias m ON a.materias_idMaterias = m.idMaterias
-                        WHERE 
-                            a.inscripcion_asignatura_alumno_legajo = '$legajo'
-                        GROUP BY 
-                            a.inscripcion_asignatura_carreras_idCarrera, c.nombre_carrera, m.Nombre";
+$query_asistencias = mysqli_query($conexion, $sql_asistencias);
 
-    $query_id_carrera = mysqli_query($conexion, $sql_id_carrera);
+if (!$query_asistencias) {
+    throw new Exception("Error al obtener las asistencias: " . mysqli_error($conexion));
+}
 
-    if (!$query_id_carrera) {
-        throw new Exception("Error al obtener los ID de carrera: " . mysqli_error($conexion));
-    }
+// Generar tabla de asistencias
+// Generar tabla de asistencias
+$pdf->Ln(10);
+$pdf->SetFont('Arial', '', 18);
+$pdf->Cell(0, 10, 'Asistencias', 0, 1);
+$pdf->SetFont('Arial', '', 13);
+$pdf->Cell(0, 10, 'Materia: ', 0, 0);
+$pdf->Cell(0, 10, 'Presente: ' . '%', 0, 0);
+$pdf->Cell(0, 10, 'Ausente: ' . '%', 0, 1);
 
-    $rowIndex = 2; // Reiniciamos el índice de fila para la nueva hoja
-    while ($row_id_carrera = mysqli_fetch_assoc($query_id_carrera)) {
-        // Calcular porcentaje de asistencia y ausencia para cada horario
-        $porcentaje_asistencia_1er_horario = $row_id_carrera['asistencias_1er_horario'] * 100.0 / $row_id_carrera['total_clases'];
-        $porcentaje_ausencia_1er_horario = $row_id_carrera['ausencias_1er_horario'] * 100.0 / $row_id_carrera['total_clases'];
-        $porcentaje_asistencia_2do_horario = $row_id_carrera['asistencias_2do_horario'] * 100.0 / $row_id_carrera['total_clases'];
-        $porcentaje_ausencia_2do_horario = $row_id_carrera['ausencias_2do_horario'] * 100.0 / $row_id_carrera['total_clases'];
+while ($row_asistencias = mysqli_fetch_assoc($query_asistencias)) {
+    $porcentaje_asistencia = $row_asistencias['asistencias'] * 100.0 / $row_asistencias['total_clases'];
+    $porcentaje_ausencia = $row_asistencias['ausencias'] * 100.0 / $row_asistencias['total_clases'];
 
-        // Agregar fila a la tabla de asistencias
-        $sheet_asistencias->setCellValue('A' . $rowIndex, $row_id_carrera['Nombre']);
-        $sheet_asistencias->setCellValue('B' . $rowIndex, $porcentaje_asistencia_1er_horario);
-        $sheet_asistencias->setCellValue('C' . $rowIndex, $porcentaje_ausencia_1er_horario);
-        $sheet_asistencias->setCellValue('D' . $rowIndex, $porcentaje_asistencia_2do_horario);
-        $sheet_asistencias->setCellValue('E' . $rowIndex, $porcentaje_ausencia_2do_horario);
-        $rowIndex++;
-    }
+    $pdf->SetFont('Arial', '', 12);
+    $pdf->Cell(0, 10, utf8_decode($row_asistencias['Nombre']), 0, 0);
+    $pdf->Cell(0, 10, utf8_decode(number_format($porcentaje_asistencia, 2)) . '%', 0, 0);
+    $pdf->Cell(0, 10, utf8_decode(number_format($porcentaje_ausencia, 2)) . '%', 0, 1);
+}
 
-    // Escribir tabla de justificaciones en la hoja correspondiente
-    $sheet_justificaciones->setCellValue('A1', 'Carrera');
-    $sheet_justificaciones->setCellValue('B1', 'Apellido');
-    $sheet_justificaciones->setCellValue('C1', 'Nombre');
-    $sheet_justificaciones->setCellValue('D1', 'Materia');
-    $sheet_justificaciones->setCellValue('E1', 'Motivo');
-    $sheet_justificaciones->setCellValue('F1', 'Fecha');
 
-    // Consulta para obtener las justificaciones del alumno
-    $sql_justificaciones = "SELECT 
-                                c.nombre_carrera,
-                                a2.nombre_alumno,
-                                a2.apellido_alumno,
-                                m.Nombre AS materia,
-                                a.Motivo,
-                                a.fecha 
-                            FROM 
-                                alumnos_justificados a
-                            INNER JOIN 
-                                carreras c ON c.idCarrera = a.inscripcion_asignatura_carreras_idCarrera
-                            INNER JOIN 
-                                alumno a2 ON a.inscripcion_asignatura_alumno_legajo = a2.legajo
-                            INNER JOIN 
-                                materias m ON m.idMaterias = a.materias_idMaterias
-                            WHERE 
-                                a.inscripcion_asignatura_alumno_legajo = '$legajo'";
-
+    // Consulta para obtener datos de justificaciones
+    $sql_justificaciones = "SELECT * FROM alumnos_justificados WHERE inscripcion_asignatura_alumno_legajo  = '$legajo'";
     $query_justificaciones = mysqli_query($conexion, $sql_justificaciones);
 
     if (!$query_justificaciones) {
         throw new Exception("Error al obtener las justificaciones: " . mysqli_error($conexion));
     }
 
-    $rowIndex = 2; // Reiniciamos el índice de fila para la nueva hoja
-    while ($row_justificacion = mysqli_fetch_assoc($query_justificaciones)) {
-        // Agregar fila a la tabla de justificaciones
-        $sheet_justificaciones->setCellValue('A' . $rowIndex, $row_justificacion['nombre_carrera']);
-        $sheet_justificaciones->setCellValue('B' . $rowIndex, $row_justificacion['apellido_alumno']);
-        $sheet_justificaciones->setCellValue('C' . $rowIndex, $row_justificacion['nombre_alumno']);
-        $sheet_justificaciones->setCellValue('D' . $rowIndex, $row_justificacion['materia']);
-        $sheet_justificaciones->setCellValue('E' . $rowIndex, $row_justificacion['Motivo']);
-        $sheet_justificaciones->setCellValue('F' . $rowIndex, $row_justificacion['fecha']);
-        $rowIndex++;
-    }
+    // Generar tabla de justificaciones
+    $pdf->Ln(10);
+    $pdf->Cell(0, 10, 'Justificaciones', 0, 1);
+    // Agregar más celdas y datos según sea necesario...
 
-    // Escribir tabla de ratificaciones en la hoja correspondiente
-    $sheet_ratificaciones->setCellValue('A1', 'Legajo');
-    $sheet_ratificaciones->setCellValue('B1', 'Apellido');
-    $sheet_ratificaciones->setCellValue('C1', 'Nombre');
-    $sheet_ratificaciones->setCellValue('D1', 'Carrera');
-    $sheet_ratificaciones->setCellValue('E1', 'Materia');
-    $sheet_ratificaciones->setCellValue('F1', 'Profesor');
-    $sheet_ratificaciones->setCellValue('G1', 'Motivo');
-    $sheet_ratificaciones->setCellValue('H1', 'Fecha');
-
-    // Consulta para obtener las ratificaciones del alumno
-    $sql_ratificaciones = "SELECT 
-                                a2.legajo, 
-                                a2.apellido_alumno,
-                                a2.nombre_alumno,
-                                c.nombre_carrera,
-                                m.Nombre AS materia,
-                                p.nombre_profe,
-                                a.motivo,
-                                a.fecha 
-                            FROM 
-                                alumnos_rat a
-                            INNER JOIN 
-                                alumno a2 ON a.alumno_legajo = a2.legajo
-                            INNER JOIN 
-                                carreras c ON a.carreras_idCarrera = c.idCarrera
-                            INNER JOIN 
-                                materias m ON a.materias_idMaterias = m.idMaterias
-                            INNER JOIN 
-                                profesor p ON a.profesor_idProrfesor = p.idProrfesor
-                            WHERE 
-                                a.alumno_legajo = '$legajo'";
-
+    // Consulta para obtener datos de ratificaciones
+    $sql_ratificaciones = "SELECT * FROM alumnos_rat WHERE alumno_legajo  = '$legajo'";
     $query_ratificaciones = mysqli_query($conexion, $sql_ratificaciones);
 
     if (!$query_ratificaciones) {
         throw new Exception("Error al obtener las ratificaciones: " . mysqli_error($conexion));
     }
 
-    $rowIndex = 2; // Reiniciamos el índice de fila para la nueva hoja
-    while ($row_ratificacion = mysqli_fetch_assoc($query_ratificaciones)) {
-        // Agregar fila a la tabla de ratificaciones
-        $sheet_ratificaciones->setCellValue('A' . $rowIndex, $row_ratificacion['legajo']);
-        $sheet_ratificaciones->setCellValue('B' . $rowIndex, $row_ratificacion['apellido_alumno']);
-        $sheet_ratificaciones->setCellValue('C' . $rowIndex, $row_ratificacion['nombre_alumno']);
-        $sheet_ratificaciones->setCellValue('D' . $rowIndex, $row_ratificacion['nombre_carrera']);
-        $sheet_ratificaciones->setCellValue('E' . $rowIndex, $row_ratificacion['materia']);
-        $sheet_ratificaciones->setCellValue('F' . $rowIndex, $row_ratificacion['nombre_profe']);
-        $sheet_ratificaciones->setCellValue('G' . $rowIndex, $row_ratificacion['motivo']);
-        $sheet_ratificaciones->setCellValue('H' . $rowIndex, $row_ratificacion['fecha']);
-        $rowIndex++;
-    }
+    // Generar tabla de ratificaciones
+    $pdf->Ln(10);
+    $pdf->Cell(0, 10, 'Ratificaciones', 0, 1);
+    // Agregar más celdas y datos según sea necesario...
 
-  // Guardar el archivo Excel en un buffer de salida
-    ob_start();
-    $writer = new Xlsx($spreadsheet);
-    $writer->save('php://output');
-    $excelFileContent = ob_get_clean();
-
-    // Descargar el archivo
-    header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    header('Content-Disposition: attachment;filename="' . $filename . '"');
+    // Configurar el tipo de contenido y la descarga del archivo
+    header('Content-Type: application/pdf');
+    header('Content-Disposition: attachment;filename="' . $nombre_archivo . '"');
     header('Cache-Control: max-age=0');
-    echo $excelFileContent;
+
+    // Salida del PDF
+    $pdf->Output('D', $nombre_archivo);
 
 } catch (Exception $e) {
     echo "Error: " . $e->getMessage();

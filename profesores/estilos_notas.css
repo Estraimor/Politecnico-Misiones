@@ -1,0 +1,116 @@
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background: url('../../../imagenes/simulacion-y-automatizacion-de-robotica.jpg') ;
+    background-size: cover;
+    font-family: Arial, sans-serif;
+}
+
+.navbar {
+    display: flex;
+    justify-content: start;
+    overflow: hidden;
+    background-color: rgba(0, 0, 0, 0.7);
+    width: 100%;
+}
+.btn-asistencia{
+    position: relative;
+    left:105px;
+}
+.dropbtn, .btn-asistencia, .btn-cerrar-sesion {
+    background-color: rgb(243, 0, 0);
+    color: white;
+    padding: 10px 16px;
+    margin: 4px 10px;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+    border-radius: 8px;
+    text-decoration: none;
+}
+
+.dropbtn:hover, .btn-asistencia:hover, .btn-cerrar-sesion:hover {
+    background-color: darkred;
+}
+
+.dropdown {
+    
+    display: inline-block;
+}
+.sub-dropdown {
+    position: relative; /* Esto es nuevo */
+    display: block;
+}
+
+.dropdown-content, .sub-dropdown-content {
+    display: none;
+    position: absolute; 
+    background-color: red;
+    min-width: 160px;
+     border-radius: 8px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+    
+}
+
+.dropdown-content a, .sub-dropdown-content a {
+    color: white;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    text-align: left;
+     left: 100%; /* Asegúrate de que se despliegue hacia la derecha del .sub-dropdown */
+    top: 0;
+    text-align: center;
+}
+
+.dropdown-content a:hover, .sub-dropdown-content a:hover { background-color: darkred; }
+
+.dropdown:hover .dropdown-content { display: block; }
+
+.sub-dropdown-content { left: 100%; top: 0; }
+
+.sub-dropdown:hover .sub-dropdown-content { display: block; }
+
+.btn-cerrar-sesion { margin-left: auto; }
+.nav-welcome-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centra horizontalmente */
+    padding-top: 40px; /* Ajusta el espaciado superior */
+  }
+  .welcome-box {
+    background-color: #000;
+    opacity: 75%;
+    margin-top: 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    text-align: center;
+    display: inline-block;
+    position: relative;
+    z-index: 1; 
+    
+  }
+  #welcome-box {
+    transition: opacity 0.3s ease-in-out;
+  }
+  
+  #welcome-box.hide {
+    opacity: 0;
+    pointer-events: none; /* Evita que los elementos sean interactivos mientras están ocultos */
+  }
+  
+  .welcome-box__h1 {
+  font-size: 24px;
+  color: #ffffff;
+  margin-bottom: 10px;
+  }
+  
+  .welcome-box__p {
+  font-size: 14px;
+  color: #ffffff;
+  margin: 0;
+  }
+  

@@ -138,36 +138,47 @@ if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)
     </div>
   <div id="modal" class="modal">
   <div class="modal-content">
-  <span class="close" onclick="closeModal()">&times;</span>
-  <?php include'../Profesor/estudiante/guardar_estudiante.php'; ?>
+    <span class="close" onclick="closeModal()">&times;</span>
+    <?php include'../Profesor/estudiante/guardar_estudiante.php'; ?>
     <h2 class="form-container__h2">Registro de Estudiante</h2>
     <form action="" method="post">
       <input type="text" class="form-container__input" name="nombre_alu" placeholder="Ingrese el nombre" autocomplete="off" required>
       <input type="text" class="form-container__input" name="apellido_alu" placeholder="Ingrese el apellido" autocomplete="off" required>
       <input type="number" class="form-container__input" name="dni_alu" placeholder="Ingrese el DNI" autocomplete="off" required>
       <input type="number" class="form-container__input" name="celular" placeholder="Ingrese el celular" autocomplete="off" >
-      <input type="number" class="form-container__input" name="legajo" placeholder="Ingrese el número de legajo" autocomplete="off" required>
+      
+      <?php
+        // Consulta para obtener el último número de legajo
+        $sql_legajo = "SELECT MAX(legajo) AS max_legajo FROM alumno";
+        $resultado_legajo = mysqli_query($conexion, $sql_legajo);
+        $fila_legajo = mysqli_fetch_assoc($resultado_legajo);
+        $nuevo_legajo = $fila_legajo['max_legajo'] + 1; // Nuevo legajo es el último más uno
+      ?>
+      <!-- Campo de legajo con el valor obtenido de la base de datos -->
+      <input type="number" class="form-container__input" name="legajo" placeholder="Ingrese el número de legajo" value="<?php echo $nuevo_legajo ?>" autocomplete="off" required readonly>
+
       <input type="date" class="form-container__input" name="edad" placeholder="Ingrese fecha de nacimiento" autocomplete="off" >
       <input type="text" class="form-container__input" name="observaciones" placeholder="Observaciones" autocomplete="off" required>
       <input type="text" class="form-container__input" name="Trabajo_Horario" placeholder="Trabajo / Horario" autocomplete="off" required>
-            <!-- php para la recorrida de las carreras del select -->
+      
+      <!-- Consulta para obtener las carreras -->
       <?php
-       $sql_mater="SELECT * 
-       FROM preceptores p 
-       INNER JOIN carreras c on p.carreras_idCarrera = c.idCarrera
-       WHERE p.profesor_idProrfesor = '{$_SESSION["id"]}'  ";
-       $peticion=mysqli_query($conexion,$sql_mater);
-       ?>      
+        $sql_mater="SELECT * 
+        FROM preceptores p 
+        INNER JOIN carreras c on p.carreras_idCarrera = c.idCarrera
+        WHERE p.profesor_idProrfesor = '{$_SESSION["id"]}' ";
+        $peticion=mysqli_query($conexion,$sql_mater);
+      ?>      
+
       <select name="inscripcion_carrera" class="form-container__input"> 
         <option hidden >Selecciona una carrera </option>
         <?php while($informacion=mysqli_fetch_assoc($peticion)){ ?>
           <option value="<?php echo $informacion['idCarrera'] ?>"><?php echo $informacion['nombre_carrera'] ?></option>
-          <?php }?>
+        <?php }?>
       </select>
 
       <input type="submit" class="form-container__input" name="enviar" value="Confirmar" onclick="mostrarAlertaExitosa(); closeSuccessMessage();">
     </form>
-    
   </div>
 </div>
 

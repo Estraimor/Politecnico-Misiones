@@ -118,6 +118,7 @@ if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)
                         <th rowspan="2">N°</th>
                         <th rowspan="2">Apellido</th>
                         <th rowspan="2">Nombre</th>
+                        <th rowspan="2">asistencia</th>
                         <th colspan="4">Fecha</th>
                     </tr>
                 </thead>
@@ -159,7 +160,7 @@ if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)
     <span id="closeComisionA" class="close-comision-a" onclick="closeModalComisionA()">&times;</span>
     <h1>Programación</h1> <!-- Título "Comisión A" -->
     <!-- form lo movi un poco mas arrinba encapsulando la fecha -->
-    <form action="../../Profesor/asistencia/guardar_asistencia_enfermeria.php" method="post" onsubmit="showModalMessage()">
+    <form action="./ABM_FP/guardar_asistencia_FP.php" method="post" onsubmit="showModalMessage()">
     <div class="date-picker" style="display: none;">
             <input type="hidden" id="fecha" name="fecha" readonly>
            
@@ -193,34 +194,41 @@ while ($materia = mysqli_fetch_assoc($query_materias)) {
         </select>
     </th>
 </tr>
-            
+            <tr>
+                <th>Presente</th>
+                <th>Ausente</th>
+                
+              
+            </tr>
                         </thead>
                         <tbody>
     <?php
     $contador = 1;
-    $sql = "SELECT ia.alumno_legajo , a2.nombre_alumno, a2.apellido_alumno, a2.dni_alumno
-    FROM asistencia a 
-    RIGHT JOIN inscripcion_asignatura ia ON a.inscripcion_asignatura_idinscripcion_asignatura = ia.idinscripcion_asignatura 
-    INNER JOIN alumno a2 ON ia.alumno_legajo = a2.legajo   
-    WHERE ia.carreras_idCarrera = '64' and a2.estado = '1'
-    ORDER BY a2.apellido_alumno";
+    $sql = "SELECT af.nombre_afp, af.apellido_afp,af.legajo_afp
+FROM asistencia_FP afp
+RIGHT JOIN alumnos_fp af ON afp.alumnos_fp_legajo_afp = af.legajo_afp   
+WHERE af.carreras_idCarrera = '64' OR af.carreras_idCarrera1 = '64' OR af.carreras_idCarrera2 = '64' or af.carreras_idCarrera3 = '64' AND af.estado = '1'
+GROUP BY af.nombre_afp
+ORDER BY af.apellido_afp
+
+";
     $query = mysqli_query($conexion, $sql);
     while ($datos = mysqli_fetch_assoc($query)) {
         ?>
         
         <tr>
         <td><?php echo $contador++; ?></td>
-        <td><?php echo $datos['apellido_alumno']; ?></td>
-        <td><?php echo $datos['nombre_alumno']; ?></td>
+        <td><?php echo $datos['apellido_afp']; ?></td>
+        <td><?php echo $datos['nombre_afp']; ?></td>
     
     
     <!-- Primera hora -->
     <td class="checkbox-cell">
-        <input type="checkbox" name="presentePrimera[]" value="<?php echo $datos['alumno_legajo']; ?>">
+        <input type="checkbox" name="presentePrimera[]" value="<?php echo $datos['legajo_afp']; ?>">
     </td>
 
     <td class="checkbox-cell">
-    <input type="checkbox" name="ausentePrimera[]" value="<?php echo $datos['alumno_legajo']; ?>" >
+    <input type="checkbox" name="ausentePrimera[]" value="<?php echo $datos['legajo_afp']; ?>" >
     </td>
 
     
@@ -476,21 +484,25 @@ const tableRows = document.querySelectorAll('.table-comision-a tbody tr');
 
 // ajax para recargar la fecha en el mismo modal (Comisión A)
 function showAsistencia() {
-        var comisionId = $("#comisionId").val();
-        var selectedDate = $("#fecha").val();
+    var comisionId = $("#comisionId").val();
+    var selectedDate = $("#fecha").val();
 
-        $.ajax({
-            type: "GET",
-            url: "obtener_asistencia_ajax.php",
-            data: { comisionId: comisionId, fecha: selectedDate },
-            success: function (response) {
-                $("#asistenciaBody").html(response);
-            },
-            error: function (xhr, status, error) {
-                console.error("Error en la solicitud Ajax: " + xhr.responseText);
-            }
-        });
-    }
+    console.log("Comision ID:", comisionId);
+    console.log("Fecha seleccionada:", selectedDate);
+
+    $.ajax({
+        type: "GET",
+        url: "obtener_asistenciaFP_ajax.php",
+        data: { comisionId: comisionId, fecha: selectedDate },
+        success: function (response) {
+            $("#asistenciaBody").html(response);
+        },
+        error: function (xhr, status, error) {
+            console.error("Error en la solicitud Ajax: " + xhr.responseText);
+        }
+    });
+}
+
 
     // ajax para recargar la fecha en el mismo modal (Comisión B)
     function showAsistenciaComisionB() {
@@ -499,7 +511,7 @@ function showAsistencia() {
 
     $.ajax({
         type: "GET",
-        url: "obtener_asistencia_ajax.php",
+        url: "obtener_asistenciaFP_ajax.php",
         data: { comisionId: comisionId, fecha: selectedDate },
         success: function (response) {
             console.log("Respuesta del servidor:", response);
@@ -518,7 +530,7 @@ function showAsistenciaComisionC() {
 
     $.ajax({
         type: "GET",
-        url: "obtener_asistencia_ajax.php",
+        url: "obtener_asistencia_ajaxFP.php",
         data: { comisionId: comisionId, fecha: selectedDate },
         success: function (response) {
             console.log("Respuesta del servidor:", response);

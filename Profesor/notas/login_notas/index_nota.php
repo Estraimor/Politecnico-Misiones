@@ -57,8 +57,8 @@ if (empty($_SESSION["id"])){header('Location: ../login/login.php');}
                     <td><?php echo $datos['apellido_alumno']; ?></td>
                     <td><?php echo $datos['dni_alumno']; ?></td>
                     <td><?php echo $datos['celular']; ?></td>
-                    <td><a href="./modificar_alumno.php?legajo=<?php echo $datos['legajo']; ?>" class="modificar-button"><i class="fas fa-pencil-alt"></i></a>
-                   <a href="./borrado_logico_alumno.php?legajo=<?php echo $datos['legajo']; ?>" class="borrar-button"><i class="fas fa-trash-alt"></i></a></td>
+                    <td><a href="#?legajo=<?php echo $datos['legajo']; ?>" class="modificar-button"><i class="fas fa-pencil-alt"></i></a>
+                   <a href="#?legajo=<?php echo $datos['legajo']; ?>" class="borrar-button"><i class="fas fa-trash-alt"></i></a></td>
 
 
 
@@ -73,43 +73,39 @@ if (empty($_SESSION["id"])){header('Location: ../login/login.php');}
         </div>
     </div>
   
-<div id="materia-modal" class="modal">
-  <div class="modal-content">
-    <span class="close" onclick="closeMateriaModal()">&times;</span>
-    <!-- Tu formulario de materia aquí -->
-    <form action="" method="post">
-      <?php include './asignatura/guardar_materia.php'; ?>    
-      <?php
-      $sql = "select * from profesor";
-      $query = mysqli_query($conexion, $sql);
-      ?>
-      <input name="nombre" type="text" placeholder="Ingrese el nombre de la Materia" autocomplete="off">
-      <select name="profe1">
-        <?php while ($row = mysqli_fetch_assoc($query)) { ?>
-          <option hidden>Profesores</option>
-          <option value="<?php echo $row['idProrfesor']; ?>"> <?php echo ucwords($row['nombre_profe']) ?> <?php echo ucwords($row['apellido_profe']) ?>  </option>
+
+
+    <div class="nav-welcome-container">
+    <div id="welcome-box" class="welcome-box">
+        <?php
+        // Asegúrate de tener la conexión a la base de datos establecida correctamente
+        $sql = "SELECT m.Nombre, c.nombre_carrera, p.nombre_profe, p.apellido_profe, m.idMaterias, c.idCarrera 
+                FROM materias m  
+                INNER JOIN carreras c ON m.carreras_idCarrera = c.idCarrera
+                INNER JOIN profesor p ON m.profesor_idProrfesor = p.idProrfesor
+                WHERE idProrfesor = '{$_SESSION["id"]}'";
+        $query = mysqli_query($conexion, $sql); // Debe ser $conexion, no $coenxion
+        
+        // Verifica si hay resultados
+        if (mysqli_num_rows($query) > 0) {
+            $row = mysqli_fetch_array($query);
+            ?>
+            <h1 class="welcome-box__h1">Bienvenido  <?php echo $row['apellido_profe'] ?>  --  <?php echo $row['nombre_profe'] ?></h1>
+            <p class="welcome-box__p">¡Selecciona una carrera para tomar asistencia!</p>
         <?php } ?>
-      </select>
-      <select name="profe2">
-    <?php mysqli_data_seek($query, 0); // Reiniciar el puntero del resultado ?>
-    <?php while ($row = mysqli_fetch_assoc($query)) { ?>
-      <option hidden>Profesores</option>
-      <option value="<?php echo $row['idProrfesor']; ?>"> <?php echo ucwords($row['nombre_profe']) ?> <?php echo ucwords($row['apellido_profe']) ?>  </option>
-    <?php } ?>
-  </select>
-      <input type="submit" name="enviar" value="Enviar-Datos">
-    </form>
-  </div>
+    </div>
 </div>
+<br><br>
 
-<div class="nav-welcome-container">
-
-<div id="welcome-box" class="welcome-box">
-  <h1 class="welcome-box__h1">Bienvenido/a</h1>
-  <p class="welcome-box__p">¡Selecciona una carrera para tomar asistencia!</p>
-</div>
-</div>
-<br><br><button><a href="./prueba_tabla.php?materia=139&carrera=18">enfermeria EDI</a></button>
+<?php
+// Asegúrate de que la variable $query no esté vacía
+if (!empty($query)) {
+    // Recorre todos los resultados
+    while ($row2 = mysqli_fetch_assoc($query)) {
+        ?>
+        <button><a href="./prueba_tabla.php?materia=<?php echo $row2['idMaterias'] ?>&carrera=<?php echo $row2['idCarrera'] ?>"><?php echo $row2['Nombre'] ?></a></button>
+    <?php }
+} ?>
 
 
 
