@@ -1,5 +1,25 @@
-<?php include'../../conexion/conexion.php';
- ?>
+<?php
+session_start();
+if (empty($_SESSION["id"])) {
+    header('Location: ../../login/login.php');
+}
+
+// Set inactivity limit in seconds
+$inactivity_limit = 1200;
+
+// Check if the user has been inactive for too long
+if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)) {
+    // User has been inactive, so destroy the session and redirect to login page
+    session_unset();
+    session_destroy();
+    header("Location: ../../login/login.php");
+    exit; // Terminar el script después de redireccionar
+} else {
+    // Update the session time to the current time
+    $_SESSION['time'] = time();
+}
+?>
+<?php include '../../conexion/conexion.php' ?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -17,51 +37,89 @@
 </head>
 <body>
 
-<form id="dateForm" action="guardar_libro_tema.php" method="post">
-    <input type="hidden" name="profesor" value="<?php echo $_SESSION['id']; ?>">
-    <table id="tablaLibros" border="1">
-        <thead>
-            <tr>
-                <th>Fecha</th>
-                <th>Capacidades</th>
-                <th>Contenidos</th>
-                <th>Evaluacion</th>
-               
-                <th>Observacione diarias</th>
-            </tr>
-        </thead>
-        <tbody>
-            
-        </tbody>
-    </table>
-</form>
+<table id="tablaLibros" border="1">
+    <thead>
+        <tr>
+            <th>Fecha</th>
+            <th>Carrera</th>
+            <th>Materia</th>
+            <th>Capacidades</th>
+            <th>Contenidos</th>
+            <th>Evaluación</th>
+            <th>Observaciones diarias</th>
+            <th> Acciones </th>
+        </tr>
+    </thead>
+    <tbody>
+        
+    </tbody>
+</table>
 
 <script>
     $(document).ready(function() {
         function cargarDatos() {
             $.ajax({
-                url: 'ruta_a_tu_php.php', // Cambia esto por la ruta a tu archivo PHP
+                url: 'ajax_libro_tema.php',
                 method: 'GET',
                 success: function(response) {
                     const data = JSON.parse(response);
                     const tbody = $('#tablaLibros tbody');
                     tbody.empty();
                     data.forEach(row => {
-                        tbody.append(`
+                        const newRow = $(`
                             <tr>
-                                <td>${row.capacidades}</td>
-                                <td>${row.contenidos}</td>
-                                <td>${row.evaluacion}</td>
                                 <td>${row.fecha}</td>
-                                <td>${row.observaciones_diarias}</td>
+                                <td>${row.nombre_carrera}</td>
+                                <td>${row.materia_nombre}</td> <!-- Verifica que la propiedad sea correcta -->
+                                <td class="editable">${row.capacidades}</td>
+                                <td class="editable">${row.contenidos}</td>
+                                <td class="editable">${row.evaluacion}</td>
+                                <td class="editable">${row.observacion_diaria}</td>
+                                <td>
+                                    <button class="btn-modificar">Modificar</button>
+                                    <button class="btn-borrar">Borrar</button>
+                                    <button class="btn-actualizar" style="display: none;">Actualizar cambios</button>
+                                </td>
                             </tr>
                         `);
+                        tbody.append(newRow);
                     });
+
+                    // Delegación de eventos para los botones
+                    tbody.on('click', '.btn-modificar', function() {
+                        var fila = $(this).closest('tr');
+                        fila.find('.editable').each(function() {
+                            var contenido = $(this).text();
+                            $(this).html('<input type="text" value="' + contenido + '">');
+                        });
+                        fila.find('.btn-modificar').hide();
+                        fila.find('.btn-borrar').hide();
+                        fila.find('.btn-actualizar').show();
+                    });
+
+                    tbody.on('click', '.btn-actualizar', function() {
+                        var fila = $(this).closest('tr');
+                        fila.find('.editable').each(function() {
+                            var contenido = $(this).find('input').val();
+                            $(this).text(contenido);
+                        });
+                        fila.find('.btn-actualizar').hide();
+                        fila.find('.btn-modificar').show();
+                        fila.find('.btn-borrar').show();
+                    });
+
+                    tbody.on('click', '.btn-borrar', function() {
+                        if (confirm('¿Está seguro de que desea borrar este registro?')) {
+                            $(this).closest('tr').remove();
+                            // Aquí puedes agregar la lógica para eliminar el registro de la base de datos si es necesario
+                        }
+                    });
+
                     // Agregar fila de inputs dentro del formulario
                     tbody.append(`
                         <tr>
-                            <td colspan="5">
-                                <form action="guardar_libro_tema.php" method="post">
+                            <td colspan="8">
+                                <form id="nuevoLibroForm" action="guardar_libro_tema.php" method="post">
                                     <input type="hidden" name="profesor" value="<?php echo $_SESSION['id']; ?>">
                                     <select name="materia" id="materia" onchange="actualizarCarrera()">
                                         <option value="">Seleccione una materia</option>
@@ -82,13 +140,15 @@
                                     <input type="text" name="capacidades" placeholder="Capacidades">
                                     <input type="text" name="contenidos" placeholder="Contenidos">
                                     <input type="text" name="evaluacion" placeholder="Evaluación">
-                                    <input type="text" name="observacion" placeholder="Observacion Diaria">
                                     <input type="date" name="fecha">
+                                    <input type="text" name="observacion" placeholder="Observación Diaria">
                                     <input type="submit" name="enviar" value="Enviar">
                                 </form>
                             </td>
                         </tr>
                     `);
+
+                    // Re-inicializar DataTables
                     var myTable = document.querySelector("#tablaLibros");
                     var dataTable = new DataTable(myTable);
                 }
@@ -98,7 +158,18 @@
         // Llamar a la función para cargar los datos
         cargarDatos();
     });
+
+    // Función para actualizar la carrera basada en la materia seleccionada
+    function actualizarCarrera() {
+        const selectMateria = document.getElementById('materia');
+        const selectedOption = selectMateria.options[selectMateria.selectedIndex];
+        const carreraId = selectedOption.getAttribute('data-carrera-id');
+        document.getElementById('carrera').value = carreraId;
+    }
 </script>
+
+
+
 
 </body>
 </html>

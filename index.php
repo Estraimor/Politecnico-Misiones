@@ -705,40 +705,57 @@ window.onclick = function(event) {
 
 
 
-document.getElementById('inscripcion_carrera').addEventListener('change', function() {
-  var carreraId = this.value;
-  var materiasContainer = document.getElementById('materias-container');
+document.addEventListener("DOMContentLoaded", function() {
+  // Función para cargar las materias cuando se selecciona una carrera
+  function cargarMaterias() {
+    // Obtener el ID de la carrera seleccionada
+    var carreraId = document.getElementById('inscripcion_carrera').value;
+    var materiasContainer = document.getElementById('materias-container');
 
-  // Limpiar el contenedor de materias
-  materiasContainer.innerHTML = '';
+    // Limpiar el contenedor de materias
+    materiasContainer.innerHTML = '';
 
-  if (carreraId) { // Si hay una carrera seleccionada, hacer la solicitud AJAX
-    var xhr = new XMLHttpRequest();
-    xhr.open('POST', 'obtener_materias.php', true);
-    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-    xhr.onreadystatechange = function() {
-      if (xhr.readyState === 4 && xhr.status === 200) {
-        var materias = JSON.parse(xhr.responseText);
-        materias.forEach(function(materia) {
-          var label = document.createElement('label');
-          label.textContent = materia.nombre;
-          var select = document.createElement('select');
-          select.name = 'materias[' + materia.id + ']';
-          var option1 = document.createElement('option');
-          option1.value = materia.id;
-          option1.textContent = materia.nombre;
-          var option2 = document.createElement('option');
-          option2.value = '0';
-          option2.textContent = 'No cursa';
-          select.appendChild(option1);
-          select.appendChild(option2);
-          materiasContainer.appendChild(label);
-          materiasContainer.appendChild(select);
-        });
-      }
-    };
-    xhr.send('carreraId=' + carreraId);
+    if (carreraId) { // Si hay una carrera seleccionada, hacer la solicitud AJAX
+      var xhr = new XMLHttpRequest();
+      xhr.open('POST', 'ajax_materias_inscripcion.php', true);
+      xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+      xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+          var materias = JSON.parse(xhr.responseText);
+          materias.forEach(function(materia) {
+            var div = document.createElement('div');
+
+            // Crear el select para la materia
+            var select = document.createElement('select');
+            select.name = 'materias[' + materia.idMaterias + ']';
+            select.className = 'form-container__input';
+
+            // Opción "No cursa"
+            var optionNoCursa = document.createElement('option');
+            optionNoCursa.value = '0';
+            optionNoCursa.textContent = 'No cursa';
+            select.appendChild(optionNoCursa);
+
+            // Opción de la materia
+            var optionMateria = document.createElement('option');
+            optionMateria.value = materia.idMaterias;
+            optionMateria.textContent = materia.Nombre;
+            select.appendChild(optionMateria);
+
+            div.appendChild(select);
+            materiasContainer.appendChild(div);
+          });
+        }
+      };
+      xhr.send('carreraId=' + carreraId);
+    }
   }
+
+  // Agregar evento 'change' al select de la carrera para cargar las materias
+  document.getElementById('inscripcion_carrera').addEventListener('change', cargarMaterias);
+
+  // Llamar a la función de carga de materias cuando se cargue la página
+  cargarMaterias();
 });
 
 </script>
