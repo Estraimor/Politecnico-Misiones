@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1:3306
--- Tiempo de generación: 30-05-2024 a las 10:55:38
+-- Tiempo de generación: 01-06-2024 a las 21:35:57
 -- Versión del servidor: 8.0.31
 -- Versión de PHP: 8.2.0
 
@@ -1145,15 +1145,14 @@ DROP TABLE IF EXISTS `asistencia`;
 CREATE TABLE IF NOT EXISTS `asistencia` (
   `idasistencia` int NOT NULL AUTO_INCREMENT,
   `fecha` date NOT NULL,
-  `inscripcion_asignatura_idinscripcion_asignatura` int DEFAULT NULL,
+  `inscripcion_asignatura_idinscripcion_asignatura` int NOT NULL,
   `inscripcion_asignatura_carreras_idCarrera` int NOT NULL,
-  `inscripcion_asignatura_comisiones_idComisiones` int NOT NULL,
   `inscripcion_asignatura_alumno_legajo` int NOT NULL,
   `materias_idMaterias` int NOT NULL,
   `asistenciacol` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`idasistencia`),
   KEY `fk_asistencia_materias1_idx` (`materias_idMaterias`),
-  KEY `fk_asistencia_inscripcion_asignatura1_idx` (`inscripcion_asignatura_idinscripcion_asignatura`,`inscripcion_asignatura_carreras_idCarrera`,`inscripcion_asignatura_comisiones_idComisiones`,`inscripcion_asignatura_alumno_legajo`)
+  KEY `fk_asistencia_inscripcion_asignatura1_idx` (`inscripcion_asignatura_idinscripcion_asignatura`,`inscripcion_asignatura_carreras_idCarrera`,`inscripcion_asignatura_alumno_legajo`)
 ) ENGINE=InnoDB AUTO_INCREMENT=26381 DEFAULT CHARSET=utf8mb3;
 
 -- --------------------------------------------------------
@@ -1384,9 +1383,9 @@ INSERT INTO `carreras` (`idCarrera`, `nombre_carrera`, `profesor_idProrfesor`) V
 DROP TABLE IF EXISTS `comisiones`;
 CREATE TABLE IF NOT EXISTS `comisiones` (
   `idComisiones` int NOT NULL AUTO_INCREMENT,
-  `N_comicion` varchar(3) DEFAULT NULL,
+  `N_comicion` varchar(3) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
   PRIMARY KEY (`idComisiones`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_es_0900_ai_ci;
 
 --
 -- Volcado de datos para la tabla `comisiones`
@@ -2846,6 +2845,7 @@ ALTER TABLE `alumnos_rat`
 -- Filtros para la tabla `asistencia`
 --
 ALTER TABLE `asistencia`
+  ADD CONSTRAINT `fk_asistencia_inscripcion_asignatura1` FOREIGN KEY (`inscripcion_asignatura_idinscripcion_asignatura`,`inscripcion_asignatura_carreras_idCarrera`,`inscripcion_asignatura_alumno_legajo`) REFERENCES `inscripcion_asignatura` (`idinscripcion_asignatura`, `carreras_idCarrera`, `alumno_legajo`),
   ADD CONSTRAINT `fk_asistencia_materias1` FOREIGN KEY (`materias_idMaterias`) REFERENCES `materias` (`idMaterias`);
 
 --
@@ -2900,7 +2900,8 @@ ALTER TABLE `inasistencia`
 --
 ALTER TABLE `inscripcion_asignatura`
   ADD CONSTRAINT `fk_inscripcion_asignatura_alumno1` FOREIGN KEY (`alumno_legajo`) REFERENCES `alumno` (`legajo`),
-  ADD CONSTRAINT `fk_inscripcion_asignatura_carreras1` FOREIGN KEY (`carreras_idCarrera`) REFERENCES `carreras` (`idCarrera`);
+  ADD CONSTRAINT `fk_inscripcion_asignatura_carreras1` FOREIGN KEY (`carreras_idCarrera`) REFERENCES `carreras` (`idCarrera`),
+  ADD CONSTRAINT `fk_inscripcion_asignatura_comisiones1` FOREIGN KEY (`comisiones_idComisiones`) REFERENCES `comisiones` (`idComisiones`);
 
 --
 -- Filtros para la tabla `libro_tema`

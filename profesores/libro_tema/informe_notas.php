@@ -46,6 +46,9 @@ if ($conexion) {
         <option value="1">1er Cuatrimestre</option>
         <option value="2">2do Cuatrimestre</option>
     </select>
+    <button>
+        <a href="./libro_tema/ver_libro_tema.php">Libro de Tema</a>
+    </button>
 
 </body>
 
