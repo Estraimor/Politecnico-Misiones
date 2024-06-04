@@ -89,8 +89,6 @@ if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)
             <?php
             $sql1 = "SELECT * FROM inscripcion_asignatura ia 
             INNER JOIN alumno a on ia.alumno_legajo = a.legajo 
-            INNER JOIN preceptores p ON p.carreras_idCarrera = ia.carreras_idCarrera 
-            INNER JOIN carreras c on ia.carreras_idCarrera = c.idCarrera
              WHERE  a.estado = '1'";
             $query1 = mysqli_query($conexion, $sql1);
             while ($datos = mysqli_fetch_assoc($query1)) {
@@ -192,7 +190,7 @@ if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)
       <input type="text" class="form-container__input" name="apellido_alu" placeholder="Ingrese el apellido" autocomplete="off" required>
       <input type="number" class="form-container__input" name="dni_alu" placeholder="Ingrese el DNI" autocomplete="off" required>
       <input type="number" class="form-container__input" name="celular" placeholder="Ingrese el celular" autocomplete="off">
-
+      
       <?php
         // Consulta para obtener el último número de legajo
         $sql_legajo = "SELECT MAX(legajo) AS max_legajo FROM alumno";
@@ -206,17 +204,29 @@ if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)
       <input type="text" class="form-container__input" name="Trabajo_Horario" placeholder="Trabajo / Horario" autocomplete="off" required>
 
       <?php
-        $sql_mater = "SELECT * FROM carreras";
-        $peticion = mysqli_query($conexion, $sql_mater);
+        $sql_carreras = "SELECT * FROM carreras WHERE idCarrera in ('18','27','46','55')";
+        $peticion = mysqli_query($conexion, $sql_carreras);
       ?>
       <select name="inscripcion_carrera" id="inscripcion_carrera" class="form-container__input">
         <option hidden>Selecciona una carrera</option>
-        <?php while ($informacion = mysqli_fetch_assoc($peticion)) { ?>
-          <option value="<?php echo $informacion['idCarrera'] ?>"><?php echo $informacion['nombre_carrera'] ?></option>
+        <?php while ($row = mysqli_fetch_assoc($peticion)) { ?>
+            <option value="<?php echo $row['idCarrera']; ?>"><?php echo $row['nombre_carrera']; ?></option>
         <?php } ?>
       </select>
+
+      <?php
+        $sql_comision = "SELECT c.idComisiones,c.N_comicion FROM comisiones c";
+        $resultado_comision = $conexion->query($sql_comision);
+      ?>
+      <select name="Comision" id="Comision"  class="form-container__input">
+        <option hidden>Selecciona una Comision</option>
+        <?php while ($rowcomision = mysqli_fetch_assoc($resultado_comision)) { ?>
+            <option value="<?php echo $rowcomision['idComisiones']; ?>"><?php echo $rowcomision['N_comicion']; ?></option>
+        <?php } ?>
+      </select>
+
       <select name="Año_inscripcion" id="Año_inscripcion" class="form-container__input">
-        <option value="2025">2025</option>
+      <option value="2025">2025</option>
         <option value="2026">2026</option>
         <option value="2027">2027</option>
         <option value="2028">2028</option>
@@ -227,12 +237,12 @@ if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)
         <option value="2033">2033</option>
         <option value="2034">2034</option>
       </select>
-      <div id="materias-container"></div>
 
       <input type="submit" class="form-container__input" name="enviar" value="Enviar" onclick="mostrarAlertaExitosa(); closeSuccessMessage();">
     </form>
   </div>
 </div>
+
 
 
 
@@ -705,58 +715,6 @@ window.onclick = function(event) {
 
 
 
-document.addEventListener("DOMContentLoaded", function() {
-  // Función para cargar las materias cuando se selecciona una carrera
-  function cargarMaterias() {
-    // Obtener el ID de la carrera seleccionada
-    var carreraId = document.getElementById('inscripcion_carrera').value;
-    var materiasContainer = document.getElementById('materias-container');
-
-    // Limpiar el contenedor de materias
-    materiasContainer.innerHTML = '';
-
-    if (carreraId) { // Si hay una carrera seleccionada, hacer la solicitud AJAX
-      var xhr = new XMLHttpRequest();
-      xhr.open('POST', 'ajax_materias_inscripcion.php', true);
-      xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-      xhr.onreadystatechange = function() {
-        if (xhr.readyState === 4 && xhr.status === 200) {
-          var materias = JSON.parse(xhr.responseText);
-          materias.forEach(function(materia) {
-            var div = document.createElement('div');
-
-            // Crear el select para la materia
-            var select = document.createElement('select');
-            select.name = 'materias[' + materia.idMaterias + ']';
-            select.className = 'form-container__input';
-
-            // Opción "No cursa"
-            var optionNoCursa = document.createElement('option');
-            optionNoCursa.value = '0';
-            optionNoCursa.textContent = 'No cursa';
-            select.appendChild(optionNoCursa);
-
-            // Opción de la materia
-            var optionMateria = document.createElement('option');
-            optionMateria.value = materia.idMaterias;
-            optionMateria.textContent = materia.Nombre;
-            select.appendChild(optionMateria);
-
-            div.appendChild(select);
-            materiasContainer.appendChild(div);
-          });
-        }
-      };
-      xhr.send('carreraId=' + carreraId);
-    }
-  }
-
-  // Agregar evento 'change' al select de la carrera para cargar las materias
-  document.getElementById('inscripcion_carrera').addEventListener('change', cargarMaterias);
-
-  // Llamar a la función de carga de materias cuando se cargue la página
-  cargarMaterias();
-});
 
 </script>
 </body>

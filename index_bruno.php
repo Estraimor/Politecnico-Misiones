@@ -252,7 +252,8 @@ if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)
        $sql_mater="SELECT * 
        FROM preceptores p 
        INNER JOIN carreras c on p.carreras_idCarrera = c.idCarrera
-       -- WHERE p.profesor_idProrfesor = '{$_SESSION["id"]}'  ";
+       -- WHERE p.profesor_idProrfesor = '{$_SESSION["id"]}'  
+       ";
        $peticion=mysqli_query($conexion,$sql_mater);
        ?>
             <select name="carrera" class="form-input-informes">
