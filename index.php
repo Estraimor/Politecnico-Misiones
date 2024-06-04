@@ -58,8 +58,8 @@ if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)
           </div>
 
 
-    <div class="nav-right">
-        <a href="../login/cerrar_sesion.php" class="btn-logout">Cerrar sesión</a>
+          <div class="nav-right">
+        <a href=" ./login/cerrar_sesion.php " class="btn-logout">Cerrar sesión</a>
     </div>
     
     
