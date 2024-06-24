@@ -44,7 +44,6 @@ if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)
   <span id="toggle-menu-icon">☰</span>
 </button>
 <nav class="navbar">
-<<<<<<< HEAD
     <div class="nav-left">  
         <a href="index.php" class="home-button">Inicio</a>
         <button class="btn-new-member" id="btn-new-member">Nuevo Estudiante</button>
@@ -62,26 +61,6 @@ if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)
     </div>
     <div class="nav-right">
         <a href="./login/cerrar_sesion.php" class="btn-logout">Cerrar sesión</a>
-=======
-          <div class="nav-left">  
-            <a href="index.php" class="home-button">Inicio</a>
-            <button class="btn-new-member" id="btn-new-member">Nuevo Estudiante</button>
-            <button class="btn-new-member" id="btnOpenNewStudentFP">Nuevo Estudiante FP</button>
-            <button class="btn-situacion-academica">
-              <a href="../proximamente/proximamente.php" class="btn-link">Situación Académica</a>
-            </button>
-            <button class="btn-preceptores">
-              <a href="./preceptores.php">Preceptores</a>
-            </button>
-            <button class="btn-preceptores">
-              <a href="../proximamente/proximamente.php">Profesores</a>
-            </button>
-          </div>
-
-
-          <div class="nav-right">
-        <a href=" ./login/cerrar_sesion.php " class="btn-logout">Cerrar sesión</a>
->>>>>>> d2c92b420cc9dede6771cec92458be6611ce8fcb
     </div>
 </nav>
 
