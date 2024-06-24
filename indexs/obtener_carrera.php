@@ -1,13 +1,17 @@
 <?php
+// Incluir la conexión a la base de datos
 include '../conexion/conexion.php';
 
 // Obtener el legajo del alumno enviado desde la solicitud AJAX
-$legajo = $_POST['legajo'];
+$legajo = isset($_POST['legajo']) ? $conexion->real_escape_string($_POST['legajo']) : '';
 
 // Consulta SQL para obtener la carrera del alumno
-$sql = "SELECT ia.carreras_idCarrera 
+$sql = "SELECT c.idCarrera 
         FROM inscripcion_asignatura ia
-        WHERE ia.alumno_legajo = '$legajo' ";
+        INNER JOIN materias m on ia.materias_idMaterias = m.idMaterias
+        INNER JOIN carreras c on m.carreras_idCarrera = c.idCarrera
+        WHERE ia.alumno_legajo = '$legajo'
+        GROUP BY ia.alumno_legajo";
 
 // Ejecutar la consulta
 $query = mysqli_query($conexion, $sql);
@@ -20,7 +24,7 @@ if ($query) {
     // Verificar si se encontró la carrera
     if ($resultado) {
         // Obtener el ID de la carrera
-        $carrera = $resultado['carreras_idCarrera'];
+        $carrera = $resultado['idCarrera'];
 
         // Devolver la carrera en formato JSON
         echo json_encode(array('carrera' => $carrera));

@@ -94,8 +94,9 @@ try {
     $sql_datos_alumno = "SELECT *
                             FROM alumno a
                             INNER JOIN inscripcion_asignatura ia ON ia.alumno_legajo = a.legajo
-                            INNER JOIN carreras c ON c.idCarrera = ia.carreras_idCarrera 
-                        WHERE legajo = '$legajo'";
+                            INNER JOIN materias m on ia.materias_idMaterias = m.idMaterias
+                            INNER JOIN carreras c on m.carreras_idCarrera = c.idCarrera
+                        WHERE a.legajo = '$legajo'";
     $query_datos_alumno = mysqli_query($conexion, $sql_datos_alumno);
 
     if (!$query_datos_alumno) {
@@ -122,7 +123,7 @@ try {
     // Imprimir tabla de datos del alumno
     echo $html_datos_alumno;
 
-    // Generar tabla de asistencias
+ // Generar tabla de asistencias
 $html_asistencias = '<br><h2 style="color:white; text-shadow: 2px 1px 2px black;">Asistencias</h2><br>';
 $html_asistencias .= '<table border="1">
                         <tr>
@@ -131,11 +132,11 @@ $html_asistencias .= '<table border="1">
                             <th>Porcentaje Ausente</th>
                         </tr>';
 
-// Obtener los datos de asistencia combinando ambos horarios
+// Obtener los datos de asistencia
 $sql_asistencias = "SELECT 
                         m.Nombre,
-                        (SUM(CASE WHEN a.1_Horario = 'Presente' OR a.2_Horario = 'Presente' THEN 1 ELSE 0 END) + SUM(CASE WHEN a.1_Horario = 'Presente' AND a.2_Horario = 'Presente' THEN 1 ELSE 0 END)) AS asistencias,
-                        (SUM(CASE WHEN a.1_Horario = 'Ausente' OR a.2_Horario = 'Ausente' THEN 1 ELSE 0 END) + SUM(CASE WHEN a.1_Horario = 'Ausente' AND a.2_Horario = 'Ausente' THEN 1 ELSE 0 END)) AS ausencias,
+                        SUM(CASE WHEN a.asistencia = 'Presente' THEN 1 ELSE 0 END) AS asistencias,
+                        SUM(CASE WHEN a.asistencia = 'Ausente' THEN 1 ELSE 0 END) AS ausencias,
                         COUNT(*) AS total_clases
                     FROM 
                         asistencia a
@@ -161,8 +162,8 @@ while ($row_asistencias = mysqli_fetch_assoc($query_asistencias)) {
     $html_asistencias .= "
                         <tr>
                             <td>{$row_asistencias['Nombre']}</td>
-                            <td>{$porcentaje_asistencia}</td>
-                            <td>{$porcentaje_ausencia}</td>
+                            <td>{$porcentaje_asistencia}%</td>
+                            <td>{$porcentaje_ausencia}%</td>
                         </tr>";
 }
 

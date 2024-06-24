@@ -54,194 +54,76 @@ if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)
         <a href="../login/cerrar_sesion.php" class="btn-logout">Cerrar sesión</a>
     </div>
   </nav>
-<?php
+  <?php
+include '../../conexion/conexion.php';
+
 if (isset($_GET['legajo'])) {
     $legajo = $_GET['legajo'];
-    $sql = "select * from alumnos_fp af where af.legajo_afp =   '$legajo'";
-    $query = mysqli_query($conexion, $sql);?>
+    $sql = "SELECT * FROM alumnos_fp WHERE legajo_afp = '$legajo'";
+    $query = mysqli_query($conexion, $sql);
 
-<?php while ($datos = mysqli_fetch_assoc($query)) { ?>
-    <form action="guardar_modificacionFP.php" method="post" class="formulario">
-    <input type="text" class="form-container__input" name="nombre_alumno" placeholder="Nombre" value="<?php echo $datos['nombre_afp']; ?>" class="input-text"><br>
-    <input type="text" class="form-container__input" name="apellido_alumno" placeholder="Apellido" value="<?php echo $datos['apellido_afp']; ?>" class="input-text"><br>
-    <input type="number" class="form-container__input" name="dni_alumno" placeholder="DNI (sin puntos)" value="<?php echo $datos['dni_afp']; ?>" class="input-text"><br>
-    <input type="number" class="form-container__input" name="celular" placeholder="Celular" value="<?php echo $datos['celular_afp']; ?>" class="input-text"><br>
-    
-   
-    <!-- Campo de legajo con el valor obtenido de la base de datos -->
-    <input type="text" class="form-container__input" name="legajo" placeholder="N° Legajo" value="<?php echo $datos['legajo_afp']; ?>" class="input-text" readonly><br>
+    if ($query && mysqli_num_rows($query) > 0) {
+        $datos = mysqli_fetch_assoc($query);
+        ?>
 
-    <input type="text" class="form-container__input" name="observaciones" placeholder="Observaciones" value="<?php echo $datos['observaciones_afp']; ?>" class="input-text"><br>
-    <input type="text" class="form-container__input" name="Trabaja_Horario" placeholder="Trabaja_Horario" value="<?php echo $datos['trabaja_fp']; ?>" class="input-text"><br>
+        <form action="guardar_modificacionFP.php" method="post" class="formulario">
+            <input type="text" class="form-container__input" name="nombre_alumno" placeholder="Nombre" value="<?php echo $datos['nombre_afp']; ?>" class="input-text"><br>
+            <input type="text" class="form-container__input" name="apellido_alumno" placeholder="Apellido" value="<?php echo $datos['apellido_afp']; ?>" class="input-text"><br>
+            <input type="number" class="form-container__input" name="dni_alumno" placeholder="DNI (sin puntos)" value="<?php echo $datos['dni_afp']; ?>" class="input-text"><br>
+            <input type="number" class="form-container__input" name="celular" placeholder="Celular" value="<?php echo $datos['celular_afp']; ?>" class="input-text"><br>
+            <input type="text" class="form-container__input" name="legajo" placeholder="N° Legajo" value="<?php echo $datos['legajo_afp']; ?>" class="input-text" readonly><br>
+            <input type="text" class="form-container__input" name="observaciones" placeholder="Observaciones" value="<?php echo $datos['observaciones_afp']; ?>" class="input-text"><br>
+            <input type="text" class="form-container__input" name="Trabaja_Horario" placeholder="Trabaja_Horario" value="<?php echo $datos['trabaja_fp']; ?>" class="input-text"><br>
 
-   <select id="carreras_1" name="carreras_1" class="input-text" required>
-    <?php
-        // Consulta SQL para obtener la carrera en la que está inscrito el alumno
-        $sql_carrera_alumno = "SELECT af.carreras_idCarrera 
-                               FROM alumnos_fp af 
-                               WHERE af.legajo_afp = '$legajo'";
-        $result_carrera_alumno = $conexion->query($sql_carrera_alumno);
-        $consulta = mysqli_fetch_assoc($result_carrera_alumno);
-        
-        // Verificar si el resultado es NULL
-        if ($consulta['carreras_idCarrera'] == NULL) {
-            echo "<option value='65' selected>Vacia</option>";
-        } else {
-            // Consulta SQL para obtener todas las carreras
-            $sql_carreras_1 = "SELECT idCarrera, nombre_carrera FROM carreras";
-            $result_carreras_1 = $conexion->query($sql_carreras_1);
-
-            // Mostrar las opciones del select
-            while($row_carrera_1 = $result_carreras_1->fetch_assoc()) {
-                $selected_1 = ""; // Inicialmente ninguna carrera está seleccionada
-
-                // Verificar si esta carrera es la misma en la que está inscrito el alumno
-                if ($consulta['carreras_idCarrera'] == $row_carrera_1["idCarrera"]) {
-                    $selected_1 = "selected"; // Marcar como seleccionada si el alumno está inscrito en esta carrera
-                }
-
-                echo "<option value='".$row_carrera_1["idCarrera"]."' $selected_1>".$row_carrera_1["nombre_carrera"]."</option>";
+            <?php
+            // Consulta para obtener las carreras del alumno
+            $sql_carreras_alumno = "SELECT carreras_idCarrera FROM alumnos_fp_has_carreras WHERE alumnos_fp_legajo_afp = '$legajo'";
+            $result_carreras_alumno = mysqli_query($conexion, $sql_carreras_alumno);
+            $carreras_alumno = array();
+            while ($row = mysqli_fetch_assoc($result_carreras_alumno)) {
+                $carreras_alumno[] = $row['carreras_idCarrera'];
             }
-        }
-    ?>
-</select>
 
-<select id="carreras_2" name="carreras_2"  class="input-text" required>
-    <?php
-        // Consulta SQL para obtener la carrera en la que está inscrito el alumno
-        $sql_carrera_alumno = "SELECT af.carreras_idCarrera1 
-                               FROM alumnos_fp af 
-                               WHERE af.legajo_afp = '$legajo'";
-        $result_carrera_alumno = $conexion->query($sql_carrera_alumno);
-        $consulta = mysqli_fetch_assoc($result_carrera_alumno);
-        
-        // Verificar si el resultado es NULL
-        if ($consulta['carreras_idCarrera1'] == NULL) {
-            echo "<option value='65' selected>Vacia</option>";
-        } else {
-            // Consulta SQL para obtener todas las carreras
-            $sql_carreras_1 = "SELECT idCarrera, nombre_carrera FROM carreras";
-            $result_carreras_1 = $conexion->query($sql_carreras_1);
+            // Consulta para obtener todas las carreras
+            $sql_carreras = "SELECT idCarrera, nombre_carrera FROM carreras c
+                              WHERE c.idCarrera in('8','14','15','64','65')";
+            $result_carreras = mysqli_query($conexion, $sql_carreras);
 
-            // Mostrar las opciones del select
-            while($row_carrera_1 = $result_carreras_1->fetch_assoc()) {
-                $selected_1 = ""; // Inicialmente ninguna carrera está seleccionada
-
-                // Verificar si esta carrera es la misma en la que está inscrito el alumno
-                if ($consulta['carreras_idCarrera1'] == $row_carrera_1["idCarrera"]) {
-                    $selected_1 = "selected"; // Marcar como seleccionada si el alumno está inscrito en esta carrera
+            // Mostrar los selects con las carreras inscritas y la opción de seleccionar carrera
+            for ($i = 1; $i <= 4; $i++) {
+                echo '<select name="carreras_' . $i . '" class="input-text">';
+                if (isset($carreras_alumno[$i - 1])) {
+                    // Mostrar la carrera en la que está inscrito
+                    while ($row_carrera = mysqli_fetch_assoc($result_carreras)) {
+                        $selected = $row_carrera['idCarrera'] == $carreras_alumno[$i - 1] ? 'selected' : '';
+                        echo '<option value="' . $row_carrera['idCarrera'] . '" ' . $selected . '>' . $row_carrera['nombre_carrera'] . '</option>';
+                    }
+                } else {
+                    // Mostrar la opción de seleccionar carrera
+                    echo '<option value="" hidden selected>Selecciona una carrera</option>';
+                    while ($row_carrera = mysqli_fetch_assoc($result_carreras)) {
+                        echo '<option value="' . $row_carrera['idCarrera'] . '">' . $row_carrera['nombre_carrera'] . '</option>';
+                    }
                 }
-
-                echo "<option value='".$row_carrera_1["idCarrera"]."' $selected_1>".$row_carrera_1["nombre_carrera"]."</option>";
+                mysqli_data_seek($result_carreras, 0); // Resetear el puntero de resultados
+                echo '</select><br>';
             }
-        }
-    ?>
-</select>
+            ?>
 
-<select id="carreras_3" name="carreras_3" class="input-text" required>
-    <?php
-         // Consulta SQL para obtener la carrera en la que está inscrito el alumno
-        $sql_carrera_alumno = "SELECT af.carreras_idCarrera2 
-                               FROM alumnos_fp af 
-                               WHERE af.legajo_afp = '$legajo'";
-        $result_carrera_alumno = $conexion->query($sql_carrera_alumno);
-        $consulta = mysqli_fetch_assoc($result_carrera_alumno);
-        
-        // Verificar si el resultado es NULL
-        if ($consulta['carreras_idCarrera2'] == NULL) {
-            echo "<option value='65' selected>Vacia</option>";
-        } else {
-            // Consulta SQL para obtener todas las carreras
-            $sql_carreras_1 = "SELECT idCarrera, nombre_carrera FROM carreras";
-            $result_carreras_1 = $conexion->query($sql_carreras_1);
+            <input type="submit" value="Enviar" name="Enviar" class="form-container__input" class="btn-enviar">
+        </form>
 
-            // Mostrar las opciones del select
-            while($row_carrera_1 = $result_carreras_1->fetch_assoc()) {
-                $selected_1 = ""; // Inicialmente ninguna carrera está seleccionada
-
-                // Verificar si esta carrera es la misma en la que está inscrito el alumno
-                if ($consulta['carreras_idCarrera2'] == $row_carrera_1["idCarrera"]) {
-                    $selected_1 = "selected"; // Marcar como seleccionada si el alumno está inscrito en esta carrera
-                }
-
-                echo "<option value='".$row_carrera_1["idCarrera"]."' $selected_1>".$row_carrera_1["nombre_carrera"]."</option>";
-            }
-        }
-    ?>
-</select>
-
-<select id="carreras_4" name="carreras_4" class="input-text" required>
-    <?php
-        // Consulta SQL para obtener la carrera en la que está inscrito el alumno
-        $sql_carrera_alumno = "SELECT af.carreras_idCarrera3 
-                               FROM alumnos_fp af 
-                               WHERE af.legajo_afp = '$legajo'";
-        $result_carrera_alumno = $conexion->query($sql_carrera_alumno);
-        $consulta = mysqli_fetch_assoc($result_carrera_alumno);
-        
-        // Verificar si el resultado es NULL
-        if ($consulta['carreras_idCarrera3'] == NULL) {
-            echo "<option value='65' selected>Vacia</option>";
-        } else {
-            // Consulta SQL para obtener todas las carreras
-            $sql_carreras_1 = "SELECT idCarrera, nombre_carrera FROM carreras";
-            $result_carreras_1 = $conexion->query($sql_carreras_1);
-
-            // Mostrar las opciones del select
-            while($row_carrera_1 = $result_carreras_1->fetch_assoc()) {
-                $selected_1 = ""; // Inicialmente ninguna carrera está seleccionada
-
-                // Verificar si esta carrera es la misma en la que está inscrito el alumno
-                if ($consulta['carreras_idCarrera3'] == $row_carrera_1["idCarrera"]) {
-                    $selected_1 = "selected"; // Marcar como seleccionada si el alumno está inscrito en esta carrera
-                }
-
-                echo "<option value='".$row_carrera_1["idCarrera"]."' $selected_1>".$row_carrera_1["nombre_carrera"]."</option>";
-            }
-        }
-    ?>
-</select>
-
-
-
-
-
-
-
-<br>
-
-    
-    <br>
-    <input type="submit" value="Enviar" name="Enviar" class="form-container__input" class="btn-enviar">
-</form>
-
-
-
-    <br>
-<?php } ?>
-
-  
-<?php
-
-try {
-  
-  
-
-  
-
-  echo $html;
-} catch (Exception $e) {
-  echo "Error: " . $e->getMessage();
-}
-
+        <?php
+    } else {
+        echo "Error: No se encontró al alumno con el legajo proporcionado.";
+    }
 } else {
-    // Manejo de error o redirección si no se proporciona el ID del alumno
     echo "Error: ID de alumno no proporcionado.";
-    // Puedes redirigir al usuario o hacer alguna otra acción en caso de error.
 }
-
-
 ?>
+
+
+
 
 
 

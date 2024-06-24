@@ -2,11 +2,13 @@
 // Incluir el archivo de conexión a la base de datos
 include '../conexion/conexion.php';
 
-// Obtener el ID de la carrera seleccionada enviado desde el cliente
-$idCarrera = $_POST['carrera'];
+// Obtener y sanitizar el ID de la carrera seleccionada enviado desde el cliente
+$idCarrera = isset($_POST['carrera']) ? $conexion->real_escape_string($_POST['carrera']) : '';
 
 // Consulta SQL para obtener las materias relacionadas con la carrera seleccionada
-$sql = "SELECT idMaterias , Nombre,carreras_idCarrera FROM materias WHERE carreras_idCarrera = $idCarrera";
+$sql = "SELECT idMaterias, Nombre, carreras_idCarrera 
+        FROM materias 
+        WHERE carreras_idCarrera = '$idCarrera'";
 
 // Ejecutar la consulta
 $resultado = mysqli_query($conexion, $sql);
@@ -25,7 +27,7 @@ if ($resultado) {
     echo json_encode(array('materias' => $materias));
 } else {
     // Si hay un error en la consulta, devolver un mensaje de error
-    echo json_encode(array('error' => 'Error al obtener las materias.'));
+    echo json_encode(array('error' => 'Error al obtener las materias: ' . mysqli_error($conexion)));
 }
 
 // Cerrar la conexión a la base de datos

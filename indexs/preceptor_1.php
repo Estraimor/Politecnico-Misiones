@@ -1,4 +1,6 @@
+<?php include'../conexion/conexion.php'; ?>
 <?php
+
 session_start();
 if (empty($_SESSION["id"])){header('Location: ../login/login.php');}
 
@@ -16,8 +18,56 @@ if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)
     // Update the session time to the current time
     $_SESSION['time'] = time();
 }
+
+
+// Asume que el ID del profesor se obtiene de la sesión
+$profesor_id = $_SESSION['id'];
+
+// Obtener las carreras asociadas al preceptor
+$sql_carreras = "SELECT c.idCarrera, c.nombre_carrera 
+                 FROM carreras c
+                 INNER JOIN preceptores p ON c.idCarrera = p.carreras_idCarrera
+                 WHERE p.profesor_idProrfesor = ?";
+$stmt_carreras = $conexion->prepare($sql_carreras);
+$stmt_carreras->bind_param('i', $profesor_id);
+$stmt_carreras->execute();
+$result_carreras = $stmt_carreras->get_result();
+
+$carreras = [];
+while ($row = $result_carreras->fetch_assoc()) {
+    $carreras[$row['idCarrera']] = $row['nombre_carrera'];
+}
+
+$stmt_carreras->close();
+
+// Asume que el ID del profesor se obtiene de la sesión
+
+// Obtener las carreras, cursos y comisiones asociadas al preceptor
+$sql = "SELECT c.idCarrera, c.nombre_carrera, cu.idcursos, cu.nombre_curso, co.idComisiones, co.N_comicion
+        FROM carreras c
+        INNER JOIN preceptores p ON c.idCarrera = p.carreras_idCarrera
+        INNER JOIN cursos cu ON cu.idcursos = p.cursos_idcursos
+        INNER JOIN comisiones co ON co.idComisiones = p.comisiones_idComisiones
+        WHERE p.profesor_idProrfesor = ?";
+$stmt = $conexion->prepare($sql);
+$stmt->bind_param('i', $profesor_id);
+$stmt->execute();
+$result = $stmt->get_result();
+
+$menu_data = [];
+while ($row = $result->fetch_assoc()) {
+    $menu_data[$row['nombre_carrera']][] = [
+        'id_curso' => $row['idcursos'],
+        'id_carrera' => $row['idCarrera'],
+        'id_comision' => $row['idComisiones'],
+        'nombre_curso' => $row['nombre_curso'],
+        'nombre_comision' => $row['N_comicion']
+    ];
+}
+
+$stmt->close();
 ?> 
-<?php include'../conexion/conexion.php'; ?>
+
 
 <!DOCTYPE html>
 <html lang="es">
@@ -53,28 +103,44 @@ if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)
       </div>
       
     
+      <ul class="nav-options">
+        <li class="dropdown">
+            <a href="#" class="dropbtn"> Elegir carrera <i class="fas fa-chevron-down"></i></a>
+            <div class="dropdown-content">
+                <?php foreach ($menu_data as $nombre_carrera => $cursos_comisiones): ?>
+                    <div class="submenu">
+                        <a href="#" class="submenu-trigger"><?php echo $nombre_carrera; ?> <i class="fas fa-chevron-right"></i></a>
+                        <div class="sub-dropdown-content">
+                            <?php foreach ($cursos_comisiones as $cc): ?>
+                                <a href="./asistencias/asistencia.php?id_curso=<?php echo $cc['id_curso']; ?>&id_carrera=<?php echo $cc['id_carrera']; ?>&id_comision=<?php echo $cc['id_comision']; ?>">
+                                    <?php echo $nombre_carrera . ' - ' . $cc['nombre_curso'] . ' - ' . $cc['nombre_comision']; ?>
+                                </a>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        </li>
+    </ul>
     <ul class="nav-options">
-  <li class="dropdown">
-  <a href="#" class="dropbtn"> Elegir carrera <i class="fas fa-chevron-down"></i></a>
-    <div class="dropdown-content">
-      <div class="submenu">
-        <a href="#" class="submenu-trigger">Enfermeria <i class="fas fa-chevron-right"></i></a>
-        <div class="sub-dropdown-content">
-          <a href="./asistencias/enfermeria_1ro_b.php">Primer Año</a>
-        </div>
-      </div>
-      
-      <div class="submenu">
-        <a href="#" class="submenu-trigger">Comercialización y Marketing <i class="fas fa-chevron-right"></i></a>
-        <div class="sub-dropdown-content">
-          <a href="./asistencias/marketing_2do_a.php">Segundo Año</a> 
-        </div>
-      </div>
-    </div>
-    
-  </li>
-  
-</ul>
+        <li class="dropdown">
+            <a href="#" class="dropbtn"> Ver asistencia carrera <i class="fas fa-chevron-down"></i></a>
+            <div class="dropdown-content">
+                <?php foreach ($menu_data as $nombre_carrera => $cursos_comisiones): ?>
+                    <div class="submenu">
+                        <a href="#" class="submenu-trigger"><?php echo $nombre_carrera; ?> <i class="fas fa-chevron-right"></i></a>
+                        <div class="sub-dropdown-content">
+                            <?php foreach ($cursos_comisiones as $cc): ?>
+                                <a href="./asistencias/ver_asistencia.php?id_curso=<?php echo $cc['id_curso']; ?>&id_carrera=<?php echo $cc['id_carrera']; ?>&id_comision=<?php echo $cc['id_comision']; ?>">
+                                    <?php echo $nombre_carrera . ' - ' . $cc['nombre_curso'] . ' - ' . $cc['nombre_comision']; ?>
+                                </a>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        </li>
+    </ul>
 
 
 
@@ -86,61 +152,70 @@ if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)
    <!-- Modal para la tabla de estudiantes -->
    <div id="estudiantesModal" class="estudiantes-modal">
     <div class="modal-content-estudiantes">
-    <span class="modal-close-estudiantes close-modal-button" id="closeEstudiantesModal">&times; Cerrar</span>
-        <div id="tablaContainerEstudiantes">
+        <span class="modal-close-estudiantes close-modal-button" id="closeEstudiantesModal">&times; Cerrar</span>
         <button id="btnMostrarInformesAsistencia" class="boton-informes-asistencia">Informes de Asistencias</button>
-        <button id="btnImprimirListaEstudiantes" class="boton-informes-asistencia" >Guardar Lista de Estudiantes</button>
-            <table id="tabla">
-              
-        <thead>
-        
-            <tr>
-                <th>Legajo</th>
-                <th>Apellido</th>
-                <th>Nombre</th>
-                <th>DNI</th>
-                <th>Celular</th>
-                <th>Carrera</th>
-                <th>Acciones</th>
-            </tr>
-           
-        </thead>  
-        
-        <tbody>
-        
-            <?php
-            $sql1 = "SELECT * FROM inscripcion_asignatura ia 
-            INNER JOIN alumno a on ia.alumno_legajo = a.legajo 
-            INNER JOIN preceptores p ON p.carreras_idCarrera = ia.carreras_idCarrera 
-            INNER JOIN carreras c on ia.carreras_idCarrera = c.idCarrera
-            WHERE p.profesor_idProrfesor = {$_SESSION["id"]} and a.estado = '1'";
-            $query1 = mysqli_query($conexion, $sql1);
-            while ($datos = mysqli_fetch_assoc($query1)) {
-                ?>
-                <tr>
-                    <td><?php echo $datos['legajo']; ?></td>
-                    <td><?php echo $datos['apellido_alumno']; ?></td>
-                    <td><?php echo $datos['nombre_alumno']; ?></td>
-                    <td><?php echo $datos['dni_alumno']; ?></td>
-                    <td><?php echo $datos['celular']; ?></td>
-                    <td><?php echo $datos['nombre_carrera']; ?></td>
-                    <td><a href="../Profesor/modificar_alumno.php?legajo=<?php echo $datos['legajo']; ?>" class="modificar-button"><i class="fas fa-pencil-alt"></i></a>
-                    <a href="#" onclick="return confirmarBorrado('<?php echo $datos['legajo']; ?>')" class="borrar-button"><i class="fas fa-trash-alt"></i></a>
-                   <a href="../Profesor/porcentajes_de_asistencia.php?legajo=<?php echo $datos['legajo']; ?>" class="accion-button"><i class="fas fa-exclamation"></i></a></td>
+        <button id="modallistaestudiantestecnicaturas" class="boton-informes-asistencia">Generar Informe estudiantes</button>
+        <div id="tablaContainerEstudiantes">
+        <table id="tabla">
+    <thead>
+        <tr>
+            <th>Legajo</th>
+            <th>Apellido</th>
+            <th>Nombre</th>
+            <th>DNI</th>
+            <th>Celular</th>
+            <th>Carrera</th>
+            <th>Comisión</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php
+        // Asume que el ID del profesor se obtiene de la sesión
+        $profesor_id = $_SESSION['id'];
 
+        $sql = "SELECT a.legajo, a.nombre_alumno, a.apellido_alumno, a.dni_alumno, a.celular, c3.nombre_carrera, c2.N_comicion
+                FROM inscripcion_asignatura ia
+                INNER JOIN alumno a ON ia.alumno_legajo = a.legajo
+                INNER JOIN materias m ON ia.materias_idMaterias = m.idMaterias
+                INNER JOIN cursos c ON ia.cursos_idcursos = c.idcursos
+                INNER JOIN comisiones c2 ON ia.comisiones_idComisiones = c2.idComisiones
+                INNER JOIN carreras c3 ON m.carreras_idCarrera = c3.idCarrera
+                INNER JOIN preceptores p ON p.carreras_idCarrera = m.carreras_idCarrera
+                INNER JOIN profesor p2 ON p.profesor_idProrfesor = p2.idProrfesor
+                WHERE p2.idProrfesor = ? AND a.estado = 1
+                GROUP BY a.legajo";
 
+        $stmt = $conexion->prepare($sql);
+        $stmt->bind_param('i', $profesor_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
-                </tr>
-                
-                <?php
-            }
-            ?>
-        </tbody>
-        
-    </table>
-            </div>
+        while ($datos = $result->fetch_assoc()) {
+        ?>
+        <tr>
+            <td><?php echo $datos['legajo']; ?></td>
+            <td><?php echo $datos['apellido_alumno']; ?></td>
+            <td><?php echo $datos['nombre_alumno']; ?></td>
+            <td><?php echo $datos['dni_alumno']; ?></td>
+            <td><?php echo $datos['celular']; ?></td>
+            <td><?php echo $datos['nombre_carrera']; ?></td>
+            <td><?php echo $datos['N_comicion']; ?></td>
+            <td>
+                <a href="../Profesor/modificar_alumno.php?legajo=<?php echo $datos['legajo']; ?>" class="modificar-button"><i class="fas fa-pencil-alt"></i></a>
+                <a href="#" onclick="return confirmarBorrado('<?php echo $datos['legajo']; ?>')" class="borrar-button"><i class="fas fa-trash-alt"></i></a>
+                <a href="../Profesor/porcentajes_de_asistencia.php?legajo=<?php echo $datos['legajo']; ?>" class="accion-button"><i class="fas fa-exclamation"></i></a>
+            </td>
+        </tr>
+        <?php
+        }
+        $stmt->close();
+        ?>
+    </tbody>
+</table>
         </div>
     </div>
+</div>
 
 
     <div id="modalInformesAsistencia" class="modal-informes-asistencia">
@@ -182,43 +257,60 @@ if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)
     <?php include'../Profesor/estudiante/guardar_estudiante.php'; ?>
     <h2 class="form-container__h2">Registro de Estudiante</h2>
     <form action="" method="post">
-      <input type="text" class="form-container__input" name="nombre_alu" placeholder="Ingrese el nombre" autocomplete="off" required>
-      <input type="text" class="form-container__input" name="apellido_alu" placeholder="Ingrese el apellido" autocomplete="off" required>
-      <input type="number" class="form-container__input" name="dni_alu" placeholder="Ingrese el DNI" autocomplete="off" required>
-      <input type="number" class="form-container__input" name="celular" placeholder="Ingrese el celular" autocomplete="off" >
-      
-      <?php
-        // Consulta para obtener el último número de legajo
-        $sql_legajo = "SELECT MAX(legajo) AS max_legajo FROM alumno";
-        $resultado_legajo = mysqli_query($conexion, $sql_legajo);
-        $fila_legajo = mysqli_fetch_assoc($resultado_legajo);
-        $nuevo_legajo = $fila_legajo['max_legajo'] + 1; // Nuevo legajo es el último más uno
-      ?>
-      <!-- Campo de legajo con el valor obtenido de la base de datos -->
-      <input type="number" class="form-container__input" name="legajo" placeholder="Ingrese el número de legajo" value="<?php echo $nuevo_legajo ?>" autocomplete="off" required readonly>
-
-      <input type="date" class="form-container__input" name="edad" placeholder="Ingrese fecha de nacimiento" autocomplete="off" >
-      <input type="text" class="form-container__input" name="observaciones" placeholder="Observaciones" autocomplete="off" required>
-      <input type="text" class="form-container__input" name="Trabajo_Horario" placeholder="Trabajo / Horario" autocomplete="off" required>
-      
-      <!-- Consulta para obtener las carreras -->
-      <?php
-        $sql_mater="SELECT * 
-        FROM preceptores p 
-        INNER JOIN carreras c on p.carreras_idCarrera = c.idCarrera
-        WHERE p.profesor_idProrfesor = '{$_SESSION["id"]}' ";
-        $peticion=mysqli_query($conexion,$sql_mater);
-      ?>      
-
-      <select name="inscripcion_carrera" class="form-container__input"> 
-        <option hidden >Selecciona una carrera </option>
-        <?php while($informacion=mysqli_fetch_assoc($peticion)){ ?>
-          <option value="<?php echo $informacion['idCarrera'] ?>"><?php echo $informacion['nombre_carrera'] ?></option>
-        <?php }?>
-      </select>
-
-      <input type="submit" class="form-container__input" name="enviar" value="Confirmar" onclick="mostrarAlertaExitosa(); closeSuccessMessage();">
-    </form>
+            <input type="text" class="form-container__input" name="nombre_alu" placeholder="Ingrese el nombre" autocomplete="off" required>
+            <input type="text" class="form-container__input" name="apellido_alu" placeholder="Ingrese el apellido" autocomplete="off" required>
+            <input type="number" class="form-container__input" name="dni_alu" placeholder="Ingrese el DNI" autocomplete="off" required>
+            <input type="number" class="form-container__input" name="celular" placeholder="Ingrese el celular" autocomplete="off">
+            <?php
+            $sql_legajo = "SELECT MAX(legajo) AS max_legajo FROM alumno";
+            $resultado_legajo = $conexion->query($sql_legajo);
+            $fila_legajo = $resultado_legajo->fetch_assoc();
+            $nuevo_legajo = $fila_legajo['max_legajo'] + 1;
+            ?>
+            <input type="text" name="legajo" placeholder="N° Legajo" value="<?php echo $nuevo_legajo; ?>" class="form-container__input" readonly >
+            <input type="date" class="form-container__input" name="edad" placeholder="Ingrese fecha de nacimiento" autocomplete="off">
+            <input type="text" class="form-container__input" name="observaciones" placeholder="Observaciones" autocomplete="off" required>
+            <input type="text" class="form-container__input" name="Trabajo_Horario" placeholder="Trabajo / Horario" autocomplete="off" required>
+            <?php
+            $sql_carreras = "SELECT c.* 
+                          FROM carreras c
+                          INNER JOIN preceptores p ON c.idCarrera = p.carreras_idCarrera
+                          WHERE p.profesor_idProrfesor ={$_SESSION["id"]} ;";
+            $peticion = mysqli_query($conexion, $sql_carreras);
+            ?>
+            <select name="inscripcion_carrera" id="inscripcion_carrera" class="form-container__input">
+                <option hidden>Selecciona una carrera</option>
+                <?php while ($row = mysqli_fetch_assoc($peticion)) { ?>
+                <option value="<?php echo $row['idCarrera']; ?>"><?php echo $row['nombre_carrera']; ?></option>
+                <?php } ?>
+            </select>
+            <?php
+            $sql_comision = "SELECT c.idComisiones, c.N_comicion 
+                                FROM comisiones c
+                                INNER JOIN preceptores p ON c.idComisiones = p.comisiones_idComisiones
+                                WHERE p.profesor_idProrfesor = {$_SESSION["id"]} ; ";
+            $resultado_comision = $conexion->query($sql_comision);
+            ?>
+            <select name="Comision" id="Comision"  class="form-container__input">
+                <option hidden>Selecciona una Comision</option>
+                <?php while ($rowcomision = mysqli_fetch_assoc($resultado_comision)) { ?>
+                <option value="<?php echo $rowcomision['idComisiones']; ?>"><?php echo $rowcomision['N_comicion']; ?></option>
+                <?php } ?>
+            </select>
+            <select name="Año_inscripcion" id="Año_inscripcion" class="form-container__input">
+                <option value="2025">2025</option>
+                <option value="2026">2026</option>
+                <option value="2027">2027</option>
+                <option value="2028">2028</option>
+                <option value="2029">2029</option>
+                <option value="2030">2030</option>
+                <option value="2031">2031</option>
+                <option value="2032">2032</option>
+                <option value="2033">2033</option>
+                <option value="2034">2034</option>
+            </select>
+            <input type="submit" class="form-container__input" name="enviar" value="Enviar" onclick="mostrarAlertaExitosa(); closeSuccessMessage();">
+        </form>
   </div>
 </div>
 
@@ -333,13 +425,7 @@ if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)
   <div class="modal-content-justificacion">
     <span class="close-justificacion" onclick="cerrarModalJustificacion()">×</span>
     
-    <?php
-  $sql_carreras="SELECT c.nombre_carrera,p.carreras_idCarrera 
-  FROM preceptores p 
-  INNER JOIN carreras c on p.carreras_idCarrera = c.idCarrera 
-  WHERE p.profesor_idProrfesor = '{$_SESSION["id"]}';";
-  $query_carrera=mysqli_query($conexion,$sql_carreras);
-  ?>
+   
     <h2 class="form-container__h2">Justificar Falta</h2>
     
    <form action="guardar_falta_justificada.php" id="miFormularioRetirados" method="post">
@@ -361,23 +447,6 @@ if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)
     </form>
   </div>
 </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 <div class="nav-welcome-container">

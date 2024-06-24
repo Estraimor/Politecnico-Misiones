@@ -8,8 +8,8 @@ if (empty($_SESSION["id"])) {
 }
 
 $server = 'localhost';
-$user = 'u756746073_root';
-$pass = 'POLITECNICOmisiones2023.';
+$user = 'root';
+$pass = '';
 $bd = 'u756746073_politecnico';
 $conexion = mysqli_connect($server, $user, $pass, $bd, '3306');
 
@@ -18,20 +18,26 @@ if (!$conexion) {
     exit;
 }
 
+$carrera = isset($_GET['carrera']) ? mysqli_real_escape_string($conexion, $_GET['carrera']) : '';
+$comision = isset($_GET['comision']) ? mysqli_real_escape_string($conexion, $_GET['comision']) : '';
+$curso = isset($_GET['curso']) ? mysqli_real_escape_string($conexion, $_GET['curso']) : '';
 $fecha = isset($_GET['fecha']) ? mysqli_real_escape_string($conexion, $_GET['fecha']) : '';
-$comisionID = isset($_GET['comisionId']) ? mysqli_real_escape_string($conexion, $_GET['comisionId']) : '';
 
-if (empty($fecha) || empty($comisionID)) {
+if (empty($fecha) || empty($carrera) || empty($comision) || empty($curso)) {
     echo "Error: Parámetros incorrectos.";
     exit;
 }
 
 try {
     // Consulta para obtener los datos de asistencia
-    $sql_asistencia = "SELECT a2.nombre_alumno, a2.apellido_alumno, a.`1_Horario`, a.`2_Horario`, a.fecha  
+    $sql_asistencia = "SELECT a2.nombre_alumno, a2.apellido_alumno, a.asistencia, a.fecha, a.materias_idMaterias, m.Nombre as nombre_materia
             FROM asistencia a 
+            INNER JOIN materias m ON a.materias_idMaterias = m.idMaterias
+            INNER JOIN carreras cr ON a.carreras_idCarrera = cr.idCarrera
+            INNER JOIN cursos cs ON a.cursos_idcursos = cs.idcursos
+            INNER JOIN comisiones cm ON a.comisiones_idComisiones = cm.idComisiones
             LEFT JOIN alumno a2 ON a.inscripcion_asignatura_alumno_legajo = a2.legajo
-            WHERE a.inscripcion_asignatura_carreras_idCarrera = '$comisionID' AND a.fecha = '$fecha'";
+            WHERE cs.idcursos = '$curso' AND cr.idCarrera = '$carrera' AND cm.idComisiones = '$comision' AND a.fecha = '$fecha'";
 
     $query_asistencia = mysqli_query($conexion, $sql_asistencia);
 
@@ -39,113 +45,72 @@ try {
         throw new Exception("Error en la consulta SQL de asistencia: " . mysqli_error($conexion));
     }
 
-    // Consulta para contar la cantidad de presentes 1HS
-    $sql_presentes = "select count(`1_Horario` ) as cantidad_presentes from asistencia a
-    where `1_Horario` = 'Presente' and fecha = '$fecha' 
-    and inscripcion_asignatura_carreras_idCarrera = '$comisionID'";
+    // Array para almacenar los datos de asistencia agrupados por materia
+    $materias_asistencia = [];
+    $alumnos_asistencia = [];
 
-    $query_presentes = mysqli_query($conexion, $sql_presentes);
-
-// Consulta para contar la cantidad de ausentes 1HS
-
-    $sql_ausente = "select count(`1_Horario` ) as cantidad_ausentes from asistencia a
-    where `1_Horario` = 'ausente' and fecha = '$fecha' 
-    and inscripcion_asignatura_carreras_idCarrera = '$comisionID'";
-
-    $query_ausentes = mysqli_query($conexion, $sql_ausente);
-
-    // Consulta para contar la cantidad de Justificada 1HS  
-
-    $sql_justificada = "select count(`1_Horario` ) as cantidad_justificada from asistencia a
-    where `1_Horario` = 'justificada' and fecha = '$fecha' 
-    and inscripcion_asignatura_carreras_idCarrera = '$comisionID'";
-
-    $query_justificadas = mysqli_query($conexion, $sql_justificada);
-
-    //__________________________________2HS_____________________________________________________
-
-     // Consulta para contar la cantidad de presentes 2HS
-    $sql_presentes2HS = "select count(`2_Horario` ) as cantidad_presentes2 from asistencia a
-    where `2_Horario` = 'Presente' and fecha = '$fecha' 
-    and inscripcion_asignatura_carreras_idCarrera = '$comisionID'";
-
-    $query_presentes2HS = mysqli_query($conexion, $sql_presentes2HS);
-
-// Consulta para contar la cantidad de ausentes 2HS
-
-    $sql_ausente2HS = "select count(`2_Horario` ) as cantidad_ausentes2 from asistencia a
-    where `2_Horario` = 'ausente' and fecha = '$fecha' 
-    and inscripcion_asignatura_carreras_idCarrera = '$comisionID'";
-
-    $query_ausentes2HS = mysqli_query($conexion, $sql_ausente2HS);
-
-    // Consulta para contar la cantidad de Justificada 2HS
-
-    $sql_justificada2HS = "select count(`2_Horario` ) as cantidad_justificada2 from asistencia a
-    where `2_Horario` = 'justificada' and fecha = '$fecha' 
-    and inscripcion_asignatura_carreras_idCarrera = '$comisionID'";
- 
-
-    $query_justificadas2HS = mysqli_query($conexion, $sql_justificada2HS);
-
-    if (!$query_presentes) {
-        throw new Exception("Error en la consulta SQL de conteo de presentes 1HS: " . mysqli_error($conexion));
-    }
-    if (!$query_ausentes) {
-        throw new Exception("Error en la consulta SQL de conteo de ausentes 1HS: " . mysqli_error($conexion));
-    }
-    if (!$query_justificadas    ) {
-        throw new Exception("Error en la consulta SQL de conteo de justificadas 1HS: " . mysqli_error($conexion));
-    }
-
-     if (!$query_presentes2HS) {
-        throw new Exception("Error en la consulta SQL de conteo de presentes 2HS: " . mysqli_error($conexion));
-    }
-    if (!$query_ausentes2HS) {
-        throw new Exception("Error en la consulta SQL de conteo de ausentes 2HS: " . mysqli_error($conexion));
-    }
-    if (!$query_justificadas2HS) {
-        throw new Exception("Error en la consulta SQL de conteo de justificadas 2HS: " . mysqli_error($conexion));
-    }
-
-    $cantidad_presentes1HS = mysqli_fetch_assoc($query_presentes)['cantidad_presentes'];
-    $cantidad_ausentes1HS = mysqli_fetch_assoc($query_ausentes)['cantidad_ausentes'];
-    $cantidad_justificadas1HS = mysqli_fetch_assoc($query_justificadas)['cantidad_justificada'];
-
-
-    $cantidad_presentes2HS = mysqli_fetch_assoc($query_presentes2HS)['cantidad_presentes2'];
-    $cantidad_ausentes2HS = mysqli_fetch_assoc($query_ausentes2HS)['cantidad_ausentes2'];
-    $cantidad_justificadas2HS = mysqli_fetch_assoc($query_justificadas2HS)['cantidad_justificada2'];
-
-    // Muestra los datos de asistencia y la cantidad de presentes
-$contador = 1; // Inicializamos el contador en 1
-    
+    // Procesar los resultados de la consulta
     while ($datos = mysqli_fetch_assoc($query_asistencia)) {
+        $materia_id = $datos['materias_idMaterias'];
+        if (!isset($materias_asistencia[$materia_id])) {
+            // Inicializa el array para una nueva materia
+            $materias_asistencia[$materia_id] = [
+                'nombre_materia' => $datos['nombre_materia'],
+                'presentes' => 0,
+                'ausentes' => 0,
+                'justificadas' => 0,
+            ];
+        }
+        // Agrega los datos del alumno al array general
+        $alumnos_asistencia[] = $datos;
+        // Incrementa los contadores de presentes, ausentes y justificadas según corresponda
+        if ($datos['asistencia'] == 'Presente') {
+            $materias_asistencia[$materia_id]['presentes']++;
+        } elseif ($datos['asistencia'] == 'ausente') {
+            $materias_asistencia[$materia_id]['ausentes']++;
+        } elseif ($datos['asistencia'] == 'justificada') {
+            $materias_asistencia[$materia_id]['justificadas']++;
+        }
+    }
+
+    // Mostrar la tabla general de alumnos
+    echo "<table class='table table-bordered'>";
+    echo "<tr>
+            <th>N°</th>
+            <th>Apellido</th>
+            <th>Nombre</th>
+            <th>Asistencia</th>
+            <th>Fecha</th>
+          </tr>";
+
+    $contador = 1;
+    foreach ($alumnos_asistencia as $alumno) {
         echo "<tr>
                 <td>{$contador}</td>
-                <td>{$datos['apellido_alumno']}</td>
-                <td>{$datos['nombre_alumno']}</td>
-                <td>{$datos['1_Horario']}</td>
-                <td>{$datos['2_Horario']}</td>
-                <td>{$datos['fecha']}</td>
+                <td>{$alumno['apellido_alumno']}</td>
+                <td>{$alumno['nombre_alumno']}</td>
+                <td>{$alumno['asistencia']}</td>
+                <td>{$alumno['fecha']}</td>
               </tr>";
-        $contador++; // Incrementamos el contador en 1 para el próximo ciclo
+        $contador++;
     }
-    echo "<tr>  
-            <td>Cantidad de presentes 1HS: $cantidad_presentes1HS
-            <td>Cantidad de presentes 2HS: $cantidad_presentes2HS
+    echo "</table>";
 
-         <tr>";
-    echo "<tr>  
-            <td>Cantidad de ausentes 1HS: $cantidad_ausentes1HS
-            <td>Cantidad de ausentes 2HS: $cantidad_ausentes2HS
-         <tr>";
-    echo "<tr>  
-            <td>Cantidad de justificadas 1HS: $cantidad_justificadas1HS
-            <td>Cantidad de justificadas 2HS: $cantidad_justificadas2HS
-         <tr>";
+    // Mostrar los contadores al final
+    echo "<table class='table table-bordered'>";
+    echo "<tr>";
+    foreach ($materias_asistencia as $materia_id => $asistencia) {
+        echo "<td>";
+        echo "<strong>Materia: {$asistencia['nombre_materia']}</strong><br>";
+        echo "Cantidad de presentes: {$asistencia['presentes']}<br>";
+        echo "Cantidad de ausentes: {$asistencia['ausentes']}<br>";
+        echo "Cantidad de justificadas: {$asistencia['justificadas']}";
+        echo "</td>";
+    }
+    echo "</tr>";
+    echo "</table>";
+
 } catch (Exception $e) {
     echo "Error: " . $e->getMessage();
 }
-
 ?>
