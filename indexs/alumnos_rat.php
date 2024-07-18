@@ -1,464 +1,451 @@
 <?php
 session_start();
-if (empty($_SESSION["id"])){header('Location: ./login/login.php');}
+if (empty($_SESSION["id"])){header('Location: ../login/login.php');}
+
+// Set inactivity limit in seconds
+$inactivity_limit = 1200;
+
+// Check if the user has been inactive for too long
+if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)) {
+    // User has been inactive, so destroy the session and redirect to login page
+    session_unset();
+    session_destroy();
+    header("Location: ../login/login.php");
+    exit; // Terminar el script después de redireccionar
+} else {
+    // Update the session time to the current time
+    $_SESSION['time'] = time();
+}
 ?>
 <?php include'../conexion/conexion.php'; ?>
+
 
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SGPM</title>
+    <title>AT 1ro</title>
     <link rel="stylesheet" type="text/css" href="../estilos.css">
     <link rel="stylesheet" type="text/css" href="../normalize.css">
     <link rel="icon" href="../politecnico.ico">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-Bz5/BqJ8SCxmeLEjmo5fD5fgONMAewh+PxQv0tRnm5IsJf5M9bGqDlVCS5c3X7CQZLjdvFtJ+zaOhtlUlm7XjA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link href="https://unpkg.com/vanilla-datatables@latest/dist/vanilla-dataTables.min.css" rel="stylesheet" type="text/css">
-    <script src="https://unpkg.com/vanilla-datatables@latest/dist/vanilla-dataTables.min.js" type="text/javascript"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        .form-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
 
+      
 
+        .btn-enviar {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            margin: 8px 0;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+        }
+    </style>
 </head>
 <body>
-<div id="success-message" class="success-message" style="display: none;"></div>
+
 <div class="background">
 
-<button class="toggle-menu-button" id="toggle-menu-button" onclick="toggleMenu()">
-  <span id="toggle-menu-icon">☰</span>
-</button>
-<nav class="navbar">
-          <div class="nav-left">  
-            <a href="index.php" class="home-button">Inicio</a>
-            <button class="btn-new-member" id="btn-new-member">Alumno RAT</button>
-            <button class="btn-situacion-academica">
-              <a href="../Profesor/notas/login_notas/index_notas.php" class="btn-link">Situación Académica</a>
-            </button>
-            <button class="btn-preceptores">
-              <a href="../preceptores.php">Preceptores</a>
-            </button>
-          </div>
+  <button class="toggle-menu-button" onclick="toggleMenu()">☰</button>
+  <nav class="navbar">
+      
+    <div class="nav-left">  
+    <a href="./controlador_preceptor.php" class="home-button">Menu Principal</a>
 
-    <ul class="nav-options">
-      <li class="dropdown">
-        <a href="#" class="dropbtn"> Elegir carrera <i class="fas fa-chevron-down"></i></a>
-          <div class="dropdown-content">
-              <div class="submenu">
-                <a href="#" class="submenu-trigger">Enfermeria <i class="fas fa-chevron-right"></i></a>
-                  <div class="sub-dropdown-content">
-                    <a href="../Profesor/asistencia/asistencia_enfermeria.php">Primer Año</a>
-                    <a href="../Profesor/asistencia/asistencia_enfermeria2ano.php">Segundo Año</a>
-                    <a href="../Profesor/asistencia/asistencia_enfermeria3ano.php">Tercer Año</a>
-                  </div>
-              </div>
-              <div class="submenu">
-                <a href="#" class="submenu-trigger">Acompañamiento Terapeutico <i class="fas fa-chevron-right"></i></a>
-                  <div class="sub-dropdown-content">
-                    <a href="../Profesor/asistencia/asistencia_acompanante_terapeutico1ano.php">Primer Año</a>
-                    <a href="../Profesor/asistencia/asistencia_acompanante_terapeutico2ano.php">Segundo Año</a>
-                    <a href="../Profesor/asistencia/asistencia_acompanante_terapeutico1ano.php">Tercer Año</a>
-                  </div>
-              </div>
-              <div class="submenu">
-                <a href="#" class="submenu-trigger">Comercialización y Marketing <i class="fas fa-chevron-right"></i></a>
-                  <div class="sub-dropdown-content">
-                    <a href="../Profesor/asistencia/asistencia_comercializacion_marketing1ano.php">Primer Año</a>
-                    <a href="../Profesor/asistencia/asistencia_comercializacion_marketing2ano.php">Segundo Año</a>
-                    <a href="../Profesor/asistencia/asistencia_comercializacion_marketing3ano.php">Tercer Año</a>
-                  </div>
-              </div>
-              <div class="submenu">
-                <a href="#" class="submenu-trigger">Automatización y Robótica  <i class="fas fa-chevron-right"></i></a>
-                  <div class="sub-dropdown-content">
-                    <a href="../Profesor/asistencia/asistencia_automatizacion_robotica1ano.php">Primer Año</a>
-                    <a href="../Profesor/asistencia/asistencia_automatizacion_robotica2ano.php  ">Segundo Año</a>
-                    <a href="#">Tercer Año</a>
-                  </div>
-              </div>
-                    <a href="asistencia_programacion_web.php" class="submenu-trigger">FP-Programación Web</a>
-                    <a href="#" class="submenu-trigger">FP-Marketing y Venta Digital</a>
-                    <a href="#" class="submenu-trigger">FP-Redes Informáticas</a>
- 
-      </li>
-    </ul>
+      
+      </div>
+      
+    
+    
+
+
+
     <div class="nav-right">
         <a href="../login/cerrar_sesion.php" class="btn-logout">Cerrar sesión</a>
     </div>
-    
-    
-    
-</nav>
-  <button id="btnMostrarEstudiantes">Alumnos Retirados antes de tiempo</button>
-   <!-- Modal para la tabla de estudiantes -->
-   <div id="estudiantesModal" class="estudiantes-modal">
-    <div class="modal-content-estudiantes">
-    <span class="modal-close-estudiantes close-modal-button" id="closeEstudiantesModal">&times; Cerrar</span>
-        <div id="tablaContainerEstudiantes">
-            <table id="tabla">
-        <thead>
-            <tr>
-                <th>Nombre</th>
-                <th>Apellido</th>
-                <th>Legajo</th>
-                <th>Preceptor</th>
-                <th>Carrera</th>
-                <th>Motivo</th>
-                <th>Fecha</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php
-              $sql1 = "SELECT a2.nombre_alumno,a2.apellido_alumno,a2.legajo,p.nombre_profe,c.nombre_carrera,a.fecha,a.motivo
-              FROM alumnos_rat a
-              INNER JOIN alumno a2 on a2.legajo = a.alumno_legajo
-              INNER JOIN profesor p on p.idProrfesor = a.profesor_idProrfesor
-              INNER JOIN carreras c on c.idCarrera = a.carreras_idCarrera";
-            $query1 = mysqli_query($conexion, $sql1);
-            while ($datos = mysqli_fetch_assoc($query1)) {
-                ?>
-                <tr>
-                    <td><?php echo $datos['nombre_alumno']; ?></td>
-                    <td><?php echo $datos['apellido_alumno']; ?></td>
-                    <td><?php echo $datos['legajo']; ?></td>
-                    <td><?php echo $datos['nombre_profe']; ?></td>
-                    <td><?php echo $datos['nombre_carrera']; ?></td>
-                    <td><?php echo $datos['motivo']; ?></td>
-                    <td><?php echo $datos['fecha']; ?></td>
+  </nav>
+  
 
+  <?php
+// Obtener el curso, carrera y comisión desde la URL
+$curso_id = $_GET['id_curso'];
+$carrera_id = $_GET['id_carrera'];
+$comision_id = $_GET['id_comision'];
 
+// Obtener el listado de materias del curso y la carrera
+$sql_materias = "SELECT m.idMaterias, m.Nombre 
+                 FROM cursos_has_materias cm
+                 INNER JOIN materias m ON cm.materias_idMaterias = m.idMaterias
+                 WHERE cm.cursos_idcursos = ? AND m.carreras_idCarrera = ?";
+$stmt_materias = $conexion->prepare($sql_materias);
+$stmt_materias->bind_param("ii", $curso_id, $carrera_id);
+$stmt_materias->execute();
+$query_materias = $stmt_materias->get_result();
 
-                </tr>
-                <?php
-            }
-            ?>
-        </tbody>
-        
-    </table>
-            </div>
+// Obtener los datos de los alumnos
+$sql_alumnos = "SELECT a.legajo, a.nombre_alumno, a.apellido_alumno, c.nombre_carrera, c2.N_comicion
+                FROM inscripcion_asignatura ia
+                INNER JOIN alumno a ON ia.alumno_legajo = a.legajo
+                INNER JOIN materias m ON ia.materias_idMaterias = m.idMaterias
+                INNER JOIN carreras c ON m.carreras_idCarrera = c.idCarrera
+                INNER JOIN comisiones c2 ON ia.comisiones_idComisiones = c2.idComisiones
+                WHERE ia.cursos_idcursos = ? AND c.idCarrera = ? AND ia.comisiones_idComisiones = ?
+                GROUP BY a.legajo";
+$stmt_alumnos = $conexion->prepare($sql_alumnos);
+$stmt_alumnos->bind_param("iii", $curso_id, $carrera_id, $comision_id);
+$stmt_alumnos->execute();
+$result_alumnos = $stmt_alumnos->get_result();
+?>
+   
+   <form action="guardar_alumnos_rat.php" method="post">
+        <div class="form-container">
+            <select id="materiaSelect" name="materia" class="form-container__input" required>
+                <?php while ($materia = mysqli_fetch_assoc($query_materias)) { ?>
+                    <option value="<?php echo htmlspecialchars($materia['idMaterias']); ?>">
+                        <?php echo htmlspecialchars($materia['Nombre']); ?>
+                    </option>
+                <?php } ?>
+            </select>
         </div>
-    </div>
-  <div id="modal" class="modal">
-  <div class="modal-content">
-  <span class="close" onclick="closeModal()">&times;</span>
-<?php
-  $sql_carreras="SELECT c.nombre_carrera,p.carreras_idCarrera 
-  FROM preceptores p 
-  INNER JOIN carreras c on p.carreras_idCarrera = c.idCarrera 
-  WHERE p.profesor_idProrfesor = '{$_SESSION["id"]}';";
-  $query_carrera=mysqli_query($conexion,$sql_carreras);
-  ?>
+        
+        <input type="hidden" name="curso" value="<?php echo htmlspecialchars($curso_id); ?>">
+        <input type="hidden" name="carrera" value="<?php echo htmlspecialchars($carrera_id); ?>">
+        <input type="hidden" name="comision" value="<?php echo htmlspecialchars($comision_id); ?>">
 
-    <h2 class="form-container__h2">Alumno Retirado Antes de Tiempo</h2>
-    <form action="./guardar_alumnos_rat.php" id="miFormulario" method="post">
-      
-            
-    <input type="text" name="filtroAlumno" id="filtroAlumno" placeholder="Filtrar por nombre, apellido o legajo de alumno">
-    <select name="selectAlumno" id="selectAlumno">
-        <option value="">Seleccionar alumno</option>
-    </select>
-    <input type="hidden" id="carrera" name="carrera" value="">
-    <select id="selectMateria" name="materia">
-      <option value="">Seleccione Materia</option>
-    </select>
-     <input type="text" name="motivo" placeholder="Motivo de Retirado" >
-              <input type="date" name="fecha" id="">
-      <input type="submit" class="form-container__input" name="enviar" value="Enviar" onclick="mostrarAlertaExitosa(); closeSuccessMessage();">
+        <div class="table-responsive">
+            <table class="table-comision-a">
+                <thead>
+                    <tr>
+                        <th>Legajo</th>
+                        <th>Nombre</th>
+                        <th>Apellido</th>
+                        <th>Carrera</th>
+                        <th>Comisión</th>
+                        <th>Cfolectivo</th>
+                        <th>Particular</th>
+                        <th>Sin Motivo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php while ($alumno = mysqli_fetch_assoc($result_alumnos)) { ?>
+                        <tr>
+                            <td><?php echo htmlspecialchars($alumno['legajo']); ?></td>
+                            <td><?php echo htmlspecialchars($alumno['nombre_alumno']); ?></td>
+                            <td><?php echo htmlspecialchars($alumno['apellido_alumno']); ?></td>
+                            <td><?php echo htmlspecialchars($alumno['nombre_carrera']); ?></td>
+                            <td><?php echo htmlspecialchars($alumno['N_comicion']); ?></td>
+                            <td class="checkbox-cell">
+                                <input type="radio" name="motivo[<?php echo $alumno['legajo']; ?>]" value="Cfolectivo" required>
+                            </td>
+                            <td class="checkbox-cell">
+                                <input type="radio" name="motivo[<?php echo $alumno['legajo']; ?>]" value="Particular" required>
+                            </td>
+                            <td class="checkbox-cell">
+                                <input type="radio" name="motivo[<?php echo $alumno['legajo']; ?>]" value="Sin Motivo" required>
+                            </td>
+                        </tr>
+                    <?php } ?>
+                </tbody>
+            </table>
+        </div>
+        <input type="submit" value="Guardar" class="btn-enviar">
     </form>
     
-  </div>
-</div>
-
-
-<div class="nav-welcome-container">
-
-<div id="welcome-box" class="welcome-box">
-  <h1 class="welcome-box__h1">Bienvenido/a</h1>
-  <p class="welcome-box__p">¡Selecciona una carrera para tomar asistencia!</p>
-</div>
-</div>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-
-
-  function toggleMenu() {
-      const navbar = document.querySelector(".navbar");
-      navbar.classList.toggle("show-menu");
-    }
-  // Función para abrir la ventana emergente
-  function openModal() {
-    var modal = document.getElementById("modal");
-    modal.style.display = "block";
-    if (window.innerWidth <= 768) {
-      toggleMenu(); // Oculta el menú cuando se abre la ventana emergente en modo responsivo
-    }
-    setTimeout(function() {
-    modal.classList.add("show"); // Agrega la clase show para mostrar el modal con animación
-  }, 10); 
   
-  var welcomeBox = document.querySelector(".welcome-box");
-  welcomeBox.style.display = "none"; // Oculta el welcome-box
+
+function toggleMenu() {
+  const navbar = document.querySelector(".navbar");
+  navbar.classList.toggle("show-menu");
+}
+
+// Función para abrir la ventana emergente
+function openModal() {
+  var modal = document.getElementById("modal");
+  modal.style.display = "block";
+  if (window.innerWidth <= 768) {
+    toggleMenu();
+  }
   setTimeout(function() {
     modal.classList.add("show");
   }, 10);
-  } 
 
-  // Función para cerrar la ventana emergente
-  function closeModal() {
-    var modal = document.getElementById("modal");
-  modal.classList.remove("show"); // Remueve la clase show para ocultar el modal con animación
+  var welcomeBox = document.querySelector(".welcome-box");
+  welcomeBox.style.display = "none";
   setTimeout(function() {
-    modal.style.display = "none"; // Oculta el modal después de la animación
+    modal.classList.add("show");
+  }, 10);
+}
+
+// Función para cerrar la ventana emergente
+function closeModal() {
+  var modal = document.getElementById("modal");
+  modal.classList.remove("show");
+  setTimeout(function() {
+    modal.style.display = "none";
   }, 300);
   var welcomeBox = document.querySelector(".welcome-box");
   welcomeBox.style.display = "block";
 }
-  
-  document.getElementById("btn-new-member").onclick = function() {
-      openModal();
-};
-    
-   function mostrarAlertaExitosa() {
-  var successMessage = document.getElementById("success-message");
-  successMessage.style.display = "block"; // Muestra el mensaje de éxito
 
-  
+document.getElementById("btn-new-member").onclick = function() {
+  openModal();
+};
+
+function mostrarAlertaExitosa() {
+  var successMessage = document.getElementById("success-message");
+  successMessage.style.display = "block";
 }
+
 function closeSuccessMessage() {
   var successMessage = document.getElementById("success-message");
-  successMessage.style.display = "none"; // Oculta el mensaje de éxito
+  successMessage.style.display = "none";
 }
-// Función para abrir el modal de materia
-
 
 
 
 // Escucha el evento 'keydown' en el documento
-document.addEventListener('keydown', function (event) {
+document.addEventListener('keydown', function(event) {
   if (event.key === 'Escape') {
     // Cierra el modal de Nuevo Estudiante si está abierto
     var estudianteModal = document.getElementById('modal');
-    if (estudianteModal.style.display === 'block') {
-      closeModal(); // Llama a tu función closeModal para cerrar el modal de Nuevo Estudiante
-    }
-
-    // Cierra el modal de Nueva Materia si está abierto
-    var materiaModal = document.getElementById('materia-modal');
-    if (materiaModal.style.display === 'block') {
-      closeMateriaModal(); // Llama a tu función closeMateriaModal para cerrar el modal de Nueva Materia
+    if (estudianteModal && estudianteModal.style.display === 'block') {
+      closeModal();
     }
   }
 });
 
-document.addEventListener("DOMContentLoaded", function() {
-  console.log("Script cargado");
 
-  // Agrega el evento submit después de que el DOM esté completamente cargado
-  var tuFormulario = document.getElementById("tu-formulario");
 
-  if (tuFormulario) {
-    // Verifica que el elemento con el ID "tu-formulario" existe
-    tuFormulario.addEventListener("submit", function (event) {
-      event.preventDefault();
+// Función para abrir el modal de asistencia
+function openAttendanceModal() {
+  var attendanceModal = document.getElementById("attendance-modal-asistencia");
+  attendanceModal.style.display = "block";
+}
 
-      // Aquí va tu lógica de procesamiento del formulario.
+// Función para cerrar el modal de tomar asistencia
+function closeAttendanceModaltomarasistencia() {
+  var attendanceModal = document.getElementById("attendance-modal-asistencia");
+  attendanceModal.style.display = "none";
+}
+// Función para abrir el modal de ver asistencia 
+function openAttendanceModalasistencia() {
+  var attendanceModalasistencia = document.getElementById("attendance-modal-asistencia");
+  openAttendanceModalasistencia.style.display = "block";
+}
 
-      var envioExitoso = true; 
+// Función para cerrar el modal de ver asistencia
+function closeAttendanceModal() {
+  var attendanceModal = document.getElementById("attendance-modal-asistencia");
+  attendanceModal.style.display = "none";
+}
 
-      if (envioExitoso) {
-        document.getElementById("envio-exitoso").value = "1";
-      }
+// Funciones para abrir y cerrar el modal de Comisión A
+function openModalComisionA() {
+  // Cierra el modal de asistencia
+  closeAttendanceModal();
 
-      if (envioExitoso) {
-        var successMessage = document.getElementById("success-message");
-        successMessage.textContent = "Los datos se enviaron correctamente.";
-        successMessage.style.display = "block";
-      }
-    });
-  }
+  var modalComisionA = document.getElementById("asistenciamodalComisionA");
+  modalComisionA.style.display = 'block';
+}
 
-  
+function closeModalComisionA() {
+  var modalComisionA = document.getElementById('asistenciamodalComisionA');
+  modalComisionA.style.display = 'none';
+}
+// comision B
 
-  var btnMostrarEstudiantes = document.getElementById("btnMostrarEstudiantes");
-  var estudiantesModal = document.getElementById("estudiantesModal");
-  var closeEstudiantesModal = document.getElementById("closeEstudiantesModal");
+function openModalComisionB() {
+  // Cierra el modal de asistencia
+  closeAttendanceModal();
 
-  btnMostrarEstudiantes.addEventListener("click", function() {
-    console.log("Botón clickeado");
-    estudiantesModal.style.display = "block";
-  });
+  var modalComisionB = document.getElementById("asistenciamodalComisionB");
+  modalComisionB.style.display = 'block';
+}
 
-  closeEstudiantesModal.addEventListener("click", function() {
-    estudiantesModal.style.display = "none";
-  });
+function closeModalComisionB() {
+  var modalComisionB = document.getElementById('asistenciamodalComisionB');
+  modalComisionB.style.display = 'none';
+}
+// comision c
 
-  window.addEventListener("click", function(event) {
-    if (event.target === estudiantesModal) {
-      estudiantesModal.style.display = "none";
-    }
-  });
-});
+function openModalComisionC() {
+  // Cierra el modal de asistencia
+  closeAttendanceModal();
 
-// dataTables de Alumnos //
-var myTable = document.querySelector("#tabla");
-var dataTable = new DataTable(tabla);
-    
+  var modalComisionC = document.getElementById("asistenciamodalComisionC");
+  modalComisionC.style.display = 'block';
+}
 
-//---------------------------------- Filtro Alumnos ---------------------------------//
+function closeModalComisionC() {
+  var modalComisionC = document.getElementById('asistenciamodalComisionC');
+  modalComisionC.style.display = 'none';
+}
 
-$(document).ready(function() {
-    // Función para actualizar el selector de alumnos
-    function actualizarSelectAlumnos(alumnos) {
-        var selectAlumno = $('#selectAlumno');
-        selectAlumno.empty(); // Vaciar el select para llenarlo de nuevo
 
-        // Agregar una opción por cada alumno recibido
-        alumnos.forEach(function(alumno) {
-            var option = $('<option>', {
-                value: alumno.legajo, // Utilizamos el legajo del alumno como valor
-                text: alumno.nombre_alumno + ' ' + alumno.apellido_alumno + ' (' + alumno.legajo + ')'
-            });
-            selectAlumno.append(option);
-        });
-    }
+//__________________________ver asistencia ____________________________
 
-    // Llamada inicial para llenar el selector de alumnos
-    $.ajax({
-        url: 'obtener_opciones.php',
-        method: 'POST',
-        data: {},
-        dataType: 'json', // Especificar que esperamos datos JSON en la respuesta
-        success: function(response) {
-            actualizarSelectAlumnos(response.alumnos);
-        },
-        error: function(xhr, status, error) {
-            console.error(xhr.responseText);
-        }
-    });
+// Función para abrir el modal de asistencia
+function openAttendanceModalverasistencia() {
+  var attendanceModal = document.getElementById("attendance-modal");
+  attendanceModal.style.display = "block";
+}
 
-    // Función para filtrar los selectores al escribir en los inputs
-    $('#filtroAlumno').on('input', function() {
-        var alumno = $('#filtroAlumno').val();
+// Función para cerrar el modal de asistencia
+function closeAttendanceModalverasistencia() {
+  var attendanceModal = document.getElementById("attendance-modal");
+  attendanceModal.style.display = "none";
+}
+// Función para abrir el modal de ver asistencia 
+function openAttendanceModalasistencia() {
+  var attendanceModalasistencia = document.getElementById("attendance-modal");
+  openAttendanceModalasistencia.style.display = "block";
+}
 
-        // Llamar a la función para actualizar los selectores
-        actualizarSelects(alumno);
-    });
+// Función para cerrar el modal de ver asistencia
+function closeAttendanceModal() {
+  var attendanceModal = document.getElementById("attendance-modal");
+  attendanceModal.style.display = "none";
+}
 
-    function actualizarSelects(alumno) {
+// Funciones para abrir y cerrar el modal de Comisión A
+function openModalComisionAverasistencia() {
+  // Cierra el modal de asistencia
+  closeAttendanceModal();
+
+  var modalComisionA = document.getElementById("modalComisionAverasistencia");
+  modalComisionA.style.display = 'block';
+}
+
+function closeModalComisionAverasistencia() {
+  var modalComisionA = document.getElementById('modalComisionAverasistencia');
+  modalComisionA.style.display = 'none';
+}
+
+
+// comision B
+
+function openModalComisionBverasistencia() {
+  // Cierra el modal de asistencia
+  closeAttendanceModal();
+
+  var modalComisionB = document.getElementById("modalComisionBverasistencia");
+  modalComisionB.style.display = 'block';
+}
+
+function closeModalComisionBverasistencia() {
+  var modalComisionB = document.getElementById('modalComisionBverasistencia');
+  modalComisionB.style.display = 'none';
+}
+// comision c
+
+function openModalComisionCverasistencia() {
+  // Cierra el modal de asistencia
+  closeAttendanceModal();
+
+  var modalComisionC = document.getElementById("modalComisionCverasistencia");
+  modalComisionC.style.display = 'block';
+}
+
+function closeModalComisionCverasistencia() {
+  var modalComisionC = document.getElementById('modalComisionCverasistencia');
+  modalComisionC.style.display = 'none';
+}
+
+
+
+
+
+
+
+
+
+function showModalMessage() {
+    alert('¡Los datos se han enviado satisfactoriamente!');
+}
+function showDatePicker() {
+    const fechaInput = document.getElementById("fecha");
+    const fechaSeleccionada = fechaInput.value;
+    const fechaMostrada = document.getElementById("fecha-seleccionada");
+
+    fechaMostrada.textContent = "Fecha seleccionada: " + fechaSeleccionada;
+}
+const tableRows = document.querySelectorAll('.table-comision-a tbody tr');
+
+
+
+// ajax para recargar la fecha en el mismo modal (Comisión A)
+function showAsistencia() {
+        var carrera = $("#carrera").val();
+        var comision = $("#comision").val();
+        var curso = $("#curso").val();
+        var selectedDate = $("#fecha").val();
+
         $.ajax({
-            url: 'obtener_opciones.php',
-            method: 'POST',
-            data: { alumno: alumno },
-            dataType: 'json', // Especificar que esperamos datos JSON en la respuesta
-            success: function(response) {
-                actualizarSelectAlumnos(response.alumnos);
-
-                // Actualizar el valor del input hidden con el id de la carrera del primer alumno
-                var carreraHidden = $('#carrera');
-                if (response.alumnos.length > 0) {
-                    carreraHidden.val(response.alumnos[0].carreras_idCarrera);
-                } else {
-                    carreraHidden.val(''); // Si no hay alumnos, vaciar el valor del input hidden
-                }
+            type: "GET",
+            url: "obtener_asistencia_ajax.php",
+            data: { carrera: carrera,
+                  fecha: selectedDate,
+                comision: comision,
+              curso: curso,
+             },
+            success: function (response) {
+                $("#asistenciaBody").html(response);
             },
-            error: function(xhr, status, error) {
-                console.error(xhr.responseText);
+            error: function (xhr, status, error) {
+                console.error("Error en la solicitud Ajax: " + xhr.responseText);
             }
         });
     }
 
-    // Interceptamos el envío del formulario para cambiar los valores de los selectores por los IDs
-    $('#miFormulario').submit(function() {
-        var alumnoSeleccionado = $('#selectAlumno').val();
+    
+// Esperar a que el contenido del DOM se cargue completamente.
+document.addEventListener('DOMContentLoaded', function() {
+    // Crear un nuevo objeto de fecha para obtener la fecha actual.
+    var today = new Date();
+    // Obtener el año, mes y día de la fecha actual.
+    var year = today.getFullYear();
+    var month = ('0' + (today.getMonth() + 1)).slice(-2); // Añade un cero si es necesario (formato MM).
+    var day = ('0' + today.getDate()).slice(-2); // Añade un cero si es necesario (formato DD).
+    // Formatear la fecha al formato aceptado por el input de tipo fecha (YYYY-MM-DD).
+    var formattedDate = year + '-' + month + '-' + day;
+    // Establecer el valor del input de fecha al día actual.
+    document.getElementById('fecha').value = formattedDate;
+  });
+ 
+ 
 
-        // Actualizamos los valores de los selectores por los IDs
-        $('#selectAlumno').val(alumnoSeleccionado);
-        // El valor de la materia ya es el ID, no es necesario cambiarlo
-    });
 
-    // Evento change para el select de alumno
-    $('#selectAlumno').change(function() {
-        // Obtener el valor seleccionado en el select de alumno
-        var legajoAlumno = $(this).val();
 
-        // Enviar una solicitud AJAX para obtener la carrera del alumno
-        $.ajax({
-            url: 'obtener_carrera.php', // Ruta al script PHP que obtiene la carrera
-            method: 'POST',
-            data: { legajo: legajoAlumno }, // Datos a enviar al servidor
-            dataType: 'json', // Especificar que esperamos datos JSON en la respuesta
-            success: function(response) {
-                // Rellenar el campo de carrera con el valor obtenido
-                $('#carrera').val(response.carrera);
-            },
-            error: function(xhr, status, error) {
-                console.error(xhr.responseText);
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Selecciona todos los checkboxes
+    const checkboxes = document.querySelectorAll('.table-comision-a tbody .checkbox-cell input[type="checkbox"]');
+
+    checkboxes.forEach((checkbox) => {
+        checkbox.addEventListener('change', function() {
+            // Encuentra todos los checkboxes en la misma fila
+            const rowCheckboxes = Array.from(this.closest('tr').querySelectorAll('.checkbox-cell input[type="checkbox"]'));
+            // Cuenta cuántos checkboxes en la misma fila están marcados
+            const checkedCount = rowCheckboxes.filter(cb => cb.checked).length;
+
+            // Si hay más de 2 checkboxes marcados, desmarca el actual
+            if (checkedCount > 2) {
+                this.checked = false;
+                alert('Solo puedes seleccionar hasta 2 opciones por fila.');
             }
         });
     });
 });
-
-
-// Evento change para el input hidden de carrera
-$('#carrera').change(function() {
-    // Obtener el valor del input de carrera
-    var idCarrera = $(this).val();
-    
-    // Verificar si el ID de la carrera no está vacío
-    if (idCarrera) {
-        // Enviar una solicitud AJAX para obtener las materias relacionadas con la carrera seleccionada
-        $.ajax({
-            url: 'obtener_materias.php', // Ruta al script PHP que obtiene las materias
-            method: 'POST',
-            data: { carrera: idCarrera }, // Datos a enviar al servidor (el ID de la carrera)
-            dataType: 'json', // Especificar que esperamos datos JSON en la respuesta
-            success: function(response) {
-                // Limpiar el select de materias
-                $('#selectMateria').empty();
-                // Agregar una opción por cada materia recibida
-                response.materias.forEach(function(materia) {
-                    var option = $('<option>', {
-                        value: materia.idMaterias,
-                        text: materia.Nombre
-                    });
-                    $('#selectMateria').append(option);
-                });
-            },
-            error: function(xhr, status, error) {
-                console.error(xhr.responseText);
-            }
-        });
-    } else {
-        // Si el ID de la carrera está vacío, limpiar el select de materias
-        $('#selectMateria').empty();
-    }
-});
-
-// Evento change para el select de alumno
-$('#selectAlumno').change(function() {
-    // Obtener el valor seleccionado en el select de alumno
-    var legajoAlumno = $(this).val();
-    
-    // Enviar una solicitud AJAX para obtener la carrera del alumno
-    $.ajax({
-        url: 'obtener_carrera.php', // Ruta al script PHP que obtiene la carrera
-        method: 'POST',
-        data: { legajo: legajoAlumno }, // Datos a enviar al servidor
-        dataType: 'json', // Especificar que esperamos datos JSON en la respuesta
-        success: function(response) {
-            // Rellenar el campo de carrera con el valor obtenido
-            $('#carrera').val(response.carrera).change(); // Disparar el evento change del input hidden de carrera
-        },
-        error: function(xhr, status, error) {
-            console.error(xhr.responseText);
-        }
-    });
-});
-
-
-
-
 </script>
 </body>
 </html>

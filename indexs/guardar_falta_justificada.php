@@ -1,48 +1,39 @@
 <?php
 include '../conexion/conexion.php';
-
 if (isset($_POST['enviar'])) {
-    $legajo = $_POST['selectAlumno'];
+    $legajo = $_POST['selectAlumnoJustificado'];
     $carrera = $_POST['carrera'];
+    $curso = $_POST['curso'];
+    $comision = $_POST['comision'];
     $motivo = $_POST['motivo'];
+    $materia1 = $_POST['materia1'];
+    $materia2 = $_POST['materia2'];
     $fecha = $_POST['fecha'];
+    $profesor = $_POST['profesor'];
 
-    // Recoger materias seleccionadas en un array
-    $materias = array($_POST['materia'], $_POST['materia2']);
+    // Debugging
+    echo "Legajo: $legajo <br>";
+    echo "Carrera: $carrera <br>";
+    echo "Curso: $curso <br>";
+    echo "Comision: $comision <br>";
+    echo "Motivo: $motivo <br>";
+    echo "Materia 1: $materia1 <br>";
+    echo "Materia 2: $materia2 <br>";
+    echo "Fecha: $fecha <br>";
+    echo "Profesor: $profesor <br>";
 
-    foreach ($materias as $materia) {
-        // Asegurarse de que la materia no esté vacía antes de insertar
-        if (!empty($materia)) {
-            $sql_insertar = "INSERT INTO `alumnos_justificados` (
-                                `idalumnos_justificados`, 
-                                `inscripcion_asignatura_idinscripcion_asignatura`, 
-                                `inscripcion_asignatura_alumno_legajo`, 
-                                `materias_idMaterias`, 
-                                `fecha`, 
-                                `Motivo`
-                             ) VALUES (
-                                NULL, 
-                                NULL, 
-                                '$legajo', 
-                                '$materia', 
-                                '$fecha', 
-                                '$motivo'
-                             );";
-            $query = mysqli_query($conexion, $sql_insertar);
+    // // Insertar la primera materia
+    // $sql_insertar1 = "INSERT INTO alumnos_justificados (alumno_legajo, carreras_idCarrera, materias_idMaterias, profesor_idProfesor, motivo, fecha, cursos_idcursos, comisiones_idComisiones) 
+    //                   VALUES ('$legajo', '$carrera', '$materia1', '$profesor', '$motivo', '$fecha', '$curso', '$comision')";
+    // $query1 = mysqli_query($conexion, $sql_insertar1);
 
-            // Verificar si la consulta se ejecutó correctamente
-            if (!$query) {
-                die('Error: ' . mysqli_error($conexion));
-            }
-        }
-    }
+    // // Insertar la segunda materia si está seleccionada
+    // if (!empty($materia2)) {
+    //     $sql_insertar2 = "INSERT INTO alumnos_justificados (alumno_legajo, carreras_idCarrera, materias_idMaterias, profesor_idProfesor, motivo, fecha, cursos_idcursos, comisiones_idComisiones) 
+    //                       VALUES ('$legajo', '$carrera', '$materia2', '$profesor', '$motivo', '$fecha', '$curso', '$comision')";
+    //     $query2 = mysqli_query($conexion, $sql_insertar2);
+    // }
 
-    // Redirigir después de la inserción
-    header('Location: controlador_preceptor.php');
-    exit;
+    // header('Location: controlador_preceptor.php');
 }
-
-// Cerrar la conexión a la base de datos
-mysqli_close($conexion);
 ?>
- 

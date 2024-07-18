@@ -100,22 +100,12 @@ while ($materia = mysqli_fetch_assoc($query_materias)) {
             <?php } ?>
         </select>
     </th>
-    <th colspan="2">
-        <select name="materia2" id="" class="form-container__input">
-            <option hidden>Segunda Materia</option>
-            <?php foreach ($materias as $materia) { ?>
-                <option value="<?php echo $materia['idMaterias']; ?>"><?php echo $materia['Nombre']; ?></option>
-            <?php } ?>
-        </select>
-    </th>
 </tr>
                         
             <tr>
                 <th>Presente</th>
                 <th>Ausente</th>
                 
-                <th>Presente</th>
-                <th>Ausente</th>
               
             </tr>
             
@@ -148,19 +138,6 @@ GROUP BY a.legajo";
     <td class="checkbox-cell">
     <input type="checkbox" name="ausentePrimera[]" value="<?php echo $datos['legajo']; ?>" >
     </td>
-
-   
-
-    <!-- Segunda hora -->
-    <td class="checkbox-cell">
-        <input type="checkbox" name="presenteSegunda[]" value="<?php echo $datos['legajo']; ?>">
-    </td>
-
-    <td class="checkbox-cell">
-    <input type="checkbox" name="ausenteSegunda[]" value="<?php echo $datos['legajo']; ?>" >
-    </td>
-
-    
 </tr>
 
 

@@ -170,100 +170,121 @@ if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)
         <span class="modal-close-estudiantes close-modal-button" id="closeInscripcionSegundoAnioModal">&times; Cerrar</span>
         <h2>Registro de Inscripción para Segundo Y Tercer Año</h2>
         <form id="formInscripcion">
-            <input type="text" name="legajo" placeholder="N° Legajo" class="form-container__input" required>
-            <input type="text" name="nombre" class="form-container__input" readonly>
+    <input type="text" name="legajo" placeholder="N° Legajo" class="form-container__input" required>
+    <input type="text" name="nombre" class="form-container__input" readonly>
 
-            <select name="carrera" id="carreraSelect" class="form-container__input" required>
-                <option hidden>Selecciona Carrera</option>
-                <?php
-                $sql_carreras = "SELECT * FROM carreras WHERE idCarrera in (18, 27, 46, 55)";
-                $result_carreras = mysqli_query($conexion, $sql_carreras);
-                while ($row = mysqli_fetch_assoc($result_carreras)) {
-                    echo "<option value='{$row['idCarrera']}'>{$row['nombre_carrera']}</option>";
-                }
-                ?>
-            </select>
+    <select name="carrera" id="carreraSelect" class="form-container__input" required>
+        <option hidden>Selecciona Carrera</option>
+        <?php
+        $sql_carreras = "SELECT * FROM carreras WHERE idCarrera in (18, 27, 46, 55)";
+        $result_carreras = mysqli_query($conexion, $sql_carreras);
+        while ($row = mysqli_fetch_assoc($result_carreras)) {
+            echo "<option value='{$row['idCarrera']}'>{$row['nombre_carrera']}</option>";
+        }
+        ?>
+    </select>
 
-            <select name="curso" id="cursoSelect" class="form-container__input" required>
-                <option hidden>Selecciona Curso</option>
-                <option value="2">Segundo Año</option>
-                <option value="3">Tercer Año</option>
-            </select>
+    <select name="curso" id="cursoSelect" class="form-container__input" required>
+        <option hidden>Selecciona Curso</option>
+        <option value="2">Segundo Año</option>
+        <option value="3">Tercer Año</option>
+    </select>
 
-            <div id="materias-container">
-                <!-- Los selects de materias se agregarán aquí mediante JavaScript -->
-            </div>
+    <div id="materias-container">
+        <!-- Los checkboxes de materias se agregarán aquí mediante JavaScript -->
+    </div>
 
-            <select name="comision" class="form-container__input" required>
-                <option hidden>Selecciona Comisión</option>
-                <?php
-                $sql_comision = "SELECT * FROM comisiones";
-                $result_comision = mysqli_query($conexion, $sql_comision);
-                while ($row = mysqli_fetch_assoc($result_comision)) {
-                    echo "<option value='{$row['idComisiones']}'>{$row['N_comicion']}</option>";
-                }
-                ?>
-            </select>
+    <select name="comision" class="form-container__input" required>
+        <option hidden>Selecciona Comisión</option>
+        <?php
+        $sql_comision = "SELECT * FROM comisiones";
+        $result_comision = mysqli_query($conexion, $sql_comision);
+        while ($row = mysqli_fetch_assoc($result_comision)) {
+            echo "<option value='{$row['idComisiones']}'>{$row['N_comicion']}</option>";
+        }
+        ?>
+    </select>
 
-            <select name="año_inscripcion" id="año_inscripcion" class="form-container__input" required>
-                <option value="2025">2025</option>
-                <option value="2026">2026</option>
-                <option value="2027">2027</option>
-                <option value="2028">2028</option>
-                <option value="2029">2029</option>
-                <option value="2030">2030</option>
-                <option value="2031">2031</option>
-                <option value="2032">2032</option>
-                <option value="2033">2033</option>
-                <option value="2034">2034</option>
-            </select>
+    <select name="año_inscripcion" id="año_inscripcion" class="form-container__input" required>
+        <option value="2025">2025</option>
+        <option value="2026">2026</option>
+        <option value="2027">2027</option>
+        <option value="2028">2028</option>
+        <option value="2029">2029</option>
+        <option value="2030">2030</option>
+        <option value="2031">2031</option>
+        <option value="2032">2032</option>
+        <option value="2033">2033</option>
+        <option value="2034">2034</option>
+    </select>
 
-            <input type="submit" name="enviar" value="Inscribir" class="form-container__input">
-        </form>
+    <input type="submit" name="enviar" value="Inscribir" class="form-container__input">
+</form>
     </div>
 </div>
 
 
 <div id="modal" class="modal">
-    <div class="modal-content">
+    <div class="modal-content" style="text-align: left;">
         <span class="close" onclick="closeModal()">&times;</span>
         <?php include './Profesor/estudiante/guardar_estudiante.php'; ?>
         <h2 class="form-container__h2">Registro de Estudiante</h2>
-        <form action="" method="post">
-            <input type="text" class="form-container__input" name="nombre_alu" placeholder="Ingrese el nombre" autocomplete="off" required>
-            <input type="text" class="form-container__input" name="apellido_alu" placeholder="Ingrese el apellido" autocomplete="off" required>
-            <input type="number" class="form-container__input" name="dni_alu" placeholder="Ingrese el DNI" autocomplete="off" required>
-            <input type="number" class="form-container__input" name="celular" placeholder="Ingrese el celular" autocomplete="off">
+        <form action="" method="post" style="text-align: left;">
+            <label for="nombre_alu">Nombre:</label>
+            <input type="text" id="nombre_alu" class="form-container__input" name="nombre_alu" placeholder="Ingrese el nombre" autocomplete="off" required>
+            
+            <label for="apellido_alu">Apellido:</label>
+            <input type="text" id="apellido_alu" class="form-container__input" name="apellido_alu" placeholder="Ingrese el apellido" autocomplete="off" required>
+            
+            <label for="dni_alu">DNI:</label>
+            <input type="number" id="dni_alu" class="form-container__input" name="dni_alu" placeholder="Ingrese el DNI" autocomplete="off" required>
+            
+            <label for="celular">Celular:</label>
+            <input type="number" id="celular" class="form-container__input" name="celular" placeholder="Ingrese el celular" autocomplete="off">
+            
             <?php
             $sql_legajo = "SELECT MAX(legajo) AS max_legajo FROM alumno";
             $resultado_legajo = $conexion->query($sql_legajo);
             $fila_legajo = $resultado_legajo->fetch_assoc();
             $nuevo_legajo = $fila_legajo['max_legajo'] + 1;
             ?>
-            <input type="text" name="legajo" placeholder="N° Legajo" value="<?php echo $nuevo_legajo; ?>" class="form-container__input">
-            <input type="date" class="form-container__input" name="edad" placeholder="Ingrese fecha de nacimiento" autocomplete="off">
-            <input type="text" class="form-container__input" name="observaciones" placeholder="Observaciones" autocomplete="off" required>
-            <input type="text" class="form-container__input" name="Trabajo_Horario" placeholder="Trabajo / Horario" autocomplete="off" required>
+            <label for="legajo">N° Legajo:</label>
+            <input type="text" id="legajo" name="legajo" placeholder="N° Legajo" value="<?php echo $nuevo_legajo; ?>" class="form-container__input">
+            
+            <label for="edad">Fecha de Nacimiento:</label>
+            <input type="date" id="edad" class="form-container__input" name="edad" placeholder="Ingrese fecha de nacimiento" autocomplete="off">
+            
+            <label for="observaciones">Observaciones:</label>
+            <input type="text" id="observaciones" class="form-container__input" name="observaciones" placeholder="Observaciones" autocomplete="off" required>
+            
+            <label for="Trabajo_Horario">Trabajo / Horario:</label>
+            <input type="text" id="Trabajo_Horario" class="form-container__input" name="Trabajo_Horario" placeholder="Trabajo / Horario" autocomplete="off" required>
+            
             <?php
             $sql_carreras = "SELECT * FROM carreras WHERE idCarrera in ('18','27','46','55')";
             $peticion = mysqli_query($conexion, $sql_carreras);
             ?>
+            <label for="inscripcion_carrera">Carrera:</label>
             <select name="inscripcion_carrera" id="inscripcion_carrera" class="form-container__input">
                 <option hidden>Selecciona una carrera</option>
                 <?php while ($row = mysqli_fetch_assoc($peticion)) { ?>
                 <option value="<?php echo $row['idCarrera']; ?>"><?php echo $row['nombre_carrera']; ?></option>
                 <?php } ?>
             </select>
+            
             <?php
             $sql_comision = "SELECT c.idComisiones,c.N_comicion FROM comisiones c";
             $resultado_comision = $conexion->query($sql_comision);
             ?>
-            <select name="Comision" id="Comision"  class="form-container__input">
-                <option hidden>Selecciona una Comision</option>
+            <label for="Comision">Comisión:</label>
+            <select name="Comision" id="Comision" class="form-container__input">
+                <option hidden>Selecciona una Comisión</option>
                 <?php while ($rowcomision = mysqli_fetch_assoc($resultado_comision)) { ?>
                 <option value="<?php echo $rowcomision['idComisiones']; ?>"><?php echo $rowcomision['N_comicion']; ?></option>
                 <?php } ?>
             </select>
+            
+            <label for="Año_inscripcion">Año de Inscripción:</label>
             <select name="Año_inscripcion" id="Año_inscripcion" class="form-container__input">
                 <option value="2025">2025</option>
                 <option value="2026">2026</option>
@@ -276,10 +297,13 @@ if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)
                 <option value="2033">2033</option>
                 <option value="2034">2034</option>
             </select>
+            
             <input type="submit" class="form-container__input" name="enviar" value="Enviar" onclick="mostrarAlertaExitosa(); closeSuccessMessage();">
         </form>
     </div>
 </div>
+
+
 
 <div id="modalInformesAsistencia" class="modal-informes-asistencia">
     <div class="modal-content-informes-asistencia">
@@ -709,23 +733,19 @@ document.addEventListener("DOMContentLoaded", function() {
                         materiasContainer.empty(); // Limpiar el contenedor de materias
 
                         materias.forEach(function(materia) {
-                            var div = $('<div></div>'); // Crear un contenedor para cada select
+                            var div = $('<div></div>'); // Crear un contenedor para cada materia
 
-                            var select = $('<select></select>')
-                                .attr('name', 'materias[' + materia.idMaterias + ']')
-                                .addClass('form-container__input');
+                            var checkbox = $('<input>')
+                                .attr('type', 'checkbox')
+                                .attr('name', 'materias[]')
+                                .attr('value', materia.idMaterias)
+                                .attr('checked', true); // Marcar como seleccionado por defecto
 
-                            var optionNoCursa = $('<option></option>')
-                                .val('0')
-                                .text('No Cursa');
-                            select.append(optionNoCursa);
+                            var label = $('<label></label>')
+                                .text(materia.Nombre)
+                                .prepend(checkbox); // Añadir el checkbox al inicio del label
 
-                            var optionMateria = $('<option></option>')
-                                .val(materia.idMaterias)
-                                .text(materia.Nombre);
-                            select.append(optionMateria);
-
-                            div.append(select);
+                            div.append(label);
                             materiasContainer.append(div);
                         });
 
@@ -760,6 +780,9 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     });
 });
+
+
+
 
 
 

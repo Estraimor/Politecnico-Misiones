@@ -50,60 +50,93 @@ if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)
 <?php
 if (isset($_GET['legajo'])) {
     $legajo = $_GET['legajo'];
-    $sql = "SELECT * FROM alumno a
-            INNER JOIN inscripcion_asignatura ia ON a.legajo = ia.alumno_legajo
-            WHERE legajo = '$legajo'";
-    $query = mysqli_query($conexion, $sql);
-    $datos = mysqli_fetch_assoc($query);
+
+    // Consulta preparada para evitar inyección SQL
+    $stmt = $conexion->prepare("SELECT * FROM alumno a
+                                INNER JOIN inscripcion_asignatura ia ON a.legajo = ia.alumno_legajo
+                                WHERE a.legajo = ?");
+    $stmt->bind_param("s", $legajo);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $datos = $result->fetch_assoc();
 
     // Obtener todas las materias de la carrera del estudiante
-    $sql_todas_materias = "SELECT m.idMaterias, m.Nombre, cm.cursos_idcursos 
+    $sql_todas_materias = "SELECT m.idMaterias, m.Nombre, cm.cursos_idcursos, ia.año_cursada
                            FROM materias m
                            INNER JOIN cursos_has_materias cm ON cm.materias_idMaterias = m.idMaterias
-                           WHERE m.carreras_idCarrera = (SELECT carreras_idCarrera FROM materias WHERE idMaterias = (SELECT materias_idMaterias FROM inscripcion_asignatura WHERE alumno_legajo = '$legajo' LIMIT 1))";
-    $query_todas_materias = mysqli_query($conexion, $sql_todas_materias);
+                           LEFT JOIN inscripcion_asignatura ia ON ia.materias_idMaterias = m.idMaterias AND ia.alumno_legajo = ?
+                           WHERE m.carreras_idCarrera = (SELECT carreras_idCarrera 
+                                                         FROM materias 
+                                                         WHERE idMaterias = (SELECT materias_idMaterias 
+                                                                             FROM inscripcion_asignatura 
+                                                                             WHERE alumno_legajo = ? LIMIT 1))";
+    $stmt_todas_materias = $conexion->prepare($sql_todas_materias);
+    $stmt_todas_materias->bind_param("ss", $legajo, $legajo);
+    $stmt_todas_materias->execute();
+    $query_todas_materias = $stmt_todas_materias->get_result();
     $todas_materias = [];
-    while ($materia = mysqli_fetch_assoc($query_todas_materias)) {
+    while ($materia = $query_todas_materias->fetch_assoc()) {
         $todas_materias[$materia['cursos_idcursos']][] = $materia;
     }
 
     // Obtener las materias inscritas por el alumno
     $materias_inscritas = [];
-    $sql_materias_inscritas = "SELECT m.idMaterias, m.Nombre, cm.cursos_idcursos 
+    $sql_materias_inscritas = "SELECT m.idMaterias, m.Nombre, cm.cursos_idcursos, ia.año_cursada
                                FROM materias m
                                INNER JOIN inscripcion_asignatura ia ON ia.materias_idMaterias = m.idMaterias
                                INNER JOIN cursos_has_materias cm ON cm.materias_idMaterias = m.idMaterias
-                               WHERE ia.alumno_legajo = '$legajo'";
-    $query_materias_inscritas = mysqli_query($conexion, $sql_materias_inscritas);
-    while ($materia = mysqli_fetch_assoc($query_materias_inscritas)) {
+                               WHERE ia.alumno_legajo = ?";
+    $stmt_materias_inscritas = $conexion->prepare($sql_materias_inscritas);
+    $stmt_materias_inscritas->bind_param("s", $legajo);
+    $stmt_materias_inscritas->execute();
+    $query_materias_inscritas = $stmt_materias_inscritas->get_result();
+    while ($materia = $query_materias_inscritas->fetch_assoc()) {
         $materias_inscritas[$materia['cursos_idcursos']][] = $materia;
     }
 
     // Obtener las comisiones
     $sql_comisiones = "SELECT * FROM comisiones";
-    $result_comisiones = mysqli_query($conexion, $sql_comisiones);
+    $result_comisiones = $conexion->query($sql_comisiones);
 ?>
-
 <form action="guardar_modificacion_alumno.php" method="post" class="formulario">
-    <input type="text" name="nombre_alumno" placeholder="Nombre" value="<?php echo $datos['nombre_alumno']; ?>" class="input-text"><br>
-    <input type="text" name="apellido_alumno" placeholder="Apellido" value="<?php echo $datos['apellido_alumno']; ?>" class="input-text"><br>
-    <input type="number" name="dni_alumno" placeholder="DNI (sin puntos)" value="<?php echo $datos['dni_alumno']; ?>" class="input-text"><br>
-    <input type="number" name="celular" placeholder="Celular" value="<?php echo $datos['celular']; ?>" class="input-text"><br>
-    <input type="text" name="legajo" id="legajo" placeholder="N° Legajo" value="<?php echo $datos['legajo']; ?>" class="input-text"><br>
-    <input type="text" name="edad" placeholder="Edad" value="<?php echo $datos['edad']; ?>" class="input-text"><br>
-    <input type="text" name="observaciones" placeholder="Observaciones" value="<?php echo $datos['observaciones']; ?>" class="input-text"><br>
-    <input type="text" name="Trabaja_Horario" placeholder="Trabaja_Horario" value="<?php echo $datos['Trabaja_Horario']; ?>" class="input-text"><br>
-    <input type="text" name="Año_cursada" placeholder="Año de Cursada" value="<?php echo $datos['año_cursada']; ?>" class="input-text"><br>
+    <label for="nombre_alumno">Nombre del Alumno:</label>
+    <input type="text" name="nombre_alumno" placeholder="Nombre" value="<?php echo htmlspecialchars($datos['nombre_alumno']); ?>" class="input-text"><br>
+    
+    <label for="apellido_alumno">Apellido del Alumno:</label>
+    <input type="text" name="apellido_alumno" placeholder="Apellido" value="<?php echo htmlspecialchars($datos['apellido_alumno']); ?>" class="input-text"><br>
+    
+    <label for="dni_alumno">DNI del Alumno:</label>
+    <input type="number" name="dni_alumno" placeholder="DNI (sin puntos)" value="<?php echo htmlspecialchars($datos['dni_alumno']); ?>" class="input-text"><br>
+    
+    <label for="celular">Celular del Alumno:</label>
+    <input type="number" name="celular" placeholder="Celular" value="<?php echo htmlspecialchars($datos['celular']); ?>" class="input-text"><br>
+    
+    <label for="legajo">N° Legajo del Alumno:</label>
+    <input type="text" name="legajo" id="legajo" placeholder="N° Legajo" value="<?php echo htmlspecialchars($datos['legajo']); ?>" class="input-text"><br>
+    
+    <label for="edad">Edad del Alumno:</label>
+    <input type="text" name="edad" placeholder="Edad" value="<?php echo htmlspecialchars($datos['edad']); ?>" class="input-text"><br>
+    
+    <label for="observaciones">Observaciones:</label>
+    <input type="text" name="observaciones" placeholder="Observaciones" value="<?php echo htmlspecialchars($datos['observaciones']); ?>" class="input-text"><br>
+    
+    <label for="Trabaja_Horario">Horario de Trabajo:</label>
+    <input type="text" name="Trabaja_Horario" placeholder="Trabaja_Horario" value="<?php echo htmlspecialchars($datos['Trabaja_Horario']); ?>" class="input-text"><br>
+    
+    <label for="Año_cursada">Año de Cursada:</label>
+    <input type="text" name="Año_cursada" placeholder="Año de Cursada" value="<?php echo htmlspecialchars($datos['año_cursada']); ?>" class="input-text"><br>
 
     <!-- Select de comisiones -->
+    <label for="Comision">Comisión:</label>
     <select name="Comision" class="input-text" required>
-        <?php while ($row_comision = mysqli_fetch_assoc($result_comisiones)) { ?>
-            <option value="<?php echo $row_comision['idComisiones']; ?>" <?php echo ($row_comision['idComisiones'] == $datos['comisiones_idComisiones']) ? 'selected' : ''; ?>>
-                <?php echo $row_comision['N_comicion']; ?>
+        <?php while ($row_comision = $result_comisiones->fetch_assoc()) { ?>
+            <option value="<?php echo htmlspecialchars($row_comision['idComisiones']); ?>" <?php echo ($row_comision['idComisiones'] == $datos['comisiones_idComisiones']) ? 'selected' : ''; ?>>
+                <?php echo htmlspecialchars($row_comision['N_comicion']); ?>
             </option>
         <?php } ?>
     </select><br><br>
 
+    <label for="carreras">Carrera:</label>
     <select id="carreras" name="carreras" class="input-text" required>
         <?php
         $sql_carreras = "SELECT idCarrera, nombre_carrera FROM carreras";
@@ -113,12 +146,15 @@ if (isset($_GET['legajo'])) {
                 $selected = "";
                 $sql_inscripcion = "SELECT 1 FROM inscripcion_asignatura ia
                                     INNER JOIN materias m ON m.idMaterias = ia.materias_idMaterias 
-                                    WHERE m.carreras_idCarrera = " . $row_carrera["idCarrera"] . " AND ia.alumno_legajo = '$legajo'";
-                $result_inscripcion = $conexion->query($sql_inscripcion);
+                                    WHERE m.carreras_idCarrera = ? AND ia.alumno_legajo = ?";
+                $stmt_inscripcion = $conexion->prepare($sql_inscripcion);
+                $stmt_inscripcion->bind_param("ss", $row_carrera["idCarrera"], $legajo);
+                $stmt_inscripcion->execute();
+                $result_inscripcion = $stmt_inscripcion->get_result();
                 if ($result_inscripcion->num_rows > 0) {
                     $selected = "selected";
                 }
-                echo "<option value='" . $row_carrera["idCarrera"] . "' $selected>" . $row_carrera["nombre_carrera"] . "</option>";
+                echo "<option value='" . htmlspecialchars($row_carrera["idCarrera"]) . "' $selected>" . htmlspecialchars($row_carrera["nombre_carrera"]) . "</option>";
             }
         } else {
             echo "<option value=''>No se encontraron carreras</option>";
@@ -133,9 +169,10 @@ if (isset($_GET['legajo'])) {
             <div id="materias-primer-ano">
                 <?php
                 foreach ($todas_materias[1] as $materia) {
+                    $año_cursada = isset($materia['año_cursada']) ? " (" . htmlspecialchars($materia['año_cursada']) . ")" : "";
                     echo "<select name='materias[1][]' class='form-container__input'>";
                     echo "<option value='0'" . (!isset($materias_inscritas[1]) || !in_array($materia, $materias_inscritas[1]) ? " selected" : "") . ">No cursa</option>";
-                    echo "<option value='" . $materia['idMaterias'] . "'" . (isset($materias_inscritas[1]) && in_array($materia, $materias_inscritas[1]) ? " selected" : "") . ">" . $materia['Nombre'] . "</option>";
+                    echo "<option value='" . htmlspecialchars($materia['idMaterias']) . "'" . (isset($materias_inscritas[1]) && in_array($materia, $materias_inscritas[1]) ? " selected" : "") . ">" . htmlspecialchars($materia['Nombre']) . "$año_cursada</option>";
                     echo "</select><br>";
                 }
                 ?>
@@ -146,11 +183,13 @@ if (isset($_GET['legajo'])) {
             <h3>Materias de Segundo Año</h3>
             <div id="materias-segundo-ano">
                 <?php
-                foreach ($todas_materias[2] as $materia) {
-                    echo "<select name='materias[2][]' class='form-container__input'>";
-                    echo "<option value='0'" . (!isset($materias_inscritas[2]) || !in_array($materia, $materias_inscritas[2]) ? " selected" : "") . ">No cursa</option>";
-                    echo "<option value='" . $materia['idMaterias'] . "'" . (isset($materias_inscritas[2]) && in_array($materia, $materias_inscritas[2]) ? " selected" : "") . ">" . $materia['Nombre'] . "</option>";
-                    echo "</select><br>";
+                if (isset($materias_inscritas[2])) {
+                    foreach ($materias_inscritas[2] as $materia) {
+                        $año_cursada = isset($materia['año_cursada']) ? " (" . htmlspecialchars($materia['año_cursada']) . ")" : "";
+                        echo "<input type='text' readonly name='materias[2][]' value='" . htmlspecialchars($materia['Nombre']) . "$año_cursada' class='form-container__input'><br>";
+                    }
+                } else {
+                    echo "<input type='text' readonly value='No cursa' class='form-container__input'><br>";
                 }
                 ?>
             </div>
@@ -160,11 +199,13 @@ if (isset($_GET['legajo'])) {
             <h3>Materias de Tercer Año</h3>
             <div id="materias-tercer-ano">
                 <?php
-                foreach ($todas_materias[3] as $materia) {
-                    echo "<select name='materias[3][]' class='form-container__input'>";
-                    echo "<option value='0'" . (!isset($materias_inscritas[3]) || !in_array($materia, $materias_inscritas[3]) ? " selected" : "") . ">No cursa</option>";
-                    echo "<option value='" . $materia['idMaterias'] . "'" . (isset($materias_inscritas[3]) && in_array($materia, $materias_inscritas[3]) ? " selected" : "") . ">" . $materia['Nombre'] . "</option>";
-                    echo "</select><br>";
+                if (isset($materias_inscritas[3])) {
+                    foreach ($materias_inscritas[3] as $materia) {
+                        $año_cursada = isset($materia['año_cursada']) ? " (" . htmlspecialchars($materia['año_cursada']) . ")" : "";
+                        echo "<input type='text' readonly name='materias[3][]' value='" . htmlspecialchars($materia['Nombre']) . "$año_cursada' class='form-container__input'><br>";
+                    }
+                } else {
+                    echo "<input type='text' readonly value='No cursa' class='form-container__input'><br>";
                 }
                 ?>
             </div>
@@ -177,6 +218,9 @@ if (isset($_GET['legajo'])) {
 <?php } else { ?>
     <p>Error: ID de alumno no proporcionado.</p>
 <?php } ?>
+
+
+
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {

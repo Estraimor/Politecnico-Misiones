@@ -23,6 +23,15 @@ if (isset($_POST['enviar'])) {
     $comision = mysqli_real_escape_string($conexion, $_POST['Comision']);
     $año_inscripcion = mysqli_real_escape_string($conexion, $_POST['Año_inscripcion']);
 
+    // Si el campo de observaciones está vacío, asignar "ninguna observación"
+    if (empty($observaciones)) {
+        $observaciones = "ninguna observación";
+    }
+
+    // Si el campo de Trabajo / Horario está vacío, asignar "No trabaja"
+    if (empty($trabajo_hs)) {
+        $trabajo_hs = "No trabaja";
+    }
 
     $fecha_nacimiento = $_POST['edad'];
 
@@ -49,7 +58,6 @@ if (isset($_POST['enviar'])) {
     } else {
         // Si $fecha_nacimiento_dt no es un objeto DateTime válido
     }
-
 
     // Insertar el nuevo alumno
     $sql_insertar_alumno = "INSERT INTO alumno (nombre_alumno, apellido_alumno, dni_alumno, legajo, Trabaja_Horario, edad, observaciones, celular, estado) 
