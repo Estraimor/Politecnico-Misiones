@@ -2,34 +2,24 @@
 // Incluir el archivo de conexión a la base de datos
 include '../conexion/conexion.php';
 
-// Obtener y sanitizar el ID de la carrera seleccionada enviado desde el cliente
-$idCarrera = isset($_POST['carrera']) ? $conexion->real_escape_string($_POST['carrera']) : '';
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $legajo = $_POST['legajo'];
 
-// Consulta SQL para obtener las materias relacionadas con la carrera seleccionada
-$sql = "SELECT idMaterias, Nombre, carreras_idCarrera 
-        FROM materias 
-        WHERE carreras_idCarrera = '$idCarrera'";
+    // Consulta SQL para obtener las materias específicas del alumno
+    $sql = "SELECT m.idMaterias, m.Nombre
+            FROM inscripcion_asignatura ia
+            INNER JOIN materias m ON ia.materias_idMaterias = m.idMaterias
+            WHERE ia.alumno_legajo = ?";
+    $stmt = $conexion->prepare($sql);
+    $stmt->bind_param('i', $legajo);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
-// Ejecutar la consulta
-$resultado = mysqli_query($conexion, $sql);
-
-// Verificar si se obtuvieron resultados
-if ($resultado) {
-    // Arreglo para almacenar las materias
-    $materias = array();
-    
-    // Recorrer los resultados y guardar cada materia en el arreglo
-    while ($fila = mysqli_fetch_assoc($resultado)) {
-        $materias[] = $fila;
+    $materias = [];
+    while ($row = $result->fetch_assoc()) {
+        $materias[] = $row;
     }
-    
-    // Devolver las materias en formato JSON
-    echo json_encode(array('materias' => $materias));
-} else {
-    // Si hay un error en la consulta, devolver un mensaje de error
-    echo json_encode(array('error' => 'Error al obtener las materias: ' . mysqli_error($conexion)));
-}
 
-// Cerrar la conexión a la base de datos
-mysqli_close($conexion);
+    echo json_encode(['materias' => $materias]);
+}
 ?>

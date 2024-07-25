@@ -27,6 +27,9 @@ $sql_carreras = "SELECT c.idCarrera, c.nombre_carrera
                  INNER JOIN preceptores p ON c.idCarrera = p.carreras_idCarrera
                  WHERE p.profesor_idProrfesor = ?";
 $stmt_carreras = $conexion->prepare($sql_carreras);
+if ($stmt_carreras === false) {
+    die('Prepare failed: ' . htmlspecialchars($conexion->error));
+}
 $stmt_carreras->bind_param('i', $profesor_id);
 $stmt_carreras->execute();
 $result_carreras = $stmt_carreras->get_result();
@@ -35,10 +38,7 @@ $carreras = [];
 while ($row = $result_carreras->fetch_assoc()) {
     $carreras[$row['idCarrera']] = $row['nombre_carrera'];
 }
-
 $stmt_carreras->close();
-
-// Asume que el ID del profesor se obtiene de la sesión
 
 // Obtener las carreras, cursos y comisiones asociadas al preceptor
 $sql = "SELECT c.idCarrera, c.nombre_carrera, cu.idcursos, cu.nombre_curso, co.idComisiones, co.N_comicion
@@ -48,6 +48,9 @@ $sql = "SELECT c.idCarrera, c.nombre_carrera, cu.idcursos, cu.nombre_curso, co.i
         INNER JOIN comisiones co ON co.idComisiones = p.comisiones_idComisiones
         WHERE p.profesor_idProrfesor = ?";
 $stmt = $conexion->prepare($sql);
+if ($stmt === false) {
+    die('Prepare failed: ' . htmlspecialchars($conexion->error));
+}
 $stmt->bind_param('i', $profesor_id);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -62,9 +65,8 @@ while ($row = $result->fetch_assoc()) {
         'nombre_comision' => $row['N_comicion']
     ];
 }
-
 $stmt->close();
-?> 
+?>
 
 <!DOCTYPE html>
 <html lang="es">
@@ -81,6 +83,74 @@ $stmt->close();
     <link href="https://unpkg.com/vanilla-datatables@latest/dist/vanilla-dataTables.min.css" rel="stylesheet" type="text/css">
     <script src="https://unpkg.com/vanilla-datatables@latest/dist/vanilla-dataTables.min.js" type="text/javascript"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        .modal-justificados {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.7);
+    z-index: 999999;
+}
+
+.modal-content-justificados {
+    background-color: #fefefe;
+    margin: 10% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 70%;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    animation: animatetop 0.4s;
+}
+
+@keyframes animatetop {
+    from {top: -300px; opacity: 0}
+    to {top: 0; opacity: 1}
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+#tablaJustificados {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#tablaJustificados th, #tablaJustificados td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+#tablaJustificados th {
+    background-color: #4CAF50;
+    color: white;
+}
+
+#tablaJustificados tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+#tablaJustificados tr:hover {
+    background-color: #ddd;
+}
+    </style>
 </head>
 <body>
 <div id="success-message" class="success-message" style="display: none;"></div>
@@ -167,7 +237,7 @@ $stmt->close();
     <div class="modal-content-estudiantes">
         <span class="modal-close-estudiantes close-modal-button" id="closeEstudiantesModal">&times; Cerrar</span>
         <button id="btnMostrarInformesAsistencia" class="boton-informes-asistencia">Informes de Asistencias</button>
-        <button id="modallistaestudiantestecnicaturas" class="boton-informes-asistencia">Generar Informe estudiantes</button>
+        <button id="btnGenerarInformeEstudiantes">Generar Informe Estudiantes</button>
         <div id="tablaContainerEstudiantes">
         <table id="tabla">
     <thead>
@@ -231,33 +301,64 @@ $stmt->close();
 </div>
 
 
-    <div id="modalInformesAsistencia" class="modal-informes-asistencia">
+<div id="modalInformesAsistencia" class="modal-informes-asistencia">
     <div class="modal-content-informes-asistencia">
-    <span class="cerrar-modal-informes-asistencia">&times;</span>
-        <h2>Generar Excel de Asistencias</h2>
+        <span class="cerrar-modal-informes-asistencia">&times;</span>
+        <h2>Generar PDF de Asistencias</h2>
         <br>
         <form action="generar_excel.php" method="post">
             <label for="fecha_inicio">Fecha de inicio:</label>
-            <input type="date" id="fecha_inicio" class="input_fecha" name="fecha_inicio">
+            <input type="date" id="fecha_inicio" class="input_fecha" name="fecha_inicio" required >
             <br><br>
             <label for="fecha_fin">Fecha de fin:</label>
-            <input type="date" id="fecha_fin" class="input_fecha" name="fecha_fin">
+            <input type="date" id="fecha_fin" class="input_fecha" name="fecha_fin" required >
             <br><br>
             <?php
-       $sql_mater="SELECT * 
-       FROM preceptores p 
-       INNER JOIN carreras c on p.carreras_idCarrera = c.idCarrera
-       WHERE p.profesor_idProrfesor = '{$_SESSION["id"]}'  ";
-       $peticion=mysqli_query($conexion,$sql_mater);
-       ?>
-            <select name="carrera" class="form-input-informes">
+            // Obtener las carreras, cursos y comisiones asociadas al preceptor
+            $sql_data = "
+                SELECT DISTINCT c.idCarrera, c.nombre_carrera, cu.idcursos, cu.nombre_curso, co.idComisiones, co.N_comicion
+                FROM carreras c
+                INNER JOIN preceptores p ON c.idCarrera = p.carreras_idCarrera
+                INNER JOIN cursos cu ON cu.idcursos = p.cursos_idcursos
+                INNER JOIN comisiones co ON co.idComisiones = p.comisiones_idComisiones
+                WHERE p.profesor_idProrfesor = ?
+            ";
+            $stmt = $conexion->prepare($sql_data);
+            $stmt->bind_param('i', $_SESSION["id"]);
+            $stmt->execute();
+            $result = $stmt->get_result();
+
+            $data = [];
+            while ($row = $result->fetch_assoc()) {
+                $data[$row['idCarrera']]['nombre_carrera'] = $row['nombre_carrera'];
+                $data[$row['idCarrera']]['cursos'][$row['idcursos']]['nombre_curso'] = $row['nombre_curso'];
+                $data[$row['idCarrera']]['cursos'][$row['idcursos']]['comisiones'][$row['idComisiones']] = $row['N_comicion'];
+            }
+            $stmt->close();
+            ?>
+
+            <label for="selectCarrera">Selecciona una carrera:</label>
+            <select id="selectCarrera" name="carrera" class="form-input-informes">
                 <option hidden>Selecciona una carrera</option>
-                <?php while($informacion=mysqli_fetch_assoc($peticion)){ ?>
-          <option value="<?php echo $informacion['idCarrera'] ?>"><?php echo $informacion['nombre_carrera'] ?></option>
-          <?php }?>
+                <?php foreach ($data as $idCarrera => $carrera) { ?>
+                    <option value="<?php echo htmlspecialchars($idCarrera); ?>"><?php echo htmlspecialchars($carrera['nombre_carrera']); ?></option>
+                <?php } ?>
             </select>
             <br><br>
-            <input type="submit" value="Generar Excel" class="boton-submit-informes">
+
+            <label for="selectCurso">Selecciona un curso:</label>
+            <select id="selectCurso" name="curso" class="form-input-informes">
+                <option hidden>Selecciona un curso</option>
+            </select>
+            <br><br>
+
+            <label for="selectComision">Selecciona una comisión:</label>
+            <select id="selectComision" name="comision" class="form-input-informes">
+                <option hidden>Selecciona una comisión</option>
+            </select>
+            <br><br>
+
+            <input type="submit" value="Generar PDF" class="boton-submit-informes">
         </form>
     </div>
 </div>
@@ -402,25 +503,111 @@ $stmt->close();
     </div>
 </div>
 
-<!-- Nuevo Modal para Imprimir Lista de Estudiantes -->
-<div id="modal-lista-estudiantes" class="modal-lista-estudiantes" style="display: none; position: fixed; z-index: 155555555555; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4);">
+<button id="btnOpenModalJustificados">Ver Alumnos Justificados</button>
+
+<div id="modalJustificados" class="modal-justificados">
+    <div class="modal-content-justificados">
+        <span class="close" id="closeJustificados">&times;</span>
+        <div id="modalBodyJustificados">
+            <table id="tablaJustificados">
+                <thead>
+                    <tr>
+                        <th>Apellido</th>
+                        <th>Nombre</th>
+                        <th>Legajo</th>
+                        <th>Preceptor</th>
+                        <th>Carrera</th>
+                        <th>Materia</th>
+                        <th>Motivo</th>
+                        <th>Fecha</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    // Consulta SQL para obtener los datos de los alumnos justificados
+                    $sql_justificados = "SELECT a2.nombre_alumno, a2.apellido_alumno, a2.legajo, p.nombre_profe, c.nombre_carrera, m.Nombre AS nombre_materia, a.fecha, a.motivo
+                                         FROM alumnos_justificados a
+                                         INNER JOIN alumno a2 ON a2.legajo = a.alumno_legajo
+                                         INNER JOIN carreras c ON c.idCarrera = a.carreras_idCarrera
+                                         INNER JOIN profesor p ON a.profesor_idProrfesor = p.idProrfesor 
+                                         INNER JOIN materias m ON a.materias_idMaterias = m.idMaterias
+                                         WHERE p.idProrfesor = {$_SESSION['id']}";
+
+                    $query_justificados = mysqli_query($conexion, $sql_justificados);
+
+                    // Verificar si la consulta fue exitosa
+                    if ($query_justificados) {
+                        while ($datos_justificados = mysqli_fetch_assoc($query_justificados)) {
+                            ?>
+                            <tr>
+                                <td><?php echo htmlspecialchars($datos_justificados['apellido_alumno']); ?></td>
+                                <td><?php echo htmlspecialchars($datos_justificados['nombre_alumno']); ?></td>
+                                <td><?php echo htmlspecialchars($datos_justificados['legajo']); ?></td>
+                                <td><?php echo htmlspecialchars($datos_justificados['nombre_profe']); ?></td>
+                                <td><?php echo htmlspecialchars($datos_justificados['nombre_carrera']); ?></td>
+                                <td><?php echo htmlspecialchars($datos_justificados['nombre_materia']); ?></td>
+                                <td><?php echo htmlspecialchars($datos_justificados['motivo']); ?></td>
+                                <td><?php echo htmlspecialchars($datos_justificados['fecha']); ?></td>
+                            </tr>
+                            <?php
+                        }
+                    } else {
+                        // Mostrar un mensaje de error si la consulta falla
+                        echo "<tr><td colspan='8'>Error: " . mysqli_error($conexion) . "</td></tr>";
+                    }
+                    ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<?php
+
+ ?>
+ <!-- Modal para generar informe de estudiantes -->
+ <div id="modal-lista-estudiantes" class="modal-lista-estudiantes" style="display: none; position: fixed; z-index: 155555555555; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4);">
     <div class="modal-content-lista-estudiantes" style="background-color: rgba(255, 255, 255, 0.9); margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);">
-        <span class="close-modal-button" id="closeListaEstudiantesModal" style="color: #aaa; float: right; font-size: 28px; font-weight: bold;">&times;</span>
-        <h2>Informe de Estudiantes</h2>
-        <form action="./generar_exel_alumnos.php" method="post">
+        <span class="cerrar-modal-lista-estudiantes">&times;</span>
+        <h2>Generar Informe de Estudiantes</h2>
+        <br>
+        <form action="generar_exel_alumnos.php" method="post">
             <?php
-            $sql_mater = "select * from preceptores p 
-            INNER JOIN carreras c on c.idCarrera = p.carreras_idCarrera
-            WHERE p.profesor_idProrfesor = {$_SESSION["id"]} ";
-            $peticion = mysqli_query($conexion, $sql_mater);
-            ?>      
-            <select name="carrera" class="form-container__input"> 
+            // Obtener las carreras, cursos y comisiones asociadas al preceptor
+            $sql_data = "
+                SELECT DISTINCT c.idCarrera, c.nombre_carrera, cu.idcursos, cu.nombre_curso, co.idComisiones, co.N_comicion
+                FROM carreras c
+                INNER JOIN preceptores p ON c.idCarrera = p.carreras_idCarrera
+                INNER JOIN cursos cu ON cu.idcursos = p.cursos_idcursos
+                INNER JOIN comisiones co ON co.idComisiones = p.comisiones_idComisiones
+                WHERE p.profesor_idProrfesor = ?
+            ";
+            $stmt = $conexion->prepare($sql_data);
+            $stmt->bind_param('i', $_SESSION["id"]);
+            $stmt->execute();
+            $result = $stmt->get_result();
+
+            $data = [];
+            while ($row = $result->fetch_assoc()) {
+                $data[$row['idCarrera']]['nombre_carrera'] = $row['nombre_carrera'];
+                $data[$row['idCarrera']]['cursos'][$row['idcursos']]['nombre_curso'] = $row['nombre_curso'];
+                $data[$row['idCarrera']]['cursos'][$row['idcursos']]['comisiones'][$row['idComisiones']] = $row['N_comicion'];
+            }
+            $stmt->close();
+            ?>
+
+            <label for="selectCarrera">Selecciona una carrera:</label>
+            <select id="selectCarrera" name="carrera" class="form-input-informes">
                 <option hidden>Selecciona una carrera</option>
-                <?php while ($informacion = mysqli_fetch_assoc($peticion)) { ?>
-                    <option value="<?php echo $informacion['idCarrera'] ?>"><?php echo $informacion['nombre_carrera'] ?></option>
+                <?php foreach ($data as $idCarrera => $carrera) { ?>
+                    <option value="<?php echo htmlspecialchars($idCarrera); ?>"><?php echo htmlspecialchars($carrera['nombre_carrera']); ?></option>
                 <?php } ?>
             </select>
-            <input type="submit" value="Generar Lista de Estudiantes" style="background-color: red; color: white; padding: 10px 20px; margin: 8px 0; border: none; cursor: pointer; width: 100%;">
+            <br><br>
+
+            <input type="hidden" id="cursoHidden" name="curso" value="">
+            <input type="hidden" id="comisionHidden" name="comision" value="">
+
+            <input type="submit" value="Generar Lista de Estudiantes" class="boton-submit-informes">
         </form>
     </div>
 </div>
@@ -431,26 +618,27 @@ $stmt->close();
     <span class="close-justificacion" onclick="cerrarModalJustificacion()">×</span>
     <h2 class="form-container__h2">Justificar Falta</h2>
     <form action="guardar_falta_justificada.php" id="miFormularioJustificados" method="post">
-      <input type="text" name="filtroAlumno" id="filtroAlumnoJustificado" placeholder="Filtrar por nombre, apellido o legajo de alumno">
-      <select name="selectAlumno" id="selectAlumnoJustificado">
-          <option value="">Seleccionar alumno</option>
+      <input type="text" name="filtroAlumno" id="filtroAlumnoJustificado" placeholder="Filtrar por nombre, apellido o legajo de alumno" class="form-container__input">
+      <select name="selectAlumnoJustificado" id="selectAlumnoJustificado" class="form-container__input">
+          <option value="" selected>Seleccionar alumno</option>
       </select>
-      <select id="selectMateriaJustificada1" name="materia1">
+      <select id="selectMateriaJustificada1" name="materia1" class="form-container__input">
         <option value="">Seleccione Primera Materia</option>
       </select>
-      <select id="selectMateriaJustificada2" name="materia2">
+      <select id="selectMateriaJustificada2" name="materia2" class="form-container__input">
         <option value="">Seleccione Segunda Materia</option>
       </select>
       <input type="hidden" id="carreraJustificada" name="carrera" value="">
       <input type="hidden" id="cursoJustificado" name="curso" value="">
       <input type="hidden" id="comisionJustificada" name="comision" value="">
       <input type="hidden" name="profesor" value="<?php echo $_SESSION["id"]; ?>">
-      <input type="text" name="motivo" placeholder="Motivo de Falta Justificada">
-      <input type="date" name="fecha" id="fechaJustificados">
+      <input type="text" name="motivo" placeholder="Motivo de Falta Justificada" class="form-container__input">
+      <input type="date" name="fecha" id="fechaJustificados" class="form-container__input">
       <input type="submit" class="form-container__input" name="enviar" value="Confirmar">
     </form>
   </div>
 </div>
+
 
 
 <div class="nav-welcome-container">
@@ -643,16 +831,19 @@ window.onclick = function(event) {
   }
 }
 
-// JavaScript para manejar la apertura y cierre de modales
+//--------------------PDF alumno ---------------------------//
+
 document.addEventListener('DOMContentLoaded', function() {
-    var modalEstudiantes = document.getElementById('estudiantesModal');
-    var btnImprimirListaEstudiantes = document.getElementById('btnImprimirListaEstudiantes');
+    var data = <?php echo json_encode($data); ?>;
+    console.log("Datos cargados:", data);
+
     var modalListaEstudiantes = document.getElementById('modal-lista-estudiantes');
-    var closeListaEstudiantesModal = document.getElementById('closeListaEstudiantesModal');
+    var closeListaEstudiantesModal = document.querySelector('.cerrar-modal-lista-estudiantes');
+    var btnGenerarInformeEstudiantes = document.getElementById('btnGenerarInformeEstudiantes');
 
     // Abrir el modal de lista de estudiantes
-    btnImprimirListaEstudiantes.onclick = function() {
-        modalEstudiantes.style.display = "none";
+    btnGenerarInformeEstudiantes.onclick = function() {
+        console.log("Botón clickeado");
         modalListaEstudiantes.style.display = "block";
     }
 
@@ -667,156 +858,50 @@ document.addEventListener('DOMContentLoaded', function() {
             modalListaEstudiantes.style.display = "none";
         }
     }
-});
 
-$(document).ready(function() {
-    // Función para actualizar el selector de alumnos
-    function actualizarSelectAlumnos(alumnos) {
-        var selectAlumno = $('.modal-content-retirados #selectAlumno, .modal-content-justificacion #selectAlumno');
-        selectAlumno.empty(); // Vaciar el select para llenarlo de nuevo
+    var data = <?php echo json_encode($data); ?>;
+    console.log("Datos cargados:", data);
 
-        // Agregar una opción por cada alumno recibido
-        alumnos.forEach(function(alumno) {
-            var option = $('<option>', {
-                value: alumno.legajo, // Utilizamos el legajo del alumno como valor
-                text: alumno.nombre_alumno + ' ' + alumno.apellido_alumno + ' (' + alumno.legajo + ')'
-            });
-            selectAlumno.append(option);
-        });
-    }
+    var selectCarrera = document.getElementById('selectCarrera');
+    var cursoHidden = document.getElementById('cursoHidden');
+    var comisionHidden = document.getElementById('comisionHidden');
 
-    // Llamada inicial para llenar el selector de alumnos
-    $.ajax({
-        url: 'obtener_opciones.php',
-        method: 'POST',
-        data: {},
-        dataType: 'json', // Especificar que esperamos datos JSON en la respuesta
-        success: function(response) {
-            actualizarSelectAlumnos(response.alumnos);
-        },
-        error: function(xhr, status, error) {
-            console.error(xhr.responseText);
+    selectCarrera.addEventListener('change', function() {
+        var selectedCarrera = this.value.trim();
+
+        if (data[selectedCarrera] && data[selectedCarrera].cursos) {
+            var cursos = data[selectedCarrera].cursos;
+            for (var idCurso in cursos) {
+                if (cursos.hasOwnProperty(idCurso)) {
+                    cursoHidden.value = idCurso;
+                    
+                    var comisiones = cursos[idCurso].comisiones;
+                    for (var idComision in comisiones) {
+                        if (comisiones.hasOwnProperty(idComision)) {
+                            comisionHidden.value = idComision;
+                            break; // Salir después de establecer el primer curso y comisión
+                        }
+                    }
+                    break; // Salir después de establecer el primer curso y comisión
+                }
+            }
+        } else {
+            console.log('No se encontraron datos para la carrera seleccionada.');
+            cursoHidden.value = '';
+            comisionHidden.value = '';
         }
     });
-
-    // Función para filtrar los selectores al escribir en los inputs
-    $('.modal-content-retirados #filtroAlumno, .modal-content-justificacion #filtroAlumno').on('input', function() {
-        var alumno = $(this).val();
-
-        // Llamar a la función para actualizar los selectores
-        actualizarSelects(alumno);
-    });
-
-    function actualizarSelects(alumno) {
-        $.ajax({
-            url: 'obtener_opciones.php',
-            method: 'POST',
-            data: { alumno: alumno },
-            dataType: 'json', // Especificar que esperamos datos JSON en la respuesta
-            success: function(response) {
-                actualizarSelectAlumnos(response.alumnos);
-
-                // Actualizar el valor del input hidden con el id de la carrera del primer alumno
-                var carreraHidden = $('.modal-content-retirados #carrera, .modal-content-justificacion #carrera');
-                if (response.alumnos.length > 0) {
-                    carreraHidden.val(response.alumnos[0].carreras_idCarrera);
-                    // Llamar a la función para actualizar el selector de materias
-                    actualizarSelectMaterias(response.alumnos[0].carreras_idCarrera);
-                } else {
-                    carreraHidden.val(''); // Si no hay alumnos, vaciar el valor del input hidden
-                    // Limpiar el selector de materias
-                    limpiarSelectMaterias();
-                }
-            },
-            error: function(xhr, status, error) {
-                console.error(xhr.responseText);
-            }
-        });
-    }
-
-    // Función para actualizar el selector de materias
-    function actualizarSelectMaterias(idCarrera) {
-        $.ajax({
-            url: 'obtener_materias.php',
-            method: 'POST',
-            data: { carrera: idCarrera },
-            dataType: 'json',
-            success: function(response) {
-                var selectMateria = $('.modal-content-retirados #selectMateria, .modal-content-justificacion #selectMateria');
-                selectMateria.empty(); // Vaciar el select para llenarlo de nuevo
-
-                // Agregar una opción por cada materia recibida
-                response.materias.forEach(function(materia) {
-                    var option = $('<option>', {
-                        value: materia.idMaterias,
-                        text: materia.Nombre
-                    });
-                    selectMateria.append(option);
-                });
-            },
-            error: function(xhr, status, error) {
-                console.error(xhr.responseText);
-            }
-        });
-    }
-
-    // Función para limpiar el selector de materias
-    function limpiarSelectMaterias() {
-        var selectMateria = $('.modal-content-retirados #selectMateria, .modal-content-justificacion #selectMateria');
-        selectMateria.empty(); // Vaciar el select
-        selectMateria.append('<option value="">Seleccione Materia</option>'); // Agregar la opción por defecto
-    }
-
-    // Interceptamos el envío del formulario para cambiar los valores de los selectores por los IDs
-    $('#miFormularioRetirados').submit(function() {
-        var alumnoSeleccionado = $('.modal-content-retirados #selectAlumno, .modal-content-justificacion #selectAlumno').val();
-
-        // Actualizamos los valores de los selectores por los IDs
-        $('.modal-content-retirados #selectAlumno, .modal-content-justificacion #selectAlumno').val(alumnoSeleccionado);
-        // El valor de la materia ya es el ID, no es necesario cambiarlo
-    });
-
-    // Evento change para el select de alumno
-    $('.modal-content-retirados #selectAlumno, .modal-content-justificacion #selectAlumno').change(function() {
-        // Obtener el valor seleccionado en el select de alumno
-        var legajoAlumno = $(this).val();
-
-        // Enviar una solicitud AJAX para obtener la carrera del alumno
-        $.ajax({
-            url: 'obtener_carrera.php', // Ruta al script PHP que obtiene la carrera
-            method: 'POST',
-            data: { legajo: legajoAlumno }, // Datos a enviar al servidor
-            dataType: 'json', // Especificar que esperamos datos JSON en la respuesta
-            success: function(response) {
-                // Rellenar el campo de carrera con el valor obtenido
-                $('.modal-content-retirados #carrera, .modal-content-justificacion #carrera').val(response.carrera);
-                // Llamar a la función para actualizar el selector de materias
-                actualizarSelectMaterias(response.carrera);
-            },
-            error: function(xhr, status, error) {
-                console.error(xhr.responseText);
-            }
-        });
-    });
 });
 
-function abrirModalJustificacion() {
-    document.getElementsByClassName("modal-justificacion")[0].style.display = "block";
-}
-
-function cerrarModalJustificacion() {
-    document.getElementsByClassName("modal-justificacion")[0].style.display = "none";
-}
-
-// DataTables de Alumnos
-var myTable = document.querySelector("#tablaRetiradosTiempo");
-var dataTable = new DataTable(tablaRetiradosTiempo);
 
 $(document).ready(function() {
     // Función para actualizar el selector de alumnos
     function actualizarSelectAlumnos(alumnos) {
         var selectAlumno = $('#selectAlumnoJustificado');
         selectAlumno.empty(); // Vaciar el select para llenarlo de nuevo
+
+        // Agregar la opción por defecto
+        selectAlumno.append('<option value="" selected>Seleccionar alumno</option>');
 
         // Agregar una opción por cada alumno recibido
         alumnos.forEach(function(alumno) {
@@ -863,13 +948,10 @@ $(document).ready(function() {
                 var carreraHidden = $('#carreraJustificada');
                 if (response.alumnos.length > 0) {
                     carreraHidden.val(response.alumnos[0].carreras_idCarrera);
-                    // Llamar a la función para actualizar el selector de materias
-                    actualizarSelectMaterias(response.alumnos[0].carreras_idCarrera);
                 } else {
                     carreraHidden.val(''); // Si no hay alumnos, vaciar el valor del input hidden
-                    // Limpiar el selector de materias
-                    limpiarSelectMaterias();
                 }
+                limpiarSelectMaterias(); // Limpiar el selector de materias hasta que se seleccione un alumno
             },
             error: function(xhr, status, error) {
                 console.error(xhr.responseText);
@@ -878,11 +960,11 @@ $(document).ready(function() {
     }
 
     // Función para actualizar el selector de materias
-    function actualizarSelectMaterias(idCarrera) {
+    function actualizarSelectMaterias(legajoAlumno) {
         $.ajax({
             url: 'obtener_materias.php',
             method: 'POST',
-            data: { carrera: idCarrera },
+            data: { legajo: legajoAlumno },
             dataType: 'json',
             success: function(response) {
                 var selectMateria1 = $('#selectMateriaJustificada1');
@@ -916,37 +998,34 @@ $(document).ready(function() {
         selectMateria2.append('<option value="">Seleccione Segunda Materia</option>'); // Agregar la opción por defecto
     }
 
-    // Interceptamos el envío del formulario para cambiar los valores de los selectores por los IDs
-    $('#miFormularioJustificados').submit(function() {
-        var alumnoSeleccionado = $('#selectAlumnoJustificado').val();
-
-        // Actualizamos los valores de los selectores por los IDs
-        $('#selectAlumnoJustificado').val(alumnoSeleccionado);
-        // El valor de la materia ya es el ID, no es necesario cambiarlo
-    });
-
     // Evento change para el select de alumno para justificación
     $('#selectAlumnoJustificado').change(function() {
         // Obtener el valor seleccionado en el select de alumno
         var legajoAlumno = $(this).val();
 
-        // Enviar una solicitud AJAX para obtener el curso y la comisión del alumno
-        $.ajax({
-            url: 'obtener_curso_comision.php', // Ruta al script PHP que obtiene los datos
-            method: 'POST',
-            data: { legajo: legajoAlumno }, // Datos a enviar al servidor
-            dataType: 'json', // Especificar que esperamos datos JSON en la respuesta
-            success: function(response) {
-                // Rellenar los campos ocultos con los valores obtenidos
-                $('#cursoJustificado').val(response.curso);
-                $('#comisionJustificada').val(response.comision);
-                // Llamar a la función para actualizar el selector de materias
-                actualizarSelectMaterias(response.carrera);
-            },
-            error: function(xhr, status, error) {
-                console.error(xhr.responseText);
-            }
-        });
+        if (legajoAlumno) {
+            // Enviar una solicitud AJAX para obtener el curso y la comisión del alumno
+            $.ajax({
+                url: 'obtener_curso_comision.php', // Ruta al script PHP que obtiene los datos
+                method: 'POST',
+                data: { legajo: legajoAlumno }, // Datos a enviar al servidor
+                dataType: 'json', // Especificar que esperamos datos JSON en la respuesta
+                success: function(response) {
+                    // Rellenar los campos ocultos con los valores obtenidos
+                    $('#cursoJustificado').val(response.curso);
+                    $('#comisionJustificada').val(response.comision);
+                    $('#carreraJustificada').val(response.carrera);
+                    
+                    // Llamar a la función para actualizar el selector de materias
+                    actualizarSelectMaterias(legajoAlumno);
+                },
+                error: function(xhr, status, error) {
+                    console.error(xhr.responseText);
+                }
+            });
+        } else {
+            limpiarSelectMaterias();
+        }
     });
 
     // Evento change para los selectores de materia para justificación
@@ -970,6 +1049,88 @@ $(document).ready(function() {
         });
     });
 });
+
+function abrirModalJustificacion() {
+  document.getElementsByClassName("modal-justificacion")[0].style.display = "block";
+}
+
+function cerrarModalJustificacion() {
+  document.getElementsByClassName("modal-justificacion")[0].style.display = "none";
+}
+
+
+// Obtener el modal
+var modalJustificados = document.getElementById("modalJustificados");
+
+// Obtener el botón que abre el modal
+var btnJustificados = document.getElementById("btnOpenModalJustificados");
+
+// Obtener el elemento que cierra el modal
+var spanJustificados = document.getElementById("closeJustificados");
+
+// Cuando el usuario hace clic en el botón, abrir el modal
+btnJustificados.onclick = function() {
+  modalJustificados.style.display = "block";
+}
+
+// Cuando el usuario hace clic en (x), cerrar el modal
+spanJustificados.onclick = function() {
+  modalJustificados.style.display = "none";
+}
+
+// También cierra el modal si el usuario hace clic fuera de él
+window.onclick = function(event) {
+  if (event.target == modalJustificados) {
+    modalJustificados.style.display = "none";
+  }
+}
+
+
+//------------------------------------PDF Asistewncia---------------------------------------//
+document.addEventListener('DOMContentLoaded', function() {
+    var data = <?php echo json_encode($data); ?>;
+
+    var selectCarrera = document.getElementById('selectCarrera');
+    var selectCurso = document.getElementById('selectCurso');
+    var selectComision = document.getElementById('selectComision');
+
+    selectCarrera.addEventListener('change', function() {
+        var selectedCarrera = this.value;
+        selectCurso.innerHTML = '<option hidden>Selecciona un curso</option>';
+        selectComision.innerHTML = '<option hidden>Selecciona una comisión</option>';
+
+        if (data[selectedCarrera] && data[selectedCarrera].cursos) {
+            for (var idCurso in data[selectedCarrera].cursos) {
+                if (data[selectedCarrera].cursos.hasOwnProperty(idCurso)) {
+                    var option = document.createElement('option');
+                    option.value = idCurso;
+                    option.textContent = data[selectedCarrera].cursos[idCurso].nombre_curso;
+                    selectCurso.appendChild(option);
+                }
+            }
+        }
+    });
+
+    selectCurso.addEventListener('change', function() {
+        var selectedCarrera = selectCarrera.value;
+        var selectedCurso = this.value;
+        selectComision.innerHTML = '<option hidden>Selecciona una comisión</option>';
+
+        if (data[selectedCarrera] && data[selectedCarrera].cursos && data[selectedCarrera].cursos[selectedCurso]) {
+            for (var idComision in data[selectedCarrera].cursos[selectedCurso].comisiones) {
+                if (data[selectedCarrera].cursos[selectedCurso].comisiones.hasOwnProperty(idComision)) {
+                    var option = document.createElement('option');
+                    option.value = idComision;
+                    option.textContent = data[selectedCarrera].cursos[selectedCurso].comisiones[idComision];
+                    selectComision.appendChild(option);
+                }
+            }
+        }
+    });
+});
+
+
+
 </script>
 </body>
 </html>
