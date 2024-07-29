@@ -40,20 +40,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $curso = isset($_POST['curso']) ? $_POST['curso'] : null;
     $comision = isset($_POST['comision']) ? $_POST['comision'] : null;
 
+    // Verifica los valores de las variables
     if ($fecha_inicio && $fecha_fin && $carrera && $curso && $comision) {
         // Obtener los nombres de la carrera, curso y comisión
         $consulta_datos = "
             SELECT c.nombre_carrera, cu.nombre_curso, co.N_comicion 
             FROM carreras c
-            INNER JOIN cursos cu ON cu.idcursos = $curso
-            INNER JOIN comisiones co ON co.idComisiones = $comision
-            WHERE c.idCarrera = $carrera
+            INNER JOIN cursos cu ON cu.idcursos = ?
+            INNER JOIN comisiones co ON co.idComisiones = ?
+            WHERE c.idCarrera = ?
         ";
-        $resultado_datos = $conexion->query($consulta_datos);
-        $datos = $resultado_datos->fetch_assoc();
-        $nombre_carrera = $datos['nombre_carrera'];
-        $nombre_curso = $datos['nombre_curso'];
-        $nombre_comision = $datos['N_comicion'];
+        $stmt_datos = $conexion->prepare($consulta_datos);
+        $stmt_datos->bind_param('iii', $curso, $comision, $carrera);
+        $stmt_datos->execute();
+        $resultado_datos = $stmt_datos->get_result();
+
+        // Comprueba si se encontraron resultados
+        if ($resultado_datos->num_rows > 0) {
+            $datos = $resultado_datos->fetch_assoc();
+            $nombre_carrera = $datos['nombre_carrera'];
+            $nombre_curso = $datos['nombre_curso'];
+            $nombre_comision = $datos['N_comicion'];
+        } else {
+            die("Error: No se encontraron datos para los identificadores proporcionados.");
+        }
 
         $subtitulo = "$nombre_carrera - Curso: $nombre_curso - Comisión: $nombre_comision";
 
@@ -62,13 +72,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             FROM asistencia a 
             INNER JOIN inscripcion_asignatura ia ON ia.alumno_legajo = a.inscripcion_asignatura_alumno_legajo 
             INNER JOIN alumno a2 ON a2.legajo = ia.alumno_legajo 
-            WHERE a.fecha BETWEEN '$fecha_inicio' AND '$fecha_fin' 
-            AND a.carreras_idCarrera = '$carrera' 
-            AND a.cursos_idcursos = '$curso' 
-            AND a.comisiones_idComisiones = '$comision'
+            WHERE a.fecha BETWEEN ? AND ? 
+            AND a.carreras_idCarrera = ? 
+            AND a.cursos_idcursos = ? 
+            AND a.comisiones_idComisiones = ?
         ";
-
-        $resultado_fechas = $conexion->query($consulta_asistencia);
+        $stmt_asistencia = $conexion->prepare($consulta_asistencia);
+        $stmt_asistencia->bind_param('ssiii', $fecha_inicio, $fecha_fin, $carrera, $curso, $comision);
+        $stmt_asistencia->execute();
+        $resultado_fechas = $stmt_asistencia->get_result();
         
         $fechas_asistencia = [];
         while ($row = $resultado_fechas->fetch_assoc()) {
@@ -102,14 +114,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 FROM asistencia a 
                 INNER JOIN inscripcion_asignatura ia ON ia.alumno_legajo = a.inscripcion_asignatura_alumno_legajo 
                 INNER JOIN alumno a2 ON a2.legajo = ia.alumno_legajo 
-                WHERE a.fecha BETWEEN '$fecha_inicio' AND '$fecha_fin' 
-                AND a.carreras_idCarrera = '$carrera' 
-                AND a.cursos_idcursos = '$curso' 
-                AND a.comisiones_idComisiones = '$comision'
+                WHERE a.fecha BETWEEN ? AND ? 
+                AND a.carreras_idCarrera = ? 
+                AND a.cursos_idcursos = ? 
+                AND a.comisiones_idComisiones = ?
                 ORDER BY a2.apellido_alumno, a2.nombre_alumno, a.fecha
             ";
-
-            $resultado_asistencia = $conexion->query($consulta_asistencia);
+            $stmt_asistencia_detalle = $conexion->prepare($consulta_asistencia);
+            $stmt_asistencia_detalle->bind_param('ssiii', $fecha_inicio, $fecha_fin, $carrera, $curso, $comision);
+            $stmt_asistencia_detalle->execute();
+            $resultado_asistencia = $stmt_asistencia_detalle->get_result();
 
             $asistencias_por_alumno = [];
             while ($fila_asistencia = $resultado_asistencia->fetch_assoc()) {

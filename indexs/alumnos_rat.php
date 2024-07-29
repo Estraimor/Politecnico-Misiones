@@ -40,7 +40,7 @@ if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)
       
 
         .btn-enviar {
-            background-color: #4CAF50;
+            background-color: #9c0e0e;
             color: white;
             padding: 10px 20px;
             margin: 8px 0;
@@ -91,7 +91,7 @@ $stmt_materias->execute();
 $query_materias = $stmt_materias->get_result();
 
 // Obtener los datos de los alumnos
-$sql_alumnos = "SELECT a.legajo, a.nombre_alumno, a.apellido_alumno, c.nombre_carrera, c2.N_comicion
+$sql_alumnos = "SELECT a.legajo, a.nombre_alumno, a.dni_alumno, a.apellido_alumno, c.nombre_carrera, c2.N_comicion
                 FROM inscripcion_asignatura ia
                 INNER JOIN alumno a ON ia.alumno_legajo = a.legajo
                 INNER JOIN materias m ON ia.materias_idMaterias = m.idMaterias
@@ -125,11 +125,12 @@ $result_alumnos = $stmt_alumnos->get_result();
                 <thead>
                     <tr>
                         <th>Legajo</th>
-                        <th>Nombre</th>
                         <th>Apellido</th>
+                        <th>Nombre</th>
+                        <th>DNI</th>
                         <th>Carrera</th>
                         <th>Comisión</th>
-                        <th>Cfolectivo</th>
+                        <th>Colectivo</th>
                         <th>Particular</th>
                         <th>Sin Motivo</th>
                     </tr>
@@ -138,12 +139,13 @@ $result_alumnos = $stmt_alumnos->get_result();
                     <?php while ($alumno = mysqli_fetch_assoc($result_alumnos)) { ?>
                         <tr>
                             <td><?php echo htmlspecialchars($alumno['legajo']); ?></td>
-                            <td><?php echo htmlspecialchars($alumno['nombre_alumno']); ?></td>
                             <td><?php echo htmlspecialchars($alumno['apellido_alumno']); ?></td>
+                            <td><?php echo htmlspecialchars($alumno['nombre_alumno']); ?></td>
+                            <td><?php echo htmlspecialchars($alumno['dni_alumno']); ?></td>
                             <td><?php echo htmlspecialchars($alumno['nombre_carrera']); ?></td>
                             <td><?php echo htmlspecialchars($alumno['N_comicion']); ?></td>
                             <td class="checkbox-cell">
-                                <input type="radio" name="motivo[<?php echo $alumno['legajo']; ?>]" value="Cfolectivo" required>
+                                <input type="radio" name="motivo[<?php echo $alumno['legajo']; ?>]" value="Colectivo" required>
                             </td>
                             <td class="checkbox-cell">
                                 <input type="radio" name="motivo[<?php echo $alumno['legajo']; ?>]" value="Particular" required>

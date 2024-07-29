@@ -70,8 +70,8 @@ if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)
 $legajo = $_GET['legajo'];
 
 ?>
-<a href="imprimir_alumno.php?legajo=<?php echo $legajo; ?>" class="accion-button"><i class="fa-solid fa-print"></i></a>
-<br>
+<!-- <a href="imprimir_alumno.php?legajo=<?php echo $legajo; ?>" class="accion-button"><i class="fa-solid fa-print"></i></a>
+<br> -->
 <br>
 <?php
 try {
@@ -195,13 +195,13 @@ echo $html_asistencias;
                             FROM 
                                 alumnos_justificados a
                             INNER JOIN 
-                                carreras c ON c.idCarrera = a.inscripcion_asignatura_carreras_idCarrera
+                                carreras c ON a.carreras_idCarrera = c.idCarrera
                             INNER JOIN 
-                                alumno a2 ON a.inscripcion_asignatura_alumno_legajo = a2.legajo
+                                alumno a2 ON a.alumno_legajo = a2.legajo
                             INNER JOIN 
-                                materias m ON m.idMaterias = a.materias_idMaterias
+                                materias m ON a.materias_idMaterias = m.idMaterias
                             WHERE 
-                                a.inscripcion_asignatura_alumno_legajo = '$legajo'";
+                               a.alumno_legajo = $legajo";
 
     $query_justificaciones = mysqli_query($conexion, $sql_justificaciones);
 

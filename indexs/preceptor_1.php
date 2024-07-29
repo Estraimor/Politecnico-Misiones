@@ -301,64 +301,31 @@ $stmt->close();
 </div>
 
 
-<div id="modalInformesAsistencia" class="modal-informes-asistencia">
-    <div class="modal-content-informes-asistencia">
+<div id="modalInformesAsistencia" class="modal-informes-asistencia" style="display: none; position: fixed; z-index: 155555555555; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4);">
+    <div class="modal-content-informes-asistencia" style="background-color: rgba(255, 255, 255, 0.9); margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);">
         <span class="cerrar-modal-informes-asistencia">&times;</span>
-        <h2>Generar PDF de Asistencias</h2>
+        <h2>Generar Informe de Asistencias</h2>
         <br>
         <form action="generar_excel.php" method="post">
+            <label for="selectCarreraAsistencias">Selecciona una carrera, curso y comisión:</label>
+            <select id="selectCarreraAsistencias" name="carrera_curso_comision" class="form-input-informes">
+                <option hidden>Selecciona una opción</option>
+                <!-- Opciones se llenarán dinámicamente -->
+            </select>
+            <br><br>
+
+            <input type="hidden" id="cursoHiddenAsistencias" name="curso" value="">
+            <input type="hidden" id="comisionHiddenAsistencias" name="comision" value="">
+
             <label for="fecha_inicio">Fecha de inicio:</label>
-            <input type="date" id="fecha_inicio" class="input_fecha" name="fecha_inicio" required >
+            <input type="date" id="fecha_inicio" name="fecha_inicio" required>
             <br><br>
+
             <label for="fecha_fin">Fecha de fin:</label>
-            <input type="date" id="fecha_fin" class="input_fecha" name="fecha_fin" required >
-            <br><br>
-            <?php
-            // Obtener las carreras, cursos y comisiones asociadas al preceptor
-            $sql_data = "
-                SELECT DISTINCT c.idCarrera, c.nombre_carrera, cu.idcursos, cu.nombre_curso, co.idComisiones, co.N_comicion
-                FROM carreras c
-                INNER JOIN preceptores p ON c.idCarrera = p.carreras_idCarrera
-                INNER JOIN cursos cu ON cu.idcursos = p.cursos_idcursos
-                INNER JOIN comisiones co ON co.idComisiones = p.comisiones_idComisiones
-                WHERE p.profesor_idProrfesor = ?
-            ";
-            $stmt = $conexion->prepare($sql_data);
-            $stmt->bind_param('i', $_SESSION["id"]);
-            $stmt->execute();
-            $result = $stmt->get_result();
-
-            $data = [];
-            while ($row = $result->fetch_assoc()) {
-                $data[$row['idCarrera']]['nombre_carrera'] = $row['nombre_carrera'];
-                $data[$row['idCarrera']]['cursos'][$row['idcursos']]['nombre_curso'] = $row['nombre_curso'];
-                $data[$row['idCarrera']]['cursos'][$row['idcursos']]['comisiones'][$row['idComisiones']] = $row['N_comicion'];
-            }
-            $stmt->close();
-            ?>
-
-            <label for="selectCarrera">Selecciona una carrera:</label>
-            <select id="selectCarrera" name="carrera" class="form-input-informes">
-                <option hidden>Selecciona una carrera</option>
-                <?php foreach ($data as $idCarrera => $carrera) { ?>
-                    <option value="<?php echo htmlspecialchars($idCarrera); ?>"><?php echo htmlspecialchars($carrera['nombre_carrera']); ?></option>
-                <?php } ?>
-            </select>
+            <input type="date" id="fecha_fin" name="fecha_fin" required>
             <br><br>
 
-            <label for="selectCurso">Selecciona un curso:</label>
-            <select id="selectCurso" name="curso" class="form-input-informes">
-                <option hidden>Selecciona un curso</option>
-            </select>
-            <br><br>
-
-            <label for="selectComision">Selecciona una comisión:</label>
-            <select id="selectComision" name="comision" class="form-input-informes">
-                <option hidden>Selecciona una comisión</option>
-            </select>
-            <br><br>
-
-            <input type="submit" value="Generar PDF" class="boton-submit-informes">
+            <input type="submit" value="Generar PDF de Asistencias" class="boton-submit-informes">
         </form>
     </div>
 </div>
@@ -407,11 +374,11 @@ $stmt->close();
             ?>
             <label for="inscripcion_carrera">Carrera:</label>
             <select name="inscripcion_carrera" id="inscripcion_carrera" class="form-container__input">
-                <option hidden>Selecciona una carrera</option>
-                <?php while ($row = mysqli_fetch_assoc($peticion)) { ?>
-                <option value="<?php echo $row['idCarrera']; ?>"><?php echo $row['nombre_carrera']; ?></option>
-                <?php } ?>
-            </select>
+    <option hidden>Selecciona una carrera</option>
+    <?php foreach ($carreras as $idCarrera => $nombreCarrera) { ?>
+        <option value="<?php echo $idCarrera; ?>"><?php echo $nombreCarrera; ?></option>
+    <?php } ?>
+</select>
             
             <?php
             $sql_comision = "SELECT c.idComisiones,c.N_comicion FROM comisiones c";
@@ -570,42 +537,16 @@ $stmt->close();
         <span class="cerrar-modal-lista-estudiantes">&times;</span>
         <h2>Generar Informe de Estudiantes</h2>
         <br>
-        <form action="generar_exel_alumnos.php" method="post">
-            <?php
-            // Obtener las carreras, cursos y comisiones asociadas al preceptor
-            $sql_data = "
-                SELECT DISTINCT c.idCarrera, c.nombre_carrera, cu.idcursos, cu.nombre_curso, co.idComisiones, co.N_comicion
-                FROM carreras c
-                INNER JOIN preceptores p ON c.idCarrera = p.carreras_idCarrera
-                INNER JOIN cursos cu ON cu.idcursos = p.cursos_idcursos
-                INNER JOIN comisiones co ON co.idComisiones = p.comisiones_idComisiones
-                WHERE p.profesor_idProrfesor = ?
-            ";
-            $stmt = $conexion->prepare($sql_data);
-            $stmt->bind_param('i', $_SESSION["id"]);
-            $stmt->execute();
-            $result = $stmt->get_result();
-
-            $data = [];
-            while ($row = $result->fetch_assoc()) {
-                $data[$row['idCarrera']]['nombre_carrera'] = $row['nombre_carrera'];
-                $data[$row['idCarrera']]['cursos'][$row['idcursos']]['nombre_curso'] = $row['nombre_curso'];
-                $data[$row['idCarrera']]['cursos'][$row['idcursos']]['comisiones'][$row['idComisiones']] = $row['N_comicion'];
-            }
-            $stmt->close();
-            ?>
-
-            <label for="selectCarrera">Selecciona una carrera:</label>
-            <select id="selectCarrera" name="carrera" class="form-input-informes">
-                <option hidden>Selecciona una carrera</option>
-                <?php foreach ($data as $idCarrera => $carrera) { ?>
-                    <option value="<?php echo htmlspecialchars($idCarrera); ?>"><?php echo htmlspecialchars($carrera['nombre_carrera']); ?></option>
-                <?php } ?>
+        <form action="generar_excel_alumnos.php" method="post">
+            <label for="selectCarreraEstudiantes">Selecciona una carrera, curso y comisión:</label>
+            <select id="selectCarreraEstudiantes" name="carrera_curso_comision" class="form-input-informes">
+                <option hidden>Selecciona una opción</option>
+                <!-- Opciones se llenarán dinámicamente -->
             </select>
             <br><br>
 
-            <input type="hidden" id="cursoHidden" name="curso" value="">
-            <input type="hidden" id="comisionHidden" name="comision" value="">
+            <input type="hidden" id="cursoHiddenEstudiantes" name="curso" value="">
+            <input type="hidden" id="comisionHiddenEstudiantes" name="comision" value="">
 
             <input type="submit" value="Generar Lista de Estudiantes" class="boton-submit-informes">
         </form>
@@ -834,7 +775,7 @@ window.onclick = function(event) {
 //--------------------PDF alumno ---------------------------//
 
 document.addEventListener('DOMContentLoaded', function() {
-    var data = <?php echo json_encode($data); ?>;
+    var data = <?php echo json_encode($menu_data); ?>;
     console.log("Datos cargados:", data);
 
     var modalListaEstudiantes = document.getElementById('modal-lista-estudiantes');
@@ -859,37 +800,32 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    var data = <?php echo json_encode($data); ?>;
-    console.log("Datos cargados:", data);
-
     var selectCarrera = document.getElementById('selectCarrera');
     var cursoHidden = document.getElementById('cursoHidden');
     var comisionHidden = document.getElementById('comisionHidden');
 
     selectCarrera.addEventListener('change', function() {
         var selectedCarrera = this.value.trim();
+        selectCarrera.innerHTML = '<option hidden>Selecciona un curso y comisión</option>';
 
-        if (data[selectedCarrera] && data[selectedCarrera].cursos) {
-            var cursos = data[selectedCarrera].cursos;
-            for (var idCurso in cursos) {
-                if (cursos.hasOwnProperty(idCurso)) {
-                    cursoHidden.value = idCurso;
-                    
-                    var comisiones = cursos[idCurso].comisiones;
-                    for (var idComision in comisiones) {
-                        if (comisiones.hasOwnProperty(idComision)) {
-                            comisionHidden.value = idComision;
-                            break; // Salir después de establecer el primer curso y comisión
-                        }
-                    }
-                    break; // Salir después de establecer el primer curso y comisión
-                }
-            }
+        if (data[selectedCarrera]) {
+            var opciones = data[selectedCarrera];
+            opciones.forEach(function(opcion) {
+                var option = document.createElement('option');
+                option.value = opcion.id_curso + '-' + opcion.id_comision; // Concatenar ids
+                option.textContent = opcion.nombre_carrera + ' - ' + opcion.nombre_curso + ' - ' + opcion.nombre_comision;
+                selectCarrera.appendChild(option);
+            });
         } else {
             console.log('No se encontraron datos para la carrera seleccionada.');
-            cursoHidden.value = '';
-            comisionHidden.value = '';
         }
+    });
+
+    selectCarrera.addEventListener('change', function() {
+        var selectedOption = this.value;
+        var [idCurso, idComision] = selectedOption.split('-');
+        cursoHidden.value = idCurso;
+        comisionHidden.value = idComision;
     });
 });
 
@@ -1087,49 +1023,53 @@ window.onclick = function(event) {
 
 
 //------------------------------------PDF Asistewncia---------------------------------------//
-document.addEventListener('DOMContentLoaded', function() {
-    var data = <?php echo json_encode($data); ?>;
+$(document).ready(function() {
+    // Función para cargar los datos y llenar el select
+    function cargarDatos(selectId, hiddenCursoId, hiddenComisionId) {
+        var selectCarrera = $(selectId);
 
-    var selectCarrera = document.getElementById('selectCarrera');
-    var selectCurso = document.getElementById('selectCurso');
-    var selectComision = document.getElementById('selectComision');
+        selectCarrera.on('change', function() {
+            var valorSeleccionado = $(this).val();
+            var ids = valorSeleccionado.split('-');
 
-    selectCarrera.addEventListener('change', function() {
-        var selectedCarrera = this.value;
-        selectCurso.innerHTML = '<option hidden>Selecciona un curso</option>';
-        selectComision.innerHTML = '<option hidden>Selecciona una comisión</option>';
+            if (ids.length === 3) {
+                var idCarrera = ids[0];
+                var idCurso = ids[1];
+                var idComision = ids[2];
 
-        if (data[selectedCarrera] && data[selectedCarrera].cursos) {
-            for (var idCurso in data[selectedCarrera].cursos) {
-                if (data[selectedCarrera].cursos.hasOwnProperty(idCurso)) {
-                    var option = document.createElement('option');
-                    option.value = idCurso;
-                    option.textContent = data[selectedCarrera].cursos[idCurso].nombre_curso;
-                    selectCurso.appendChild(option);
-                }
+                $(hiddenCursoId).val(idCurso);
+                $(hiddenComisionId).val(idComision);
+            } else {
+                console.log('Formato de valor inesperado:', valorSeleccionado);
             }
-        }
-    });
+        });
 
-    selectCurso.addEventListener('change', function() {
-        var selectedCarrera = selectCarrera.value;
-        var selectedCurso = this.value;
-        selectComision.innerHTML = '<option hidden>Selecciona una comisión</option>';
+        $.ajax({
+            url: 'obtener_ccc_informe.php',
+            type: 'POST',
+            dataType: 'json',
+            success: function(data) {
+                selectCarrera.html('<option hidden>Selecciona una opción</option>');
 
-        if (data[selectedCarrera] && data[selectedCarrera].cursos && data[selectedCarrera].cursos[selectedCurso]) {
-            for (var idComision in data[selectedCarrera].cursos[selectedCurso].comisiones) {
-                if (data[selectedCarrera].cursos[selectedCurso].comisiones.hasOwnProperty(idComision)) {
-                    var option = document.createElement('option');
-                    option.value = idComision;
-                    option.textContent = data[selectedCarrera].cursos[selectedCurso].comisiones[idComision];
-                    selectComision.appendChild(option);
-                }
+                data.forEach(function(opcion) {
+                    var option = $('<option></option>');
+                    option.val(opcion.idCarrera + '-' + opcion.idCurso + '-' + opcion.idComision);
+                    option.text(opcion.nombreCarrera + ' - ' + opcion.nombreCurso + ' - ' + opcion.nombreComision);
+                    selectCarrera.append(option);
+                });
+            },
+            error: function(xhr, status, error) {
+                console.error('Error al cargar los datos:', error);
             }
-        }
-    });
+        });
+    }
+
+    // Cargar datos para Informe de Asistencias
+    cargarDatos('#selectCarreraAsistencias', '#cursoHiddenAsistencias', '#comisionHiddenAsistencias');
+
+    // Cargar datos para Informe de Estudiantes
+    cargarDatos('#selectCarreraEstudiantes', '#cursoHiddenEstudiantes', '#comisionHiddenEstudiantes');
 });
-
-
 
 </script>
 </body>

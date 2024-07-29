@@ -2,8 +2,10 @@
 require './pdf/vendor/setasign/fpdf/fpdf.php';
 include '../conexion/conexion.php';
 
-// Variable global para almacenar el nombre de la carrera
+// Variables globales para almacenar los nombres
 $nombre_carrera = '';
+$nombre_curso = '';
+$nombre_comision = '';
 $nombre_inst = 'Instituto Superior Politécnico Misiones Nº 1';
 
 class PDF extends FPDF
@@ -11,7 +13,7 @@ class PDF extends FPDF
     // Cabecera de página
     function Header()
     {
-        global $nombre_carrera, $nombre_inst, $subtitulo, $carrera;
+        global $nombre_carrera, $nombre_curso, $nombre_comision, $nombre_inst;
 
         // Espacio antes del encabezado de los datos
         $this->Ln(30); // Aumentar el valor para más espacio
@@ -22,35 +24,22 @@ class PDF extends FPDF
         // Color del rectángulo
         $this->SetFillColor(189, 213, 234); // Color BDD5EA
 
-        // Encabezado solo en la primer página
+        // Encabezado solo en la primera página
         if ($this->PageNo() == 1) {
             // Dibujar rectángulo centrado
             $this->Rect($xRect, 10, 180, 40, 'F');
-            // Título solo en la primer página
+            // Título solo en la primera página
             $this->SetFont('Arial', 'B', 16);
             $this->SetTextColor(20, 13, 79); // Cambiar a color oscuro
             // Coordenadas para centrar verticalmente en el rectángulo
             $this->SetXY($xRect, 20);
-            $this->Cell(190, 10, $nombre_inst, 0, 1, 'C');
+            $this->Cell(190, 10, iconv('UTF-8', 'ISO-8859-1', $nombre_inst), 0, 1, 'C');
 
-            // Subtítulo solo en la primer página
+            // Subtítulo solo en la primera página
             $this->SetFont('Arial', '', 14);
             // Coordenadas para centrar verticalmente en el rectángulo
             $this->SetXY($xRect, 30);
-            // Lógica de transformación del nombre de la carrera
-            switch ($carrera) {
-                case "18":
-                    $subtitulo = "Enfermería Primer Año Comisión A";
-                    break;
-                case "19":
-                    $subtitulo = "Enfermería Primer Año Comisión B";
-                    break;
-                // Añadir más casos según sea necesario
-                default:
-                    $subtitulo = "Carrera no especificada";
-                    break;
-            }
-            $this->Cell(190, 10, $subtitulo, 0, 1, 'C');
+            $this->Cell(190, 10, iconv('UTF-8', 'ISO-8859-1', "Carrera: $nombre_carrera - Curso: $nombre_curso - Comisión: $nombre_comision"), 0, 1, 'C');
             
             // Espacio después del subtítulo
             $this->Ln(10);
@@ -84,29 +73,37 @@ class PDF extends FPDF
 // Verificar que los datos sean válidos
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST['carrera'])) {
-        global $nombre_carrera;
+        list($carrera, $curso, $comision) = explode('-', $_POST['carrera']);
+        global $nombre_carrera, $nombre_curso, $nombre_comision;
 
-        $carrera = $_POST['carrera'];
-
-        // Consultar el nombre de la carrera
-        $consulta_carrera = "SELECT nombre_carrera FROM carreras WHERE idCarrera = ?";
+        // Consultar el nombre de la carrera, curso y comisión
+        $consulta_carrera = "SELECT c.nombre_carrera, cu.nombre_curso, co.N_comicion 
+                             FROM inscripcion_asignatura ia
+                             INNER JOIN materias m on ia.materias_idMaterias = m.idMaterias
+                             INNER JOIN carreras c on m.carreras_idCarrera = c.idCarrera
+                             INNER JOIN cursos cu on ia.cursos_idcursos = cu.idcursos
+                             INNER JOIN comisiones co on ia.comisiones_idComisiones = co.idComisiones
+                             WHERE c.idCarrera = ? AND cu.idcursos = ? AND co.idComisiones = ?
+                             GROUP BY c.idCarrera, cu.idcursos, co.idComisiones";
         $stmt_carrera = $conexion->prepare($consulta_carrera);
-        $stmt_carrera->bind_param('i', $carrera);
+        $stmt_carrera->bind_param('iii', $carrera, $curso, $comision);
         $stmt_carrera->execute();
         $resultado_carrera = $stmt_carrera->get_result();
-        $nombre_carrera = $resultado_carrera->fetch_assoc()['nombre_carrera'];
+        $row = $resultado_carrera->fetch_assoc();
+        $nombre_carrera = $row['nombre_carrera'];
+        $nombre_curso = $row['nombre_curso'];
+        $nombre_comision = $row['N_comicion'];
 
         // Consultar la base de datos para obtener los datos de los alumnos de la carrera seleccionada
         $consulta = "SELECT apellido_alumno, nombre_alumno, dni_alumno
                      FROM inscripcion_asignatura ia 
                      INNER JOIN alumno a ON ia.alumno_legajo = a.legajo 
                      INNER JOIN materias m on ia.materias_idMaterias = m.idMaterias
-                     WHERE m.carreras_idCarrera = ? AND a.estado = '1'
+                     WHERE ia.cursos_idcursos = ? AND ia.comisiones_idComisiones = ? AND a.estado = '1'
                      GROUP BY a.legajo
-                     ORDER BY a.apellido_alumno
-                     ";
+                     ORDER BY a.apellido_alumno";
         $stmt = $conexion->prepare($consulta);
-        $stmt->bind_param('i', $carrera);
+        $stmt->bind_param('ii', $curso, $comision);
         $stmt->execute();
         $resultado = $stmt->get_result();
 
@@ -120,14 +117,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             while ($fila = $resultado->fetch_assoc()) {
                 $pdf->SetFont('Arial', '', 12);
                 $pdf->Cell(10, 10, $contador, 1, 0, 'C');
-                $pdf->Cell(50, 10, $fila['apellido_alumno'], 1, 0, 'C');
-                $pdf->Cell(50, 10, $fila['nombre_alumno'], 1, 0, 'C');
+                $pdf->Cell(50, 10, iconv('UTF-8', 'ISO-8859-1', $fila['apellido_alumno']), 1, 0, 'C');
+                $pdf->Cell(50, 10, iconv('UTF-8', 'ISO-8859-1', $fila['nombre_alumno']), 1, 0, 'C');
                 $pdf->Cell(70, 10, $fila['dni_alumno'], 1, 1, 'C');
                 $contador++; // Incrementar el contador
             }
 
             // Salida del PDF
-            $pdf->Output('D', 'Alumnos_' . date('Y-m-d') . '.pdf');
+            $pdf->Output('D', "Alumnos_{$nombre_carrera}_{$nombre_curso}_{$nombre_comision}_" . date('Y-m-d') . '.pdf');
 
             // Finalizar la ejecución del script PHP
             exit;
@@ -140,4 +137,3 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 } else {
     echo "Acceso denegado.";
 }
-?>
