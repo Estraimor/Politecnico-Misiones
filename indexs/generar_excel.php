@@ -36,13 +36,13 @@ class PDF extends FPDF {
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $fecha_inicio = isset($_POST['fecha_inicio']) ? $_POST['fecha_inicio'] : null;
     $fecha_fin = isset($_POST['fecha_fin']) ? $_POST['fecha_fin'] : null;
-    $carrera = isset($_POST['carrera']) ? $_POST['carrera'] : null;
+    $carrera = isset($_POST['carrera_curso_comision']) ? $_POST['carrera_curso_comision'] : null;
     $curso = isset($_POST['curso']) ? $_POST['curso'] : null;
     $comision = isset($_POST['comision']) ? $_POST['comision'] : null;
 
-    // Verifica los valores de las variables
+    
+
     if ($fecha_inicio && $fecha_fin && $carrera && $curso && $comision) {
-        // Obtener los nombres de la carrera, curso y comisión
         $consulta_datos = "
             SELECT c.nombre_carrera, cu.nombre_curso, co.N_comicion 
             FROM carreras c
@@ -55,7 +55,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt_datos->execute();
         $resultado_datos = $stmt_datos->get_result();
 
-        // Comprueba si se encontraron resultados
         if ($resultado_datos->num_rows > 0) {
             $datos = $resultado_datos->fetch_assoc();
             $nombre_carrera = $datos['nombre_carrera'];

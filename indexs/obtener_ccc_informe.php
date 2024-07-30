@@ -1,6 +1,12 @@
 <?php
 session_start();
-include '../conexion/conexion.php';
+include '../conexion/conexion.php'; // Asegúrate de que este archivo define correctamente la variable de conexión
+
+// Verifica la conexión
+if ($conexion->connect_error) {
+    die(json_encode(['error' => 'Conexión fallida: ' . $conexion->connect_error]));
+}
+
 // Consulta para obtener los datos necesarios
 $sql = "
     SELECT 
@@ -22,13 +28,14 @@ $sql = "
         p.profesor_idProrfesor = ?
 ";
 
-// Preparar y ejecutar la consulta
 $stmt = $conexion->prepare($sql);
+if ($stmt === false) {
+    die(json_encode(['error' => 'Error en la preparación de la consulta: ' . $conexion->error]));
+}
 $stmt->bind_param("i", $_SESSION["id"]);
 $stmt->execute();
 $result = $stmt->get_result();
 
-// Array para almacenar los resultados
 $data = array();
 
 while ($row = $result->fetch_assoc()) {
@@ -42,11 +49,9 @@ while ($row = $result->fetch_assoc()) {
     );
 }
 
-// Cerrar la conexión
 $stmt->close();
-$conn->close();
+$conexion->close(); // Asegúrate de usar la variable correcta para cerrar la conexión
 
-// Devolver los datos como JSON
 header('Content-Type: application/json');
 echo json_encode($data);
 ?>

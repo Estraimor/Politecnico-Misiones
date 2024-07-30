@@ -307,25 +307,25 @@ $stmt->close();
         <h2>Generar Informe de Asistencias</h2>
         <br>
         <form action="generar_excel.php" method="post">
-            <label for="selectCarreraAsistencias">Selecciona una carrera, curso y comisión:</label>
-            <select id="selectCarreraAsistencias" name="carrera_curso_comision" class="form-input-informes">
-                <option hidden>Selecciona una opción</option>
-                <!-- Opciones se llenarán dinámicamente -->
-            </select>
-            <br><br>
+        <label for="selectCarreraAsistencias">Selecciona una carrera, curso y comisión:</label>
+    <select id="selectCarreraAsistencias" name="carrera_curso_comision" class="form-input-informes">
+        <option hidden>Selecciona una opción</option>
+        <!-- Opciones se llenarán dinámicamente -->
+    </select>
+    <br><br>
+    
+    <input type="hidden" id="cursoHiddenAsistencias" name="curso" value="">
+    <input type="hidden" id="comisionHiddenAsistencias" name="comision" value="">
+    
+    <label for="fecha_inicio">Fecha de inicio:</label>
+    <input type="date" id="fecha_inicio" name="fecha_inicio" required>
+    <br><br>
 
-            <input type="hidden" id="cursoHiddenAsistencias" name="curso" value="">
-            <input type="hidden" id="comisionHiddenAsistencias" name="comision" value="">
+    <label for="fecha_fin">Fecha de fin:</label>
+    <input type="date" id="fecha_fin" name="fecha_fin" required>
+    <br><br>
 
-            <label for="fecha_inicio">Fecha de inicio:</label>
-            <input type="date" id="fecha_inicio" name="fecha_inicio" required>
-            <br><br>
-
-            <label for="fecha_fin">Fecha de fin:</label>
-            <input type="date" id="fecha_fin" name="fecha_fin" required>
-            <br><br>
-
-            <input type="submit" value="Generar PDF de Asistencias" class="boton-submit-informes">
+    <input type="submit" value="Generar PDF de Asistencias" class="boton-submit-informes">
         </form>
     </div>
 </div>
@@ -1024,52 +1024,54 @@ window.onclick = function(event) {
 
 //------------------------------------PDF Asistewncia---------------------------------------//
 $(document).ready(function() {
-    // Función para cargar los datos y llenar el select
     function cargarDatos(selectId, hiddenCursoId, hiddenComisionId) {
         var selectCarrera = $(selectId);
+
+        $.ajax({
+            url: 'obtener_ccc_informe.php', 
+            type: 'POST',
+            dataType: 'json',
+            success: function(data) {
+                console.log(data);
+                selectCarrera.html('<option hidden>Selecciona una opción</option>');
+                
+                if (data.length > 0) {
+                    data.forEach(function(opcion) {
+                        var option = $('<option></option>');
+                        option.val(opcion.idCarrera + '-' + opcion.idCurso + '-' + opcion.idComision);
+                        option.text(opcion.nombreCarrera + ' - ' + opcion.nombreCurso + ' - ' + opcion.nombreComision);
+                        selectCarrera.append(option);
+                    });
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('Error al cargar los datos:', error);
+                console.log(xhr.responseText);
+            }
+        });
 
         selectCarrera.on('change', function() {
             var valorSeleccionado = $(this).val();
             var ids = valorSeleccionado.split('-');
 
             if (ids.length === 3) {
-                var idCarrera = ids[0];
                 var idCurso = ids[1];
                 var idComision = ids[2];
 
                 $(hiddenCursoId).val(idCurso);
                 $(hiddenComisionId).val(idComision);
-            } else {
-                console.log('Formato de valor inesperado:', valorSeleccionado);
-            }
-        });
-
-        $.ajax({
-            url: 'obtener_ccc_informe.php',
-            type: 'POST',
-            dataType: 'json',
-            success: function(data) {
-                selectCarrera.html('<option hidden>Selecciona una opción</option>');
-
-                data.forEach(function(opcion) {
-                    var option = $('<option></option>');
-                    option.val(opcion.idCarrera + '-' + opcion.idCurso + '-' + opcion.idComision);
-                    option.text(opcion.nombreCarrera + ' - ' + opcion.nombreCurso + ' - ' + opcion.nombreComision);
-                    selectCarrera.append(option);
-                });
-            },
-            error: function(xhr, status, error) {
-                console.error('Error al cargar los datos:', error);
+                
+                // Depurar valores
+                console.log("Curso ID: " + idCurso);
+                console.log("Comisión ID: " + idComision);
             }
         });
     }
 
-    // Cargar datos para Informe de Asistencias
     cargarDatos('#selectCarreraAsistencias', '#cursoHiddenAsistencias', '#comisionHiddenAsistencias');
-
-    // Cargar datos para Informe de Estudiantes
     cargarDatos('#selectCarreraEstudiantes', '#cursoHiddenEstudiantes', '#comisionHiddenEstudiantes');
 });
+
 
 </script>
 </body>
