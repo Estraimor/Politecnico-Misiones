@@ -267,7 +267,7 @@ $stmt->close();
                 INNER JOIN preceptores p ON p.carreras_idCarrera = m.carreras_idCarrera
                 INNER JOIN profesor p2 ON p.profesor_idProrfesor = p2.idProrfesor
                 WHERE p2.idProrfesor = ? AND a.estado = 1
-                GROUP BY a.legajo";
+                GROUP BY a.legajo, c3.nombre_carrera, c2.N_comicion";
 
         $stmt = $conexion->prepare($sql);
         $stmt->bind_param('i', $profesor_id);
@@ -317,12 +317,12 @@ $stmt->close();
     <input type="hidden" id="cursoHiddenAsistencias" name="curso" value="">
     <input type="hidden" id="comisionHiddenAsistencias" name="comision" value="">
     
-    <label for="fecha_inicio">Fecha de inicio:</label>
-    <input type="date" id="fecha_inicio" name="fecha_inicio" required>
+    <label for="fecha_inicio">Fecha de inicio:</label><br>
+    <input type="date" id="fecha_inicio" name="fecha_inicio" class="form-input-informes" required>
     <br><br>
 
-    <label for="fecha_fin">Fecha de fin:</label>
-    <input type="date" id="fecha_fin" name="fecha_fin" required>
+    <label for="fecha_fin">Fecha de fin:</label><br>
+    <input type="date" id="fecha_fin" name="fecha_fin" class="form-input-informes" required>
     <br><br>
 
     <input type="submit" value="Generar PDF de Asistencias" class="boton-submit-informes">
@@ -537,7 +537,7 @@ $stmt->close();
         <span class="cerrar-modal-lista-estudiantes">&times;</span>
         <h2>Generar Informe de Estudiantes</h2>
         <br>
-        <form action="generar_excel_alumnos.php" method="post">
+        <form action="generar_exel_alumnos.php" method="post">
             <label for="selectCarreraEstudiantes">Selecciona una carrera, curso y comisión:</label>
             <select id="selectCarreraEstudiantes" name="carrera_curso_comision" class="form-input-informes">
                 <option hidden>Selecciona una opción</option>
@@ -559,13 +559,17 @@ $stmt->close();
     <span class="close-justificacion" onclick="cerrarModalJustificacion()">×</span>
     <h2 class="form-container__h2">Justificar Falta</h2>
     <form action="guardar_falta_justificada.php" id="miFormularioJustificados" method="post">
+    <label for="nombre_alu">Filtro estudiante:</label>
       <input type="text" name="filtroAlumno" id="filtroAlumnoJustificado" placeholder="Filtrar por nombre, apellido o legajo de alumno" class="form-container__input">
+      <label for="nombre_alu">Selecciona alumno:</label>
       <select name="selectAlumnoJustificado" id="selectAlumnoJustificado" class="form-container__input">
           <option value="" selected>Seleccionar alumno</option>
       </select>
+      <label for="nombre_alu">Materia 1:</label>
       <select id="selectMateriaJustificada1" name="materia1" class="form-container__input">
         <option value="">Seleccione Primera Materia</option>
       </select>
+      <label>Materia 2:</label>
       <select id="selectMateriaJustificada2" name="materia2" class="form-container__input">
         <option value="">Seleccione Segunda Materia</option>
       </select>
@@ -573,7 +577,9 @@ $stmt->close();
       <input type="hidden" id="cursoJustificado" name="curso" value="">
       <input type="hidden" id="comisionJustificada" name="comision" value="">
       <input type="hidden" name="profesor" value="<?php echo $_SESSION["id"]; ?>">
+      <label>Motivo:</label>
       <input type="text" name="motivo" placeholder="Motivo de Falta Justificada" class="form-container__input">
+      <label>Fecha Falta:</label>
       <input type="date" name="fecha" id="fechaJustificados" class="form-container__input">
       <input type="submit" class="form-container__input" name="enviar" value="Confirmar">
     </form>

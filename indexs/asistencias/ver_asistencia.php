@@ -57,49 +57,56 @@ if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)
   
 
   <?php
-   $curso=$_GET['id_curso'];
-   $carrera=$_GET['id_carrera'];
-   $comision=$_GET['id_comision']; 
-   $sql_4="SELECT c.nombre_curso,c2.nombre_carrera,cm.N_comicion FROM inscripcion_asignatura ia
+   $curso = $_GET['id_curso'];
+   $carrera = $_GET['id_carrera'];
+   $comision = $_GET['id_comision']; 
+   
+   $sql_4 = "SELECT c.nombre_curso, c2.nombre_carrera, cm.N_comicion FROM inscripcion_asignatura ia
 INNER JOIN cursos c on ia.cursos_idcursos = c.idcursos
 INNER JOIN materias m on ia.materias_idMaterias = m.idMaterias
 INNER JOIN carreras c2 on m.carreras_idCarrera = c2.idCarrera
 INNER JOIN comisiones cm on ia.comisiones_idComisiones = cm.idComisiones
-WHERE c.idcursos = '$curso' AND C2.idCarrera = '$carrera' AND CM.idComisiones = '$comision'";
-$query4=mysqli_query($conexion,$sql_4);
-$datos=mysqli_fetch_array($query4);
-   ?>
+WHERE c.idcursos = '$curso' AND c2.idCarrera = '$carrera' AND cm.idComisiones = '$comision'";
+
+   $query4 = mysqli_query($conexion, $sql_4);
    
-  <h1>Asistencia de <?php echo $datos['nombre_carrera'] . $datos['nombre_curso'] ; ?> Comision : <?php echo $datos['N_comicion']; ?> </h1>
-  
-        <input type="hidden" id="carrera" value="<?php echo $carrera ?>">
-        <input type="hidden" id="comision" value="<?php echo $comision ?>">
-        <input type="hidden" id="curso" value="<?php echo $curso ?>"> 
-        <div class="date-picker">
-            <label for="fecha">Selecciona una fecha:</label>
-            <input type="date" id="fecha" name="fecha" onchange="showAsistencia()">
-            
-        </div>
-        <div class="table-responsive">
-            <table class="table-comision-a">
-                <thead>
-                    <tr>
-                        <th rowspan="2">N°</th>
-                        <th rowspan="2">Apellido</th>
-                        <th rowspan="2">Nombre</th>
-                        <th rowspan="2">Asistencia</th>
-                        <th colspan="4">Fecha</th>
-                    </tr>
-                </thead>
-                <tbody id="asistenciaBody">
-                    <!-- Aquí se mostrará la asistencia cargada mediante Ajax -->
-                </tbody>
-                <?php
-                
-                
-                 ?>
-            </table>
-        </div>
+   if ($query4) {
+       $datos = mysqli_fetch_array($query4);
+       if ($datos) {
+           // Mostrar los datos solo si existen
+           echo "<h1>Asistencia de " . $datos['nombre_carrera'] . " " . $datos['nombre_curso'] . " Comision : " . $datos['N_comicion'] . "</h1>";
+       } else {
+           // Manejar el caso en el que no se encontraron resultados
+           echo "<h1>No se encontraron datos para los parámetros proporcionados.</h1>";
+       }
+   } else {
+       // Manejar errores de consulta
+       echo "<h1>Error en la consulta.</h1>";
+   }
+?>
+<input type="hidden" id="carrera" value="<?php echo $carrera ?>">
+<input type="hidden" id="comision" value="<?php echo $comision ?>">
+<input type="hidden" id="curso" value="<?php echo $curso ?>"> 
+<div class="date-picker">
+    <label for="fecha">Selecciona una fecha:</label>
+    <input type="date" id="fecha" name="fecha" onchange="showAsistencia()">
+</div>
+<div class="table-responsive">
+    <table class="table-comision-a">
+        <thead>
+            <tr>
+                <th rowspan="2">N°</th>
+                <th rowspan="2">Apellido</th>
+                <th rowspan="2">Nombre</th>
+                <th rowspan="2">Asistencia</th>
+                <th colspan="4">Fecha</th>
+            </tr>
+        </thead>
+        <tbody id="asistenciaBody">
+            <!-- Aquí se mostrará la asistencia cargada mediante Ajax -->
+        </tbody>
+    </table>
+</div>
     
 <script>
   

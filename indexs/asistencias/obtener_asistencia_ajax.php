@@ -64,11 +64,11 @@ try {
         // Agrega los datos del alumno al array general
         $alumnos_asistencia[] = $datos;
         // Incrementa los contadores de presentes, ausentes y justificadas según corresponda
-        if ($datos['asistencia'] == 'Presente') {
+        if (strtolower($datos['asistencia']) == 'presente') {
             $materias_asistencia[$materia_id]['presentes']++;
-        } elseif ($datos['asistencia'] == 'ausente') {
+        } elseif (strtolower($datos['asistencia']) == 'ausente') {
             $materias_asistencia[$materia_id]['ausentes']++;
-        } elseif ($datos['asistencia'] == 'justificada') {
+        } elseif (strtolower($datos['asistencia']) == 'justificada') {
             $materias_asistencia[$materia_id]['justificadas']++;
         }
     }

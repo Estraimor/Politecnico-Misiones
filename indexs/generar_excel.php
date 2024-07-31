@@ -173,7 +173,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $pdf->Output('D', $nombre_archivo);
             exit;
         } else {
-            echo "No hay registros de asistencia para las fechas especificadas.";
+            echo "<script>
+        alert('No hay registros de asistencia para las fechas especificadas.');
+        window.history.back();
+      </script>";
         }
     } else {
         echo "Error: Por favor, seleccione la fecha de inicio, la fecha de fin, la carrera, el curso y la comisión.";

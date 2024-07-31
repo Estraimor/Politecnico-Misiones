@@ -47,7 +47,6 @@ if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)
     <div class="nav-left">  
         <a href="index.php" class="home-button">Inicio</a>
         <button class="btn-new-member" id="btn-new-member">Nuevo Estudiante</button>
-        <button class="btn-new-member" id="btnOpenNewStudentFP">Nuevo Estudiante FP</button>
         <button class="btn-inscripcion" id="btnInscripcionSegundoAnio">Inscripción Segundo/Tercer Año</button>
         <button class="">
             <a href="./preceptores.php">Preceptores</a>
@@ -112,57 +111,7 @@ if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)
     </div>
 </div>
 
-<button id="btnMostrarEstudiantesFP">EstudiantesFP</button>
-<!-- Modal para la tabla de estudiantes FP -->
-<div id="estudiantesModalFP" class="estudiantes-modal">
-    <div class="modal-content-estudiantes-FP">
-        <span class="modal-close-estudiantes close-modal-button" id="closeEstudiantesModalFP">&times; Cerrar</span>
-        <button id="btnMostrarInformesAsistenciaFP" class="boton-informes-asistencia">Informes de Asistencias</button>
-        <button id="abrirInformeFP" class="boton-informes-asistencia">Generar Informe estudiantes</button>
-        <div id="tablaContainerEstudiantesFP">
-            <table id="tablaFP">
-                <thead>
-                    <tr>
-                        <th class="legajo">Legajo</th>
-                        <th>Apellido</th>
-                        <th>Nombre</th>
-                        <th>DNI</th>
-                        <th>Celular</th>
-                        <th class="ths">Carrera</th>
-                        <th class="ths">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php
-                    $sql1 = "SELECT af.nombre_afp, af.apellido_afp, af.legajo_afp, af.dni_afp, af.celular_afp,c.nombre_carrera
-                            FROM alumnos_fp af
-                            INNER JOIN alumnos_fp_has_carreras afc on af.legajo_afp = afc.alumnos_fp_legajo_afp
-                            INNER JOIN carreras c on c.idCarrera = afc.carreras_idCarrera
-                            WHERE af.estado = '1';";
-                    $query1 = mysqli_query($conexion, $sql1);
-                    while ($datos = mysqli_fetch_assoc($query1)) {
-                    ?>
-                    <tr>
-                        <td><?php echo $datos['legajo_afp']; ?></td>
-                        <td><?php echo $datos['apellido_afp']; ?></td>
-                        <td><?php echo $datos['nombre_afp']; ?></td>
-                        <td><?php echo $datos['dni_afp']; ?></td>
-                        <td><?php echo $datos['celular_afp']; ?></td>
-                        <td><?php echo $datos['nombre_carrera']; ?></td>
-                        <td>
-                            <a href="./FP/ABM_FP/modificar_alumnoFP.php?legajo=<?php echo $datos['legajo_afp']; ?>" class="modificar-button"><i class="fas fa-pencil-alt"></i></a>
-                            <a href="#" onclick="return nombreNuevo('<?php echo $datos['legajo_afp']; ?>')" class="borrar-button"><i class="fas fa-trash-alt"></i></a>
-                            <a href="./FP/info_FP.php?legajo=<?php echo $datos['legajo_afp']; ?>" class="accion-button"><i class="fas fa-exclamation"></i></a>
-                        </td>
-                    </tr>
-                    <?php
-                    }
-                    ?>
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
+
 
  <!-- Modal de inscripción para segundo año -->
 <div id="inscripcionSegundoAnioModal" class="estudiantes-modal" style="display: none;">
@@ -312,22 +261,50 @@ if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)
         <br>
         <form action="./indexs/generar_excel.php" method="post">
             <label for="fecha_inicio">Fecha de inicio:</label>
-            <input type="date" id="fecha_inicio" class="input_fecha" name="fecha_inicio">
+            <input type="date" id="fecha_inicio" class="input_fecha" name="fecha_inicio" required>
             <br><br>
             <label for="fecha_fin">Fecha de fin:</label>
-            <input type="date" id="fecha_fin" class="input_fecha" name="fecha_fin">
+            <input type="date" id="fecha_fin" class="input_fecha" name="fecha_fin" required>
             <br><br>
-            <?php
-            $sql_mater = "SELECT * 
-                        FROM preceptores p 
-                        INNER JOIN carreras c on p.carreras_idCarrera = c.idCarrera";
-            $peticion = mysqli_query($conexion, $sql_mater);
-            ?>
-            <select name="carrera" class="form-input-informes">
+            <label for="carrera">Selecciona una carrera:</label>
+            <select name="carrera_curso_comision" class="form-input-informes" required>
                 <option hidden>Selecciona una carrera</option>
-                <?php while ($informacion = mysqli_fetch_assoc($peticion)) { ?>
-                <option value="<?php echo $informacion['idCarrera'] ?>"><?php echo $informacion['nombre_carrera'] ?></option>
-                <?php }?>
+                <?php
+                include '../conexion/conexion.php';
+                $sql_carreras = "SELECT * FROM carreras
+                                WHERE idCarrera in('18','27','46','55')";
+                $result_carreras = mysqli_query($conexion, $sql_carreras);
+
+                while ($carrera = mysqli_fetch_assoc($result_carreras)) {
+                    echo '<option value="'.$carrera['idCarrera'].'">'.$carrera['nombre_carrera'].'</option>';
+                }
+                ?>
+            </select>
+            <br><br>
+            <label for="curso">Selecciona un curso:</label>
+            <select name="curso" class="form-input-informes" required>
+                <option hidden>Selecciona un curso</option>
+                <?php
+                $sql_cursos = "SELECT * FROM cursos";
+                $result_cursos = mysqli_query($conexion, $sql_cursos);
+
+                while ($curso = mysqli_fetch_assoc($result_cursos)) {
+                    echo '<option value="'.$curso['idcursos'].'">'.$curso['nombre_curso'].'</option>';
+                }
+                ?>
+            </select>
+            <br><br>
+            <label for="comision">Selecciona una comisión:</label>
+            <select name="comision" class="form-input-informes" required>
+                <option hidden>Selecciona una comisión</option>
+                <?php
+                $sql_comisiones = "SELECT * FROM comisiones";
+                $result_comisiones = mysqli_query($conexion, $sql_comisiones);
+
+                while ($comision = mysqli_fetch_assoc($result_comisiones)) {
+                    echo '<option value="'.$comision['idComisiones'].'">'.$comision['N_comicion'].'</option>';
+                }
+                ?>
             </select>
             <br><br>
             <input type="submit" value="Generar Excel" class="boton-submit-informes">
@@ -335,23 +312,55 @@ if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)
     </div>
 </div>
 
+
 <div id="modal-lista-estudiantes" class="modal-lista-estudiantes" style="display: none; position: fixed; z-index: 155555555555; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4);">
     <div class="modal-content-lista-estudiantes" style="background-color: rgba(255, 255, 255, 0.9); margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);">
         <span class="close-modal-button" id="closeListaEstudiantesModal" style="color: #aaa; float: right; font-size: 28px; font-weight: bold;">&times;</span>
         <h2>Informe de Estudiantes</h2>
-        <form action="./indexs/generar_exel_alumnos.php" method="post">
-            <?php
-            $sql_mater = "select * from preceptores p 
-            INNER JOIN carreras c on c.idCarrera = p.carreras_idCarrera";
-            $peticion = mysqli_query($conexion, $sql_mater);
-            ?>      
-            <select name="carrera" class="form-container__input"> 
+        <form action="./indexs/generar_exel_alumnos_administrativo.php" method="post">
+            <br><br>
+            <label for="carrera">Selecciona una carrera:</label>
+            <select name="carrera" class="form-input-informes" required>
                 <option hidden>Selecciona una carrera</option>
-                <?php while ($informacion = mysqli_fetch_assoc($peticion)) { ?>
-                <option value="<?php echo $informacion['idCarrera'] ?>"><?php echo $informacion['nombre_carrera'] ?></option>
-                <?php } ?>
+                <?php
+                include '../conexion/conexion.php';
+                $sql_carreras = "SELECT * FROM carreras
+                                WHERE idCarrera in('18','27','46','55')";
+                $result_carreras = mysqli_query($conexion, $sql_carreras);
+
+                while ($carrera = mysqli_fetch_assoc($result_carreras)) {
+                    echo '<option value="'.$carrera['idCarrera'].'">'.$carrera['nombre_carrera'].'</option>';
+                }
+                ?>
             </select>
-            <input type="submit" value="Generar Lista de Estudiantes" style="background-color: red; color: white; padding: 10px 20px; margin: 8px 0; border: none; cursor: pointer; width: 100%;">
+            <br><br>
+            <label for="curso">Selecciona un curso:</label>
+            <select name="curso" class="form-input-informes" required>
+                <option hidden>Selecciona un curso</option>
+                <?php
+                $sql_cursos = "SELECT * FROM cursos";
+                $result_cursos = mysqli_query($conexion, $sql_cursos);
+
+                while ($curso = mysqli_fetch_assoc($result_cursos)) {
+                    echo '<option value="'.$curso['idcursos'].'">'.$curso['nombre_curso'].'</option>';
+                }
+                ?>
+            </select>
+            <br><br>
+            <label for="comision">Selecciona una comisión:</label>
+            <select name="comision" class="form-input-informes" required>
+                <option hidden>Selecciona una comisión</option>
+                <?php
+                $sql_comisiones = "SELECT * FROM comisiones";
+                $result_comisiones = mysqli_query($conexion, $sql_comisiones);
+
+                while ($comision = mysqli_fetch_assoc($result_comisiones)) {
+                    echo '<option value="'.$comision['idComisiones'].'">'.$comision['N_comicion'].'</option>';
+                }
+                ?>
+            </select>
+            <br><br>
+            <input type="submit" value="Generar Excel" class="boton-submit-informes">
         </form>
     </div>
 </div>
@@ -377,70 +386,6 @@ if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)
     </div>
 </div>
 
-<div id="modalNewStudentFP" class="modal-student-fp">
-    <div class="modal-content-student-fp">
-        <?php
-        $sql_carreras = "SELECT * FROM carreras c WHERE c.idCarrera IN ('8','14','15','64','65')";
-        $resultado_carreras = mysqli_query($conexion, $sql_carreras);
-        $carreras = array();
-        while ($informacion_carrera = mysqli_fetch_assoc($resultado_carreras)) {
-            $carreras[] = $informacion_carrera;
-        }
-        ?>
-        <span class="close-student-fp">&times;</span>
-        <form action="./FP/ABM_FP/guardar_alumnofp.php" method="post">
-            <h2>Registro de FP</h2>
-            <?php
-            $sql_legajo = "SELECT MAX(legajo_afp) AS max_legajo FROM alumnos_fp";
-            $resultado_legajo = $conexion->query($sql_legajo);
-            $fila_legajo = $resultado_legajo->fetch_assoc();
-            $nuevo_legajo = $fila_legajo['max_legajo'] + 1;
-            ?>
-            <input type="text" name="legajo" placeholder="N° Legajo" value="<?php echo $nuevo_legajo; ?>" class="form-container__input">
-            <input type="text" name="nombre" placeholder="Nombre" class="form-container__input" autocomplete="off">
-            <input type="text" name="apellido" placeholder="Apellido" class="form-container__input" autocomplete="off">
-            <input type="number" name="dni" placeholder="DNI" class="form-container__input" autocomplete="off">
-            <input type="number" name="celular" placeholder="Celular" class="form-container__input" autocomplete="off">
-            <input type="text" name="observaciones" placeholder="Observaciones" class="form-container__input" autocomplete="off">
-            <input type="text" name="trabaja" placeholder="Trabaja" class="form-container__input" autocomplete="off">
-            
-            <select name="FP1" class="form-container__input">
-                <option value="" hidden selected>Selecciona una carrera</option>
-                <?php foreach ($carreras as $carrera) {
-                    if ($carrera['idCarrera'] != '65') { ?>
-                        <option value="<?php echo $carrera['idCarrera'] ?>"><?php echo $carrera['nombre_carrera'] ?></option>
-                <?php }
-                } ?>
-            </select>
-            <select name="FP2" class="form-container__input">
-                <option value="" hidden selected>Selecciona una carrera</option>
-                <?php foreach ($carreras as $carrera) {
-                    if ($carrera['idCarrera'] != '65') { ?>
-                        <option value="<?php echo $carrera['idCarrera'] ?>"><?php echo $carrera['nombre_carrera'] ?></option>
-                <?php }
-                } ?>
-            </select>
-            <select name="FP3" class="form-container__input">
-                <option value="" hidden selected>Selecciona una carrera</option>
-                <?php foreach ($carreras as $carrera) {
-                    if ($carrera['idCarrera'] != '65') { ?>
-                        <option value="<?php echo $carrera['idCarrera'] ?>"><?php echo $carrera['nombre_carrera'] ?></option>
-                <?php }
-                } ?>
-            </select>
-            <select name="FP4" class="form-container__input">
-                <option value="" hidden selected>Selecciona una carrera</option>
-                <?php foreach ($carreras as $carrera) {
-                    if ($carrera['idCarrera'] != '65') { ?>
-                        <option value="<?php echo $carrera['idCarrera'] ?>"><?php echo $carrera['nombre_carrera'] ?></option>
-                <?php }
-                } ?>
-            </select>
-            
-            <input type="submit" name="enviar" value="Enviar" class="form-container__input">
-        </form>
-    </div>
-</div>
 
 
 <script>
@@ -541,27 +486,9 @@ document.addEventListener("DOMContentLoaded", function() {
 
 var myTable = document.querySelector("#tabla");
 var dataTable = new DataTable(tabla);
-var btnMostrarEstudiantesFP = document.getElementById("btnMostrarEstudiantesFP");
-var estudiantesModalFP = document.getElementById("estudiantesModalFP");
-var closeEstudiantesModalFP = document.getElementById("closeEstudiantesModalFP");
 
-btnMostrarEstudiantesFP.addEventListener("click", function() {
-    console.log("Botón EstudiantesFP clickeado");
-    estudiantesModalFP.style.display = "block";
-});
 
-closeEstudiantesModalFP.addEventListener("click", function() {
-    estudiantesModalFP.style.display = "none";
-});
 
-window.addEventListener("click", function(event) {
-    if (event.target === estudiantesModalFP) {
-        estudiantesModalFP.style.display = "none";
-    }
-});
-
-var myTable = document.querySelector("#tablaFP");
-var dataTable = new DataTable(tablaFP);
 
 function confirmarBorrado(legajo) {
     var respuesta = confirm("¿Estás seguro de que quieres borrar este alumno?");
@@ -571,13 +498,7 @@ function confirmarBorrado(legajo) {
     return false;
 }
 
-function nombreNuevo(legajo) {
-    var respuesta = confirm("¿Estás seguro de que quieres borrar este alumno?");
-    if (respuesta) {
-        window.location.href = "./FP/ABM_FP/Borrado_logico_AFP.php?legajo=" + legajo;
-    }
-    return false;
-}
+
 
 document.addEventListener('DOMContentLoaded', function() {
     var modalEstudiantes = document.getElementById('estudiantesModal');
@@ -627,43 +548,10 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 
-var modal = document.getElementById('modalNewStudentFP');
-var btn = document.getElementById('btnOpenNewStudentFP');
-var span = document.getElementsByClassName('close-student-fp')[0];
 
-btn.onclick = function() {
-    modal.style.display = "block";
-}
 
-span.onclick = function() {
-    modal.style.display = "none";
-}
 
-window.onclick = function(event) {
-    if (event.target == modal) {
-        modal.style.display = "none";
-    }
-}
 
-document.addEventListener("DOMContentLoaded", function() {
-    var modal = document.getElementById("modal-lista-estudiantes-FP");
-    var btnOpenModal = document.getElementById("abrirInformeFP");
-    var btnCloseModal = document.getElementById("closeListaEstudiantesModal-FP");
-
-    btnOpenModal.addEventListener("click", function() {
-        modal.style.display = "block";
-    });
-
-    btnCloseModal.addEventListener("click", function() {
-        modal.style.display = "none";
-    });
-
-    window.onclick = function(event) {
-        if (event.target === modal) {
-            modal.style.display = "none";
-        }
-    }
-});
 
 function mostrarModal() {
     var modal = document.getElementById('modal-lista-estudiantes');
@@ -693,26 +581,29 @@ window.onclick = function(event) {
         cerrarModal();
     }
 };
-// -------------------------------Segundo AÑO--------------------------------------//
 document.addEventListener("DOMContentLoaded", function() {
-    // Abrir y cerrar el modal de inscripción para segundo año
     var modal = document.getElementById("inscripcionSegundoAnioModal");
     var btnOpenModal = document.getElementById("btnInscripcionSegundoAnio");
     var btnCloseModal = document.getElementById("closeInscripcionSegundoAnioModal");
 
-    btnOpenModal.addEventListener("click", function() {
-        modal.style.display = "block";
-    });
+    // Verificar que los elementos existan
+    if (modal && btnOpenModal && btnCloseModal) {
+        btnOpenModal.addEventListener("click", function() {
+            modal.style.display = "block";
+        });
 
-    btnCloseModal.addEventListener("click", function() {
-        modal.style.display = "none";
-    });
-
-    window.onclick = function(event) {
-        if (event.target == modal) {
+        btnCloseModal.addEventListener("click", function() {
             modal.style.display = "none";
-        }
-    };
+        });
+
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        };
+    } else {
+        console.error("No se encontraron los elementos del modal. Verifica los IDs en el HTML.");
+    }
 
     // Cargar materias mediante AJAX al cambiar el curso
     $('#cursoSelect').change(function() {
@@ -721,16 +612,16 @@ document.addEventListener("DOMContentLoaded", function() {
         var materiasContainer = $('#materias-container');
 
         if (carrera && curso) {
-            console.log("Cargando materias para carrera ID: " + carrera + " y curso: " + curso); // Depuración
+            console.log("Cargando materias para carrera ID: " + carrera + " y curso: " + curso);
             $.ajax({
                 url: './Profesor/estudiante/inscripciones_2_3/obtener_materias.php',
                 type: 'POST',
                 data: { carrera: carrera, curso: curso },
                 success: function(data) {
                     try {
-                        console.log("Respuesta recibida: ", data); // Depuración
+                        console.log("Respuesta recibida: ", data);
                         var materias = JSON.parse(data);
-                        materiasContainer.empty(); // Limpiar el contenedor de materias
+                        materiasContainer.empty();
 
                         materias.forEach(function(materia) {
                             var div = $('<div></div>'); // Crear un contenedor para cada materia
@@ -749,17 +640,17 @@ document.addEventListener("DOMContentLoaded", function() {
                             materiasContainer.append(div);
                         });
 
-                        console.log("Materias cargadas exitosamente."); // Depuración
+                        console.log("Materias cargadas exitosamente.");
                     } catch (e) {
                         console.error("Error al procesar las materias: ", e);
                     }
                 },
                 error: function(xhr, status, error) {
-                    console.error("Error al cargar las materias: " + xhr.responseText); // Detallado
+                    console.error("Error al cargar las materias: " + xhr.responseText);
                 }
             });
         } else {
-            console.warn("Carrera o curso no seleccionados."); // Depuración
+            console.warn("Carrera o curso no seleccionados.");
         }
     });
 
@@ -772,14 +663,15 @@ document.addEventListener("DOMContentLoaded", function() {
             data: $(this).serialize(),
             success: function(response) {
                 alert(response);
-                $('#inscripcionSegundoAnioModal').hide();
+                modal.style.display = "none";
             },
             error: function(xhr, status, error) {
-                console.error("Error al procesar la inscripción: " + xhr.responseText); // Detallado
+                console.error("Error al procesar la inscripción: " + xhr.responseText);
             }
         });
     });
 });
+
 
 
 
