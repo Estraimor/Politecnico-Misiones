@@ -118,10 +118,10 @@ if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)
     <div class="modal-content-estudiantes">
         <span class="modal-close-estudiantes close-modal-button" id="closeInscripcionSegundoAnioModal">&times; Cerrar</span>
         <h2>Registro de Inscripción para Segundo Y Tercer Año</h2>
-        <form id="formInscripcion">
+        <form id="formInscripcion" action="./Profesor/estudiante/inscripciones_2_3/procesar_inscripcion.php">
+        <label for="nombre_alu">Nombre:</label><br>
     <input type="text" name="legajo" placeholder="N° Legajo" class="form-container__input" required>
-    <input type="text" name="nombre" class="form-container__input" readonly>
-
+    <label for="nombre_alu">Carrera:</label>
     <select name="carrera" id="carreraSelect" class="form-container__input" required>
         <option hidden>Selecciona Carrera</option>
         <?php
@@ -132,7 +132,7 @@ if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)
         }
         ?>
     </select>
-
+    <label for="nombre_alu">Curso:</label>
     <select name="curso" id="cursoSelect" class="form-container__input" required>
         <option hidden>Selecciona Curso</option>
         <option value="2">Segundo Año</option>
@@ -142,7 +142,7 @@ if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)
     <div id="materias-container">
         <!-- Los checkboxes de materias se agregarán aquí mediante JavaScript -->
     </div>
-
+    <label for="nombre_alu">Comision:</label>
     <select name="comision" class="form-container__input" required>
         <option hidden>Selecciona Comisión</option>
         <?php
@@ -153,7 +153,7 @@ if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)
         }
         ?>
     </select>
-
+    <label for="nombre_alu">Año:</label>
     <select name="año_inscripcion" id="año_inscripcion" class="form-container__input" required>
         <option value="2025">2025</option>
         <option value="2026">2026</option>

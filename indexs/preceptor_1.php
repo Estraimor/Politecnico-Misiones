@@ -257,17 +257,41 @@ $stmt->close();
         // Asume que el ID del profesor se obtiene de la sesión
         $profesor_id = $_SESSION['id'];
 
-        $sql = "SELECT a.legajo, a.nombre_alumno, a.apellido_alumno, a.dni_alumno, a.celular, c3.nombre_carrera, c2.N_comicion
-                FROM inscripcion_asignatura ia
-                INNER JOIN alumno a ON ia.alumno_legajo = a.legajo
-                INNER JOIN materias m ON ia.materias_idMaterias = m.idMaterias
-                INNER JOIN cursos c ON ia.cursos_idcursos = c.idcursos
-                INNER JOIN comisiones c2 ON ia.comisiones_idComisiones = c2.idComisiones
-                INNER JOIN carreras c3 ON m.carreras_idCarrera = c3.idCarrera
-                INNER JOIN preceptores p ON p.carreras_idCarrera = m.carreras_idCarrera
-                INNER JOIN profesor p2 ON p.profesor_idProrfesor = p2.idProrfesor
-                WHERE p2.idProrfesor = ? AND a.estado = 1
-                GROUP BY a.legajo, c3.nombre_carrera, c2.N_comicion";
+        $sql = "SELECT 
+    a.legajo, 
+    a.nombre_alumno, 
+    a.apellido_alumno, 
+    a.dni_alumno, 
+    a.celular, 
+    c3.nombre_carrera, 
+    c2.N_comicion
+FROM 
+    inscripcion_asignatura ia
+INNER JOIN 
+    alumno a ON ia.alumno_legajo = a.legajo
+INNER JOIN 
+    materias m ON ia.materias_idMaterias = m.idMaterias
+INNER JOIN 
+    cursos c ON ia.cursos_idcursos = c.idcursos
+INNER JOIN 
+    comisiones c2 ON ia.comisiones_idComisiones = c2.idComisiones
+INNER JOIN 
+    carreras c3 ON m.carreras_idCarrera = c3.idCarrera
+INNER JOIN 
+    preceptores p ON p.carreras_idCarrera = c3.idCarrera AND p.cursos_idcursos = c.idcursos AND p.comisiones_idComisiones = c2.idComisiones
+INNER JOIN 
+    profesor p2 ON p.profesor_idProrfesor = p2.idProrfesor
+WHERE 
+    p2.idProrfesor = ? 
+    AND a.estado = 1
+GROUP BY 
+    a.legajo, 
+    a.nombre_alumno, 
+    a.apellido_alumno, 
+    a.dni_alumno, 
+    a.celular, 
+    c3.nombre_carrera, 
+    c2.N_comicion;";
 
         $stmt = $conexion->prepare($sql);
         $stmt->bind_param('i', $profesor_id);

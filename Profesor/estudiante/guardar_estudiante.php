@@ -85,6 +85,7 @@ if (isset($_POST['enviar'])) {
                     } else {
                         echo "<script>console.log('Error al inscribir en materia: " . mysqli_error($conexion) . "');</script>";
                     }
+                    
                 }
             } else {
                 echo "<script>console.log('No se encontraron materias para el primer año de la carrera ID: " . $inscripcion_carrera . "');</script>";
