@@ -449,6 +449,8 @@ GROUP BY
                         <th>Legajo</th>
                         <th>Preceptor</th>
                         <th>Carrera</th>
+                        <th>Curso</th>
+                        <th>Comision</th>
                         <th>Materia</th>
                         <th>Motivo</th>
                         <th>Fecha</th>
@@ -457,12 +459,14 @@ GROUP BY
                 <tbody>
                     <?php
                     // Consulta SQL para obtener los datos
-                    $sql1 = "SELECT a2.nombre_alumno, a2.apellido_alumno, a2.legajo, p.nombre_profe, c.nombre_carrera, m.Nombre AS nombre_materia, a.fecha, a.motivo
+                    $sql1 = "SELECT a2.nombre_alumno, a2.apellido_alumno, a2.legajo, p.nombre_profe, c.nombre_carrera, m.Nombre AS nombre_materia, a.fecha, a.motivo,c2.nombre_curso,cm.N_comicion
                              FROM alumnos_rat a
                              INNER JOIN alumno a2 ON a2.legajo = a.alumno_legajo
                              INNER JOIN carreras c ON c.idCarrera = a.carreras_idCarrera
                              INNER JOIN profesor p ON a.profesor_idProrfesor = p.idProrfesor 
                              INNER JOIN materias m ON a.materias_idMaterias = m.idMaterias
+                             INNER JOIN cursos c2 on a.cursos_idcursos = c2.idcursos
+                             INNER JOIN comisiones cm on a.comisiones_idComisiones = cm.idComisiones
                              WHERE p.idProrfesor = {$_SESSION['id']}";
 
                     $query1 = mysqli_query($conexion, $sql1);
@@ -477,6 +481,8 @@ GROUP BY
                                 <td><?php echo htmlspecialchars($datos['legajo']); ?></td>
                                 <td><?php echo htmlspecialchars($datos['nombre_profe']); ?></td>
                                 <td><?php echo htmlspecialchars($datos['nombre_carrera']); ?></td>
+                                <td><?php echo htmlspecialchars($datos['nombre_curso']); ?></td>
+                                <td><?php echo htmlspecialchars($datos['N_comicion']); ?></td>
                                 <td><?php echo htmlspecialchars($datos['nombre_materia']); ?></td>
                                 <td><?php echo htmlspecialchars($datos['motivo']); ?></td>
                                 <td><?php echo htmlspecialchars($datos['fecha']); ?></td>
@@ -1101,7 +1107,13 @@ $(document).ready(function() {
     cargarDatos('#selectCarreraAsistencias', '#cursoHiddenAsistencias', '#comisionHiddenAsistencias');
     cargarDatos('#selectCarreraEstudiantes', '#cursoHiddenEstudiantes', '#comisionHiddenEstudiantes');
 });
+// datatables de justificados
+var myTable = document.querySelector("#tablaJustificados");
+var dataTable = new DataTable(tablaJustificados);
 
+// datatables de Retirados antes de tiempo
+var myTable = document.querySelector("#tablaRetiradosTiempo");
+var dataTable = new DataTable(tablaRetiradosTiempo);
 
 </script>
 </body>
