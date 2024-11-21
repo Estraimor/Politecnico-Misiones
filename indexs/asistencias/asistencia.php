@@ -66,102 +66,104 @@ if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)
   
  
         
-<form action="../../Profesor/asistencia/guardar_asistencia_enfermeria.php" method="post" onsubmit="showModalMessage()">
-        <div class="table-responsive">
-      
-                <?php
-
-                $curso=$_GET['id_curso'];
-                $carrera=$_GET['id_carrera'];
-                $comision=$_GET['id_comision'];
-      $sql_materias="SELECT * FROM cursos_has_materias cm
-INNER JOIN materias m on cm.materias_idMaterias = m.idMaterias
-INNER JOIN carreras c on c.idCarrera = m.carreras_idCarrera
-WHERE cm.cursos_idcursos = '$curso' and m.carreras_idCarrera = '$carrera'
-      ";
-      $query_materias=mysqli_query($conexion,$sql_materias); 
-       ?>
-                <table class="table-comision-a">
-                        <thead>
-                        <?php $materias = array();
-while ($materia = mysqli_fetch_assoc($query_materias)) {
-    $materias[] = $materia;
-}
-?>
-<tr>
-<th rowspan="2">N°</th>
-<th rowspan="2">Apellido</th>
-    <th rowspan="2">Nombre</th>
-    <th colspan="2">
-        <select name="materia1" id="" class="form-container__input">
-            <option hidden>Primera Materia</option>
-            <?php foreach ($materias as $materia) { ?>
-                <option value="<?php echo $materia['idMaterias']; ?>"><?php echo $materia['Nombre']; ?></option>
-            <?php } ?>
-        </select>
-    </th>
-</tr>
-                        
-            <tr>
-                <th>Presente</th>
-                <th>Ausente</th>
-                
-              
-            </tr>
-            
-                        </thead>
-                        <tbody>
-    <?php
-    $contador = 1;
-    $sql = "SELECT a.nombre_alumno,a.apellido_alumno,a.legajo 
-    FROM inscripcion_asignatura ia
-INNER JOIN alumno a on ia.alumno_legajo = a.legajo
-INNER JOIN materias m on ia.materias_idMaterias = m.idMaterias
-INNER JOIN carreras c on m.carreras_idCarrera = c.idCarrera
-WHERE ia.cursos_idcursos = '$curso' and ia.comisiones_idComisiones = '$comision' and m.carreras_idCarrera = '$carrera' 
-GROUP BY a.legajo";
-    $query = mysqli_query($conexion, $sql);
-    while ($datos = mysqli_fetch_assoc($query)) {
-        ?>
-        
-        <tr>
-        <td><?php echo $contador++; ?></td>
-        <td><?php echo $datos['apellido_alumno']; ?></td>
-        <td><?php echo $datos['nombre_alumno']; ?></td>
-    
-    
-    <!-- Primera hora -->
-    <td class="checkbox-cell">
-        <input type="checkbox" name="presentePrimera[]" value="<?php echo $datos['legajo']; ?>">
-    </td>
-
-    <td class="checkbox-cell">
-    <input type="checkbox" name="ausentePrimera[]" value="<?php echo $datos['legajo']; ?>" >
-    </td>
-</tr>
-
-
-
-
+<form action="../../Profesor/asistencia/guardar_asistencia_enfermeria.php" method="post">
+    <div class="table-responsive">
         <?php
-    }
-    ?>
-</tbody>
-        
-        </table>
-        <form id="justificadoForm" action="justificados.php" method="post">
-    <input type="hidden" id="legajo" name="legajo" value="">
-    <input type="hidden" id="materia" name="materia" value="">
-    <input type="hidden" id="carrera" name="carrera" value="">
-    <input type="hidden" id="fecha" name="fecha" value="">
-    <input type="hidden" id="motivo" name="motivo" value="">
-</form>
+        // Conexión a la base de datos
+        include '../../conexion/conexion.php';
 
+        // Obtener datos de la URL
+        $curso = $_GET['id_curso'];
+        $carrera = $_GET['id_carrera'];
+        $comision = $_GET['id_comision'];
+
+        // Obtener las materias
+        $sql_materias = "
+            SELECT * 
+            FROM cursos_has_materias cm
+            INNER JOIN materias m ON cm.materias_idMaterias = m.idMaterias
+            INNER JOIN carreras c ON c.idCarrera = m.carreras_idCarrera
+            WHERE cm.cursos_idcursos = '$curso' 
+            AND m.carreras_idCarrera = '$carrera'
+        ";
+        $query_materias = mysqli_query($conexion, $sql_materias);
+        $materias = [];
+        while ($materia = mysqli_fetch_assoc($query_materias)) {
+            $materias[] = $materia;
+        }
+        ?>
+
+        <!-- Campos ocultos para enviar información adicional -->
         <input type="hidden" name="idcarrera" value="<?php echo $carrera; ?>">
         <input type="hidden" name="comision" value="<?php echo $comision; ?>">
         <input type="hidden" name="curso" value="<?php echo $curso; ?>">
-        <input type="submit" name="Enviar" value="Confirmar" class="btn-enviar">
-            </form>
+
+        <table class="table-comision-a">
+            <thead>
+                <tr>
+                    <th rowspan="2">N°</th>
+                    <th rowspan="2">Apellido</th>
+                    <th rowspan="2">Nombre</th>
+                    <th colspan="2">
+                        <!-- Select para elegir la materia con atributo "required" -->
+                        <select name="materia1" id="materiaSelect" class="form-container__input" required>
+                            <option hidden value="">Primera Materia</option>
+                            <?php foreach ($materias as $materia) { ?>
+                                <option value="<?php echo $materia['idMaterias']; ?>">
+                                    <?php echo $materia['Nombre']; ?>
+                                </option>
+                            <?php } ?>
+                        </select>
+                    </th>
+                </tr>
+                <tr>
+                    <th>Presente</th>
+                    <th>Ausente</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php
+                // Obtener los estudiantes inscritos
+                $sql_estudiantes = "
+                    SELECT a.nombre_alumno, a.apellido_alumno, a.legajo 
+                    FROM inscripcion_asignatura ia
+                    INNER JOIN alumno a ON ia.alumno_legajo = a.legajo
+                    INNER JOIN materias m ON ia.materias_idMaterias = m.idMaterias
+                    INNER JOIN carreras c ON m.carreras_idCarrera = c.idCarrera
+                    WHERE ia.cursos_idcursos = '$curso' 
+                    AND ia.comisiones_idComisiones = '$comision' 
+                    AND m.carreras_idCarrera = '$carrera' 
+                    GROUP BY a.legajo
+                ";
+                $query_estudiantes = mysqli_query($conexion, $sql_estudiantes);
+
+                $contador = 1;
+                while ($datos = mysqli_fetch_assoc($query_estudiantes)) {
+                ?>
+                    <tr>
+                        <td><?php echo $contador++; ?></td>
+                        <td><?php echo $datos['apellido_alumno']; ?></td>
+                        <td><?php echo $datos['nombre_alumno']; ?></td>
+
+                        <!-- Opciones de asistencia: Presente o Ausente -->
+                        <td class="checkbox-cell">
+                            <input type="radio" value="1" name="asistencia[<?php echo $datos['legajo']; ?>]"  required >
+                        </td>
+                        <td class="checkbox-cell">
+                            <input type="radio" value="2" name="asistencia[<?php echo $datos['legajo']; ?>]"  required >
+                        </td>
+                    </tr>
+                <?php
+                }
+                ?>
+            </tbody>
+        </table>
+
+        <!-- Botón para enviar el formulario -->
+        <button type="submit">Enviar</button>
+    </div>
+</form>
+
 
     
 <script>
@@ -481,6 +483,19 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 });
+
+
+function validarFormulario() {
+    const materiaSelect = document.getElementById('materiaSelect');
+
+    // Verificar si se seleccionó una materia
+    if (materiaSelect.value === "") {
+        alert("Por favor, selecciona una materia antes de enviar el formulario.");
+        return false; // Bloquear el envío del formulario
+    }
+
+    return true; // Permitir el envío si todo está correcto
+}
 </script>
 </body>
 </html>

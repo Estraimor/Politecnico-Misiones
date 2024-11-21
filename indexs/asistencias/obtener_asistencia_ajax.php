@@ -64,9 +64,9 @@ try {
         // Agrega los datos del alumno al array general
         $alumnos_asistencia[] = $datos;
         // Incrementa los contadores de presentes, ausentes y justificadas según corresponda
-        if (strtolower($datos['asistencia']) == 'presente') {
+        if (strtolower($datos['asistencia']) == '1') {
             $materias_asistencia[$materia_id]['presentes']++;
-        } elseif (strtolower($datos['asistencia']) == 'ausente') {
+        } elseif (strtolower($datos['asistencia']) == '2') {
             $materias_asistencia[$materia_id]['ausentes']++;
         } elseif (strtolower($datos['asistencia']) == 'justificada') {
             $materias_asistencia[$materia_id]['justificadas']++;
@@ -81,19 +81,22 @@ try {
             <th>Nombre</th>
             <th>Asistencia</th>
             <th>Fecha</th>
-          </tr>";
+        </tr>";
 
-    $contador = 1;
-    foreach ($alumnos_asistencia as $alumno) {
-        echo "<tr>
-                <td>{$contador}</td>
-                <td>{$alumno['apellido_alumno']}</td>
-                <td>{$alumno['nombre_alumno']}</td>
-                <td>{$alumno['asistencia']}</td>
-                <td>{$alumno['fecha']}</td>
-              </tr>";
-        $contador++;
-    }
+        $contador = 1;
+        foreach ($alumnos_asistencia as $alumno) {
+              // Convertir el valor de asistencia a texto
+                $asistencia_texto = $alumno['asistencia'] == 1 ? 'Presente' : ($alumno['asistencia'] == 2 ? 'Ausente' : 'No especificado');
+
+                echo "<tr>
+                        <td>{$contador}</td>
+                        <td>{$alumno['apellido_alumno']}</td>
+                        <td>{$alumno['nombre_alumno']}</td>
+                        <td>{$asistencia_texto}</td>
+                        <td>{$alumno['fecha']}</td>
+                    </tr>";
+                $contador++;
+        }
     echo "</table>";
 
     // Mostrar los contadores al final

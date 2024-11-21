@@ -163,54 +163,37 @@ if (isset($_GET['legajo'])) {
     </select><br><br>
 
     <div id="materias-container">
-        <!-- Materias de primer año -->
+    <?php for ($anio = 1; $anio <= 3; $anio++): ?>
         <div>
-            <h3>Materias de Primer Año</h3>
-            <div id="materias-primer-ano">
+            <h3>Materias de <?= $anio ?>° Año</h3>
+            <div id="materias-<?= $anio ?>-ano">
                 <?php
-                foreach ($todas_materias[1] as $materia) {
+                foreach ($todas_materias[$anio] as $materia) {
                     $año_cursada = isset($materia['año_cursada']) ? " (" . htmlspecialchars($materia['año_cursada']) . ")" : "";
-                    echo "<select name='materias[1][]' class='form-container__input'>";
-                    echo "<option value='0'" . (!isset($materias_inscritas[1]) || !in_array($materia, $materias_inscritas[1]) ? " selected" : "") . ">No cursa</option>";
-                    echo "<option value='" . htmlspecialchars($materia['idMaterias']) . "'" . (isset($materias_inscritas[1]) && in_array($materia, $materias_inscritas[1]) ? " selected" : "") . ">" . htmlspecialchars($materia['Nombre']) . "$año_cursada</option>";
-                    echo "</select><br>";
-                }
-                ?>
-            </div>
-        </div>
-        <!-- Materias de segundo año -->
-        <div>
-            <h3>Materias de Segundo Año</h3>
-            <div id="materias-segundo-ano">
-                <?php
-                if (isset($materias_inscritas[2])) {
-                    foreach ($materias_inscritas[2] as $materia) {
-                        $año_cursada = isset($materia['año_cursada']) ? " (" . htmlspecialchars($materia['año_cursada']) . ")" : "";
-                        echo "<input type='text' readonly name='materias[2][]' value='" . htmlspecialchars($materia['Nombre']) . "$año_cursada' class='form-container__input'><br>";
+                    
+                    if ($anio === 1) {
+                        // Primer Año: Solo `readonly`
+                        $valorMateria = isset($materias_inscritas[$anio]) && in_array($materia, $materias_inscritas[$anio]) ? htmlspecialchars($materia['Nombre']) . $año_cursada : "No cursa";
+
+                        // Campo visible readonly
+                        echo "<input type='text' readonly class='form-container__input' value='$valorMateria'><br>";
+
+                        // Campo hidden que se envía al servidor
+                        $idMateria = isset($materias_inscritas[$anio]) && in_array($materia, $materias_inscritas[$anio]) ? htmlspecialchars($materia['idMaterias']) : '0';
+                        echo "<input type='hidden' name='materias[$anio][]' value='$idMateria'>";
+                    } else {
+                        // Segundo y Tercer Año: Selects normales
+                        echo "<select name='materias[$anio][]' class='form-container__input'>";
+                        echo "<option value='0'" . (!isset($materias_inscritas[$anio]) || !in_array($materia, $materias_inscritas[$anio]) ? " selected" : "") . ">No cursa</option>";
+                        echo "<option value='" . htmlspecialchars($materia['idMaterias']) . "'" . (isset($materias_inscritas[$anio]) && in_array($materia, $materias_inscritas[$anio]) ? " selected" : "") . ">" . htmlspecialchars($materia['Nombre']) . "$año_cursada</option>";
+                        echo "</select><br>";
                     }
-                } else {
-                    echo "<input type='text' readonly value='No cursa' class='form-container__input'><br>";
                 }
                 ?>
             </div>
         </div>
-        <!-- Materias de tercer año -->
-        <div>
-            <h3>Materias de Tercer Año</h3>
-            <div id="materias-tercer-ano">
-                <?php
-                if (isset($materias_inscritas[3])) {
-                    foreach ($materias_inscritas[3] as $materia) {
-                        $año_cursada = isset($materia['año_cursada']) ? " (" . htmlspecialchars($materia['año_cursada']) . ")" : "";
-                        echo "<input type='text' readonly name='materias[3][]' value='" . htmlspecialchars($materia['Nombre']) . "$año_cursada' class='form-container__input'><br>";
-                    }
-                } else {
-                    echo "<input type='text' readonly value='No cursa' class='form-container__input'><br>";
-                }
-                ?>
-            </div>
-        </div>
-    </div>
+    <?php endfor; ?>
+</div>
 
     <input type="submit" value="Enviar" name="Enviar" class="btn-enviar">
 </form>
@@ -233,9 +216,9 @@ document.addEventListener("DOMContentLoaded", function() {
 
     document.getElementById("carreras").addEventListener("change", function() {
         var carreraId = this.value;
-        cargarMaterias(carreraId, 1, 'materias-primer-ano');
-        cargarMaterias(carreraId, 2, 'materias-segundo-ano');
-        cargarMaterias(carreraId, 3, 'materias-tercer-ano');
+        for (let curso = 1; curso <= 3; curso++) {
+            cargarMaterias(carreraId, curso, `materias-${curso}-ano`);
+        }
     });
 
     function cargarMaterias(carreraId, curso, containerId) {
@@ -275,6 +258,7 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
 });
+
 </script>
 </body>
 </html>

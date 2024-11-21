@@ -135,8 +135,8 @@ $html_asistencias .= '<table border="1">
 // Obtener los datos de asistencia
 $sql_asistencias = "SELECT 
                         m.Nombre,
-                        SUM(CASE WHEN a.asistencia = 'Presente' THEN 1 ELSE 0 END) AS asistencias,
-                        SUM(CASE WHEN a.asistencia = 'Ausente' THEN 1 ELSE 0 END) AS ausencias,
+                        SUM(CASE WHEN a.asistencia = '1' THEN 1 ELSE 0 END) AS asistencias,
+                        SUM(CASE WHEN a.asistencia = '2' THEN 1 ELSE 0 END) AS ausencias,
                         COUNT(*) AS total_clases
                     FROM 
                         asistencia a

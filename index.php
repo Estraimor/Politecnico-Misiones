@@ -110,7 +110,7 @@ if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)
 
 
 
- <!-- Modal de inscripción para segundo año -->
+<!-- Modal de inscripción para segundo año / tercero  -->
 <div id="inscripcionSegundoAnioModal" class="estudiantes-modal" style="display: none;">
     <div class="modal-content-estudiantes">
         <span class="modal-close-estudiantes close-modal-button" id="closeInscripcionSegundoAnioModal">&times; Cerrar</span>
@@ -151,18 +151,12 @@ if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)
         ?>
     </select>
     <label for="nombre_alu">Año:</label>
-    <select name="año_inscripcion" id="año_inscripcion" class="form-container__input" required>
-        <option value="2025">2025</option>
-        <option value="2026">2026</option>
-        <option value="2027">2027</option>
-        <option value="2028">2028</option>
-        <option value="2029">2029</option>
-        <option value="2030">2030</option>
-        <option value="2031">2031</option>
-        <option value="2032">2032</option>
-        <option value="2033">2033</option>
-        <option value="2034">2034</option>
-    </select>
+    <select name="Año_inscripcion" id="Año_inscripcion" class="form-container__input" required>
+    <option hidden value="">Selecciona un año</option>
+    <?php for ($year = 2025; $year <= 2034; $year++) { ?>
+    <option value="<?php echo $year; ?>"><?php echo $year; ?></option>
+    <?php } ?>
+</select>
 
     <input type="submit" name="enviar" value="Inscribir" class="form-container__input">
 </form>
@@ -207,42 +201,37 @@ if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)
             <input type="text" id="Trabajo_Horario" class="form-container__input" name="Trabajo_Horario" placeholder="Trabajo / Horario" autocomplete="off" required>
             
             <?php
-            $sql_carreras = "SELECT * FROM carreras WHERE idCarrera in ('18','27','46','55')";
-            $peticion = mysqli_query($conexion, $sql_carreras);
-            ?>
-            <label for="inscripcion_carrera">Carrera:</label>
-            <select name="inscripcion_carrera" id="inscripcion_carrera" class="form-container__input">
-                <option hidden>Selecciona una carrera</option>
-                <?php while ($row = mysqli_fetch_assoc($peticion)) { ?>
-                <option value="<?php echo $row['idCarrera']; ?>"><?php echo $row['nombre_carrera']; ?></option>
-                <?php } ?>
-            </select>
-            
-            <?php
-            $sql_comision = "SELECT c.idComisiones,c.N_comicion FROM comisiones c";
-            $resultado_comision = $conexion->query($sql_comision);
-            ?>
-            <label for="Comision">Comisión:</label>
-            <select name="Comision" id="Comision" class="form-container__input">
-                <option hidden>Selecciona una Comisión</option>
-                <?php while ($rowcomision = mysqli_fetch_assoc($resultado_comision)) { ?>
-                <option value="<?php echo $rowcomision['idComisiones']; ?>"><?php echo $rowcomision['N_comicion']; ?></option>
-                <?php } ?>
-            </select>
-            
-            <label for="Año_inscripcion">Año de Inscripción:</label>
-            <select name="Año_inscripcion" id="Año_inscripcion" class="form-container__input">
-                <option value="2025">2025</option>
-                <option value="2026">2026</option>
-                <option value="2027">2027</option>
-                <option value="2028">2028</option>
-                <option value="2029">2029</option>
-                <option value="2030">2030</option>
-                <option value="2031">2031</option>
-                <option value="2032">2032</option>
-                <option value="2033">2033</option>
-                <option value="2034">2034</option>
-            </select>
+$sql_carreras = "SELECT * FROM carreras WHERE idCarrera in ('18','27','46','55')";
+$peticion = mysqli_query($conexion, $sql_carreras);
+?>
+<label for="inscripcion_carrera">Carrera:</label>
+<select name="inscripcion_carrera" id="inscripcion_carrera" class="form-container__input" required>
+    <option hidden value="">Selecciona una carrera</option>
+    <?php while ($row = mysqli_fetch_assoc($peticion)) { ?>
+    <option value="<?php echo $row['idCarrera']; ?>"><?php echo $row['nombre_carrera']; ?></option>
+    <?php } ?>
+</select>
+
+<?php
+$sql_comision = "SELECT c.idComisiones, c.N_comicion FROM comisiones c";
+$resultado_comision = $conexion->query($sql_comision);
+?>
+<label for="Comision">Comisión:</label>
+<select name="Comision" id="Comision" class="form-container__input" required>
+    <option hidden value="">Selecciona una Comisión</option>
+    <?php while ($rowcomision = mysqli_fetch_assoc($resultado_comision)) { ?>
+    <option value="<?php echo $rowcomision['idComisiones']; ?>"><?php echo $rowcomision['N_comicion']; ?></option>
+    <?php } ?>
+</select>
+
+<label for="Año_inscripcion">Año de Inscripción:</label>
+<select name="Año_inscripcion" id="Año_inscripcion" class="form-container__input" required>
+    <option hidden value="">Selecciona un año</option>
+    <?php for ($year = 2025; $year <= 2034; $year++) { ?>
+    <option value="<?php echo $year; ?>"><?php echo $year; ?></option>
+    <?php } ?>
+</select>
+
             
             <input type="submit" class="form-container__input" name="enviar" value="Enviar" onclick="mostrarAlertaExitosa(); closeSuccessMessage();">
         </form>
@@ -362,28 +351,65 @@ if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)
     </div>
 </div>
 
-<div id="modal-lista-estudiantes-FP" class="modal-lista-estudiantes" style="display: none; position: fixed; z-index: 155555555555; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4);">
-    <div class="modal-content-lista-estudiantes" style="background-color: rgba(255, 255, 255, 0.9); margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);">
-        <span class="close-modal-button" id="closeListaEstudiantesModal-FP" style="color: #aaa; float: right; font-size: 28px; font-weight: bold;">&times;</span>
-        <h2>Informe de Estudiantes</h2>
-        <form action="./indexs/generar_exel_alumnos.php" method="post">
-            <?php
-            $sql_mater = "select * from preceptores p 
-            INNER JOIN carreras c on c.idCarrera = p.carreras_idCarrera";
-            $peticion = mysqli_query($conexion, $sql_mater);
-            ?>      
-            <select name="carrera" class="form-container__input"> 
-                <option hidden>Selecciona una carrera</option>
-                <?php while ($informacion = mysqli_fetch_assoc($peticion)) { ?>
-                <option value="<?php echo $informacion['idCarrera'] ?>"><?php echo $informacion['nombre_carrera'] ?></option>
-                <?php } ?>
-            </select>
-            <input type="submit" value="Generar Lista de Estudiantes" style="background-color: red; color: white; padding: 10px 20px; margin: 8px 0; border: none; cursor: pointer; width: 100%;">
-        </form>
+<!-- Botón para abrir el modal -->
+<button id="btnVerEstudiantes" class="boton-ver-estudiantes">Ver estudiantes dados de baja</button>
+
+<!-- Modal para mostrar la tabla de estudiantes -->
+<div id="modalEstudiantes" class="modal-estudiantes">
+    <div class="contenido-modal-estudiantes">
+        <span class="cerrar-modal-estudiantes boton-cerrar" id="cerrarModalEstudiantes">&times; Cerrar</span>
+        <div id="contenedorTablaEstudiantes">
+            <table id="tablaEstudiantes">
+                <thead>
+                    <tr>
+                        <th>Legajo</th>
+                        <th>Apellido</th>
+                        <th>Nombre</th>
+                        <th>DNI</th>
+                        <th>Celular</th>
+                        <th>Carrera</th>
+                        <th>Comisión</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="cuerpoTablaEstudiantes">
+                    <!-- Contenido dinámico aquí -->
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 
 
+
+
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const carrera = document.getElementById("inscripcion_carrera");
+        const comision = document.getElementById("Comision");
+        const anio = document.getElementById("Año_inscripcion");
+        const submitButton = document.getElementById("submitButton");
+
+        // Función para habilitar o deshabilitar el botón de envío
+        function validateForm() {
+            if (carrera.value && comision.value && anio.value) {
+                submitButton.disabled = false;
+            } else {
+                submitButton.disabled = true;
+            }
+        }
+
+        // Inicialmente deshabilitar el botón
+        submitButton.disabled = true;
+
+        // Agregar eventos de cambio a los selects
+        carrera.addEventListener("change", validateForm);
+        comision.addEventListener("change", validateForm);
+        anio.addEventListener("change", validateForm);
+    });
+</script>
 
 <script>
 function toggleMenu() {
@@ -421,15 +447,7 @@ document.getElementById("btn-new-member").onclick = function() {
     openModal();
 };
 
-function mostrarAlertaExitosa() {
-    var successMessage = document.getElementById("success-message");
-    successMessage.style.display = "block";
-}
 
-function closeSuccessMessage() {
-    var successMessage = document.getElementById("success-message");
-    successMessage.style.display = "none";
-}
 
 document.addEventListener('keydown', function (event) {
     if (event.key === 'Escape') {
@@ -652,18 +670,30 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 
     // Manejo del formulario
-    $('#formInscripcion').submit(function(event) {
-        event.preventDefault();
-        $.ajax({
-            url: './Profesor/estudiante/inscripciones_2_3/procesar_inscripcion.php',
-            type: 'POST',
-            data: $(this).serialize(),
-            success: function(response) {
-                alert(response);
-                modal.style.display = "none";
-            },
-            error: function(xhr, status, error) {
-                console.error("Error al procesar la inscripción: " + xhr.responseText);
+$('#formInscripcion').submit(function(event) {
+    event.preventDefault(); // Prevenir el envío tradicional del formulario
+
+    $.ajax({
+        url: './Profesor/estudiante/inscripciones_2_3/procesar_inscripcion.php',
+        type: 'POST',
+        data: $(this).serialize(),
+        success: function(response) {
+            // Verificar la respuesta del servidor
+            if (response.includes("exitosa")) {
+                // Mostrar mensaje de éxito
+                alert("Inscripción realizada con éxito.");
+                // Cerrar el modal
+                $('#inscripcionSegundoAnioModal').hide();
+                // Opcional: Limpiar el formulario
+                $('#formInscripcion')[0].reset();
+            } else {
+                // Mostrar mensaje de error
+                alert("Error: " + response);
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error("Error al procesar la inscripción: " + xhr.responseText);
+            alert("Ocurrió un error al intentar inscribir al estudiante.");
             }
         });
     });
@@ -672,10 +702,183 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
 
+// Actualizar tabla estudiantes 
+document.addEventListener('DOMContentLoaded', function () {
+    const btnMostrarEstudiantes = document.getElementById('btnMostrarEstudiantes');
+    const tablaContainerEstudiantes = document.getElementById('tablaContainerEstudiantes');
+    const estudiantesModal = document.getElementById('estudiantesModal');
 
+    // Función para cargar los datos de la tabla mediante AJAX
+    function actualizarTablaEstudiantes() {
+        fetch('./obtener_estudiantes.php')
+            .then(response => response.text())
+            .then(data => {
+                // Actualiza el cuerpo de la tabla con los nuevos datos
+                const tablaBody = document.querySelector('#tabla tbody');
+                tablaBody.innerHTML = data;
+            })
+            .catch(error => {
+                console.error('Error al actualizar la tabla:', error);
+            });
+    }
 
+    // Mostrar el modal y cargar los datos al hacer clic en el botón
+    btnMostrarEstudiantes.addEventListener('click', function () {
+        estudiantesModal.style.display = 'block';
+        actualizarTablaEstudiantes(); // Cargar los datos al abrir el modal
+    });
 
+    // Cerrar el modal al hacer clic en el botón de cerrar
+    const closeEstudiantesModal = document.getElementById('closeEstudiantesModal');
+    closeEstudiantesModal.addEventListener('click', function () {
+        estudiantesModal.style.display = 'none';
+    });
+
+    // Cerrar el modal al hacer clic fuera de él
+    window.addEventListener('click', function (event) {
+        if (event.target === estudiantesModal) {
+            estudiantesModal.style.display = 'none';
+        }
+    });
+});
 
 </script>
+
+
+
+
+
+
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+    const btnVerEstudiantes = document.getElementById("btnVerEstudiantes");
+    const modalEstudiantes = document.getElementById("modalEstudiantes");
+    const cerrarModal = document.getElementById("cerrarModalEstudiantes");
+
+    // Abrir modal al hacer clic en "Ver Estudiantes"
+    btnVerEstudiantes.addEventListener("click", function () {
+        modalEstudiantes.style.display = "block";
+        cargarListaEstudiantes(); // Llamar a la función para cargar los datos
+    });
+
+    // Cerrar modal al hacer clic en la "X"
+    cerrarModal.addEventListener("click", function () {
+        modalEstudiantes.style.display = "none";
+    });
+
+    // Cerrar modal al hacer clic fuera del contenido
+    window.addEventListener("click", function (event) {
+        if (event.target === modalEstudiantes) {
+            modalEstudiantes.style.display = "none";
+        }
+    });
+
+    // Cargar estudiantes dinámicamente
+    function cargarListaEstudiantes() {
+        fetch("cargar_lista_estudiantes.php")
+            .then((response) => response.text())
+            .then((data) => {
+                document.getElementById("cuerpoTablaEstudiantes").innerHTML = data;
+            });
+    }
+
+    // Función para cambiar estado del estudiante
+    function cambiarEstadoEstudiante(legajo) {
+        fetch("cambiar_estado_estudiante.php", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: `legajo=${legajo}`,
+        })
+            .then(response => response.text())
+            .then(data => {
+                alert(data); // Mensaje de confirmación
+                cargarListaEstudiantes(); // Recargar tabla
+            });
+    }
+
+    // Delegación de eventos para el botón de recuperar
+    document.getElementById("cuerpoTablaEstudiantes").addEventListener("click", function (event) {
+        if (event.target.classList.contains("boton-recuperar")) {
+            const legajo = event.target.dataset.legajo;
+            cambiarEstadoEstudiante(legajo);
+        }
+    });
+});
+</script>
+
+<style>
+    /* Ocultar el modal inicialmente */
+.modal-estudiantes {
+    display: none; /* Ocultar inicialmente */
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5); /* Fondo semitransparente */
+}
+
+/* Contenido del modal */
+.contenido-modal-estudiantes {
+    background-color: #fff;
+    margin: 5% auto;
+    padding: 20px;
+    border-radius: 10px;
+    width: 80%;
+    max-width: 900px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Botón cerrar */
+.boton-cerrar {
+    float: right;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* Tabla */
+#tablaEstudiantes {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+#tablaEstudiantes th,
+#tablaEstudiantes td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+#tablaEstudiantes th {
+    background-color: #f3545d;
+    color: white;
+}
+
+#tablaEstudiantes tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.boton-ver-estudiantes {
+    background-color: #9c0e0e;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+
+
+</style>
+
 </body>
 </html>

@@ -57,32 +57,32 @@ if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)
   
 
   <?php
-   $curso = $_GET['id_curso'];
-   $carrera = $_GET['id_carrera'];
-   $comision = $_GET['id_comision']; 
-   
-   $sql_4 = "SELECT c.nombre_curso, c2.nombre_carrera, cm.N_comicion FROM inscripcion_asignatura ia
+    $curso = $_GET['id_curso'];
+    $carrera = $_GET['id_carrera'];
+    $comision = $_GET['id_comision']; 
+
+$sql_4 = "SELECT c.nombre_curso, c2.nombre_carrera, cm.N_comicion FROM inscripcion_asignatura ia
 INNER JOIN cursos c on ia.cursos_idcursos = c.idcursos
 INNER JOIN materias m on ia.materias_idMaterias = m.idMaterias
 INNER JOIN carreras c2 on m.carreras_idCarrera = c2.idCarrera
 INNER JOIN comisiones cm on ia.comisiones_idComisiones = cm.idComisiones
 WHERE c.idcursos = '$curso' AND c2.idCarrera = '$carrera' AND cm.idComisiones = '$comision'";
 
-   $query4 = mysqli_query($conexion, $sql_4);
-   
-   if ($query4) {
-       $datos = mysqli_fetch_array($query4);
-       if ($datos) {
+    $query4 = mysqli_query($conexion, $sql_4);
+
+    if ($query4) {
+        $datos = mysqli_fetch_array($query4);
+        if ($datos) {
            // Mostrar los datos solo si existen
-           echo "<h1>Asistencia de " . $datos['nombre_carrera'] . " " . $datos['nombre_curso'] . " Comision : " . $datos['N_comicion'] . "</h1>";
-       } else {
+            echo "<h1>Asistencia de " . $datos['nombre_carrera'] . " " . $datos['nombre_curso'] . " Comision : " . $datos['N_comicion'] . "</h1>";
+        } else {
            // Manejar el caso en el que no se encontraron resultados
-           echo "<h1>No se encontraron datos para los parámetros proporcionados.</h1>";
-       }
-   } else {
+            echo "<h1>No se encontraron datos para los parámetros proporcionados.</h1>";
+        }
+    } else {
        // Manejar errores de consulta
-       echo "<h1>Error en la consulta.</h1>";
-   }
+        echo "<h1>Error en la consulta.</h1>";
+    }
 ?>
 <input type="hidden" id="carrera" value="<?php echo $carrera ?>">
 <input type="hidden" id="comision" value="<?php echo $comision ?>">
