@@ -15,8 +15,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $horaArgentina = date('Y-m-d H:i:s'); // Fecha y hora actual en formato MySQL
         $asistencias = $_POST['asistencia']; // Array con la asistencia de cada estudiante
 
-        // Array para almacenar estudiantes con la misma asistencia
-        $estudiantes_misma_asistencia = [];
+        $nuevas_asistencias = 0;
+        $asistencias_actualizadas = 0;
 
         foreach ($asistencias as $legajo => $estadoAsistencia) {
             // Validar que el estado de asistencia sea válido (1 o 2)
@@ -41,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $estado_actual = $registro_existente['asistencia'];
 
                     if ($estado_actual != $estadoAsistencia) {
-                        // Actualizar si el estado cambió (de Presente a Ausente o viceversa)
+                        // Actualizar si el estado cambió
                         $sql_update = "
                             UPDATE asistencia 
                             SET asistencia = '$estadoAsistencia', fecha = '$horaArgentina' 
@@ -54,9 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 DATE(fecha) = CURDATE()
                         ";
                         mysqli_query($conexion, $sql_update);
-                    } else {
-                        // Si el estado es el mismo, añadir al array para mostrar alerta
-                        $estudiantes_misma_asistencia[] = $legajo;
+                        $asistencias_actualizadas++;
                     }
                 } else {
                     // Si no existe registro, insertar nuevo
@@ -81,20 +79,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         )
                     ";
                     mysqli_query($conexion, $sql_insert);
+                    $nuevas_asistencias++;
                 }
             }
         }
 
-        // Si hay estudiantes con la misma asistencia, mostrar alerta
-        if (!empty($estudiantes_misma_asistencia)) {
-            $estudiantes = implode(', ', $estudiantes_misma_asistencia);
+        // Mostrar mensajes según los cambios realizados
+        if ($nuevas_asistencias > 0 && $asistencias_actualizadas == 0) {
             echo "<script>
-                alert('Los siguientes estudiantes ya tienen la misma asistencia: $estudiantes');
+                alert('Se guardaron asistencias correctamente.');
+                window.location.href='../../indexs/controlador_preceptor.php';
+            </script>";
+        } elseif ($asistencias_actualizadas > 0) {
+            echo "<script>
+                alert('Asistencia actualizada correctamente.');
                 window.location.href='../../indexs/controlador_preceptor.php';
             </script>";
         } else {
-            // Redirigir después de guardar
-            header('Location: ../../indexs/controlador_preceptor.php');
+            echo "<script>
+                alert('No se realizaron cambios, las asistencias ya estaban registradas.');
+                window.location.href='../../indexs/controlador_preceptor.php';
+            </script>";
         }
         exit;
     } else {

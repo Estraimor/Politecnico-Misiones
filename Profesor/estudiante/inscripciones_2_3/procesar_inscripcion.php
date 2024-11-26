@@ -2,6 +2,28 @@
 include '../../../conexion/conexion.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Verificar si se solicita eliminar una materia
+    if (isset($_POST['accion']) && $_POST['accion'] === 'eliminar') {
+        $legajo = mysqli_real_escape_string($conexion, $_POST['legajo']);
+        $materia = mysqli_real_escape_string($conexion, $_POST['materia']);
+        $curso = mysqli_real_escape_string($conexion, $_POST['curso']);
+
+        // Eliminar la inscripción de la tabla `inscripcion_asignatura`
+        $sql_eliminar = "DELETE FROM inscripcion_asignatura 
+                         WHERE alumno_legajo = '$legajo' 
+                           AND materias_idMaterias = '$materia' 
+                           AND cursos_idcursos = '$curso'";
+        $resultado_eliminar = mysqli_query($conexion, $sql_eliminar);
+
+        if ($resultado_eliminar) {
+            echo "Inscripción eliminada correctamente.";
+        } else {
+            echo "Error al eliminar la inscripción: " . mysqli_error($conexion);
+        }
+        exit; // Terminar la ejecución después de eliminar
+    }
+
+    // Inscripción de materias (mantener lógica existente)
     $legajo = mysqli_real_escape_string($conexion, $_POST['legajo']);
     $carrera = mysqli_real_escape_string($conexion, $_POST['carrera']);
     $curso = mysqli_real_escape_string($conexion, $_POST['curso']);
@@ -9,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $comision = mysqli_real_escape_string($conexion, $_POST['comision']);
     $año_inscripcion = mysqli_real_escape_string($conexion, $_POST['Año_inscripcion']);
 
-    // Verificar la carrera actual del estudiante basada en materias inscritas previamente
+    // Verificar la carrera actual del estudiante
     $sql_carrera_actual = "
         SELECT m.carreras_idCarrera 
         FROM inscripcion_asignatura ia
@@ -23,10 +45,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $fila_carrera_actual = mysqli_fetch_assoc($resultado_carrera_actual);
         $carrera_actual = $fila_carrera_actual['carreras_idCarrera'];
 
-        // Verificar si la carrera seleccionada coincide con la carrera actual
         if ($carrera_actual != $carrera) {
             echo "El estudiante ya está inscrito en otra carrera y no puede inscribirse a esta.";
-            exit; // Detener el proceso
+            exit;
         }
     }
 

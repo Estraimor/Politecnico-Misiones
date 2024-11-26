@@ -5,17 +5,27 @@ $pass = '';
 $bd = 'u756746073_politecnico';
 $conexion = mysqli_connect($server, $user, $pass, $bd, '3306');
 
-if (isset($_POST['carrera']) && isset($_POST['curso'])) {
+if (isset($_POST['carrera']) && isset($_POST['curso']) && isset($_POST['legajo'])) {
     $carrera = $_POST['carrera'];
     $curso = $_POST['curso'];
+    $legajo = $_POST['legajo'];
 
-    $sql = "SELECT m.idMaterias, m.Nombre 
-            FROM materias m 
-            INNER JOIN cursos_has_materias cm ON cm.materias_idMaterias = m.idMaterias 
-            WHERE m.carreras_idCarrera = ? AND cm.cursos_idcursos = ?";
-    
+    // Seleccionar materias del curso y verificar si están siendo cursadas por el estudiante
+    $sql = "
+        SELECT m.idMaterias, m.Nombre,
+               CASE WHEN ia.alumno_legajo IS NOT NULL THEN 1 ELSE 0 END AS cursada
+        FROM materias m
+        INNER JOIN cursos_has_materias cm ON cm.materias_idMaterias = m.idMaterias
+        LEFT JOIN inscripcion_asignatura ia 
+               ON ia.materias_idMaterias = m.idMaterias 
+               AND ia.alumno_legajo = ? 
+               AND ia.cursos_idcursos = ?
+        WHERE m.carreras_idCarrera = ? 
+          AND cm.cursos_idcursos = ?
+    ";
+
     $stmt = $conexion->prepare($sql);
-    $stmt->bind_param("ii", $carrera, $curso);
+    $stmt->bind_param("iiii", $legajo, $curso, $carrera, $curso);
     $stmt->execute();
     $result = $stmt->get_result();
 

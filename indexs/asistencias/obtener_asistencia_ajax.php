@@ -79,6 +79,7 @@ try {
             <th>N°</th>
             <th>Apellido</th>
             <th>Nombre</th>
+            <th> Unidad Currricular </th>
             <th>Asistencia</th>
             <th>Fecha</th>
         </tr>";
@@ -92,6 +93,7 @@ try {
                         <td>{$contador}</td>
                         <td>{$alumno['apellido_alumno']}</td>
                         <td>{$alumno['nombre_alumno']}</td>
+                        <td>{$alumno['nombre_materia']}</td>
                         <td>{$asistencia_texto}</td>
                         <td>{$alumno['fecha']}</td>
                     </tr>";
@@ -107,7 +109,6 @@ try {
         echo "<strong>Materia: {$asistencia['nombre_materia']}</strong><br>";
         echo "Cantidad de presentes: {$asistencia['presentes']}<br>";
         echo "Cantidad de ausentes: {$asistencia['ausentes']}<br>";
-        echo "Cantidad de justificadas: {$asistencia['justificadas']}";
         echo "</td>";
     }
     echo "</tr>";

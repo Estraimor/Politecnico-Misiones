@@ -620,54 +620,103 @@ document.addEventListener("DOMContentLoaded", function() {
         console.error("No se encontraron los elementos del modal. Verifica los IDs en el HTML.");
     }
 
-    // Cargar materias mediante AJAX al cambiar el curso
-    $('#cursoSelect').change(function() {
-        var carrera = $('#carreraSelect').val();
-        var curso = $('#cursoSelect').val();
-        var materiasContainer = $('#materias-container');
+    // Cuando se cambie de curso o carrera
+$('#cursoSelect').change(function () {
+    var carrera = $('#carreraSelect').val();
+    var curso = $('#cursoSelect').val();
+    var legajo = $('input[name="legajo"]').val(); // Obtener el legajo del input
+    var materiasContainer = $('#materias-container');
 
-        if (carrera && curso) {
-            console.log("Cargando materias para carrera ID: " + carrera + " y curso: " + curso);
-            $.ajax({
-                url: './Profesor/estudiante/inscripciones_2_3/obtener_materias.php',
-                type: 'POST',
-                data: { carrera: carrera, curso: curso },
-                success: function(data) {
-                    try {
-                        console.log("Respuesta recibida: ", data);
-                        var materias = JSON.parse(data);
-                        materiasContainer.empty();
+    // Vaciar el contenedor de materias antes de cargar nuevas
+    materiasContainer.empty();
 
-                        materias.forEach(function(materia) {
-                            var div = $('<div></div>'); // Crear un contenedor para cada materia
+    if (carrera && curso && legajo) {
+        $.ajax({
+            url: './Profesor/estudiante/inscripciones_2_3/obtener_materias.php',
+            type: 'POST',
+            data: { carrera: carrera, curso: curso, legajo: legajo },
+            success: function (data) {
+                try {
+                    var materias = JSON.parse(data);
 
-                            var checkbox = $('<input>')
-                                .attr('type', 'checkbox')
-                                .attr('name', 'materias[]')
-                                .attr('value', materia.idMaterias)
-                                .attr('checked', true); // Marcar como seleccionado por defecto
+                    materias.forEach(function (materia) {
+                        var div = $('<div></div>'); // Crear un contenedor para cada materia
 
-                            var label = $('<label></label>')
-                                .text(materia.Nombre)
-                                .prepend(checkbox); // Añadir el checkbox al inicio del label
+                        var checkbox = $('<input>')
+                            .attr('type', 'checkbox')
+                            .attr('name', 'materias[]')
+                            .attr('value', materia.idMaterias)
+                            .prop('checked', materia.cursada == 1); // Marcar el checkbox si la materia ya está cursada
 
-                            div.append(label);
-                            materiasContainer.append(div);
+                        var label = $('<label></label>')
+                            .text(materia.Nombre)
+                            .prepend(checkbox); // Añadir el checkbox al inicio del label
+
+                        div.append(label);
+                        materiasContainer.append(div);
+
+                        // Evento para manejar cambios en los checkboxes
+                        checkbox.change(function () {
+                            if (!this.checked) {
+                                if (confirm("¿Estás seguro de que deseas eliminar esta inscripción?")) {
+                                    $.ajax({
+                                        url: './Profesor/estudiante/inscripciones_2_3/procesar_inscripcion.php',
+                                        type: 'POST',
+                                        data: {
+                                            accion: 'eliminar',
+                                            legajo: legajo,
+                                            materia: materia.idMaterias,
+                                            curso: curso
+                                        },
+                                        success: function (response) {
+                                            alert(response);
+                                        },
+                                        error: function (xhr, status, error) {
+                                            console.error("Error al eliminar la inscripción: " + xhr.responseText);
+                                        }
+                                    });
+                                } else {
+                                    // Si el usuario cancela, volver a marcar el checkbox
+                                    this.checked = true;
+                                }
+                            }
                         });
-
-                        console.log("Materias cargadas exitosamente.");
-                    } catch (e) {
-                        console.error("Error al procesar las materias: ", e);
-                    }
-                },
-                error: function(xhr, status, error) {
-                    console.error("Error al cargar las materias: " + xhr.responseText);
+                    });
+                } catch (e) {
+                    console.error("Error al procesar las materias: ", e);
                 }
-            });
-        } else {
-            console.warn("Carrera o curso no seleccionados.");
+            },
+            error: function (xhr, status, error) {
+                console.error("Error al cargar las materias: " + xhr.responseText);
+            }
+        });
+    } else {
+        console.warn("Carrera, curso o legajo no seleccionados.");
+    }
+});
+
+// Limpiar la tabla al enviar el formulario
+$('#formInscripcion').submit(function (event) {
+    event.preventDefault(); // Prevenir el envío tradicional del formulario
+
+    var materiasContainer = $('#materias-container');
+    materiasContainer.empty(); // Vaciar las materias antes de enviar el formulario
+
+    $.ajax({
+        url: './Profesor/estudiante/inscripciones_2_3/procesar_inscripcion.php',
+        type: 'POST',
+        data: $(this).serialize(),
+        success: function (response) {
+            alert(response); // Mostrar respuesta del servidor
+        },
+        error: function (xhr, status, error) {
+            console.error("Error al procesar el formulario: " + xhr.responseText);
+            alert("Ocurrió un error al procesar el formulario.");
         }
     });
+});
+
+
 
     // Manejo del formulario
 $('#formInscripcion').submit(function(event) {

@@ -50,8 +50,9 @@ if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)
 
 
 
-    <div class="nav-right">
-        <a href="../../login/cerrar_sesion.php" class="btn-logout">Cerrar sesión</a>
+      <div class="nav-right">
+    <span class="user-name"><?php echo $_SESSION['nombre'] . ' ' . $_SESSION['apellido']; ?></span>
+    <a href="../../login/cerrar_sesion.php" class="btn-logout">Cerrar sesión</a>
     </div>
   </nav>
   
@@ -69,20 +70,16 @@ if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)
 <form action="../../Profesor/asistencia/guardar_asistencia_enfermeria.php" method="post">
     <div class="table-responsive">
         <?php
-        // Conexión a la base de datos
         include '../../conexion/conexion.php';
 
-        // Obtener datos de la URL
         $curso = $_GET['id_curso'];
         $carrera = $_GET['id_carrera'];
         $comision = $_GET['id_comision'];
 
-        // Obtener las materias
         $sql_materias = "
             SELECT * 
             FROM cursos_has_materias cm
             INNER JOIN materias m ON cm.materias_idMaterias = m.idMaterias
-            INNER JOIN carreras c ON c.idCarrera = m.carreras_idCarrera
             WHERE cm.cursos_idcursos = '$curso' 
             AND m.carreras_idCarrera = '$carrera'
         ";
@@ -93,21 +90,25 @@ if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)
         }
         ?>
 
-        <!-- Campos ocultos para enviar información adicional -->
+        <!-- Campos ocultos -->
         <input type="hidden" name="idcarrera" value="<?php echo $carrera; ?>">
         <input type="hidden" name="comision" value="<?php echo $comision; ?>">
         <input type="hidden" name="curso" value="<?php echo $curso; ?>">
+        <div class="date-picker">
+    <label for="fecha">Fecha Actual:</label>
+    <input type="text" id="fecha" name="fecha" readonly>
+</div>
 
         <table class="table-comision-a">
             <thead>
                 <tr>
-                    <th rowspan="2">N°</th>
-                    <th rowspan="2">Apellido</th>
-                    <th rowspan="2">Nombre</th>
-                    <th colspan="2">
-                        <!-- Select para elegir la materia con atributo "required" -->
+                    <th rowspan="2" class="header-cell">N°</th>
+                    <th rowspan="2" class="header-cell">Apellido</th>
+                    <th rowspan="2" class="header-cell">Nombre</th>
+                    <th colspan="2" class="header-cell">
+                        <!-- Select para elegir la materia -->
                         <select name="materia1" id="materiaSelect" class="form-container__input" required>
-                            <option hidden value="">Primera Materia</option>
+                            <option hidden value="">Selecciona una Materia</option>
                             <?php foreach ($materias as $materia) { ?>
                                 <option value="<?php echo $materia['idMaterias']; ?>">
                                     <?php echo $materia['Nombre']; ?>
@@ -117,372 +118,23 @@ if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)
                     </th>
                 </tr>
                 <tr>
-                    <th>Presente</th>
-                    <th>Ausente</th>
+                    <th class="header-cell">Presente</th>
+                    <th class="header-cell">Ausente</th>
                 </tr>
             </thead>
-            <tbody>
-                <?php
-                // Obtener los estudiantes inscritos
-                $sql_estudiantes = "
-                    SELECT a.nombre_alumno, a.apellido_alumno, a.legajo 
-                    FROM inscripcion_asignatura ia
-                    INNER JOIN alumno a ON ia.alumno_legajo = a.legajo
-                    INNER JOIN materias m ON ia.materias_idMaterias = m.idMaterias
-                    INNER JOIN carreras c ON m.carreras_idCarrera = c.idCarrera
-                    WHERE ia.cursos_idcursos = '$curso' 
-                    AND ia.comisiones_idComisiones = '$comision' 
-                    AND m.carreras_idCarrera = '$carrera' 
-                    GROUP BY a.legajo
-                ";
-                $query_estudiantes = mysqli_query($conexion, $sql_estudiantes);
-
-                $contador = 1;
-                while ($datos = mysqli_fetch_assoc($query_estudiantes)) {
-                ?>
-                    <tr>
-                        <td><?php echo $contador++; ?></td>
-                        <td><?php echo $datos['apellido_alumno']; ?></td>
-                        <td><?php echo $datos['nombre_alumno']; ?></td>
-
-                        <!-- Opciones de asistencia: Presente o Ausente -->
-                        <td class="checkbox-cell">
-                            <input type="radio" value="1" name="asistencia[<?php echo $datos['legajo']; ?>]"  required >
-                        </td>
-                        <td class="checkbox-cell">
-                            <input type="radio" value="2" name="asistencia[<?php echo $datos['legajo']; ?>]"  required >
-                        </td>
-                    </tr>
-                <?php
-                }
-                ?>
+            <tbody id="asistenciasTable">
+                <!-- Las filas se generarán dinámicamente con JavaScript -->
             </tbody>
         </table>
 
         <!-- Botón para enviar el formulario -->
-        <button type="submit">Enviar</button>
+        <button type="submit" class="btn-submit">Guardar Asistencias</button>
     </div>
 </form>
 
 
     
 <script>
-  
-
-function toggleMenu() {
-  const navbar = document.querySelector(".navbar");
-  navbar.classList.toggle("show-menu");
-}
-
-// Función para abrir la ventana emergente
-function openModal() {
-  var modal = document.getElementById("modal");
-  modal.style.display = "block";
-  if (window.innerWidth <= 768) {
-    toggleMenu();
-  }
-  setTimeout(function() {
-    modal.classList.add("show");
-  }, 10);
-
-  var welcomeBox = document.querySelector(".welcome-box");
-  welcomeBox.style.display = "none";
-  setTimeout(function() {
-    modal.classList.add("show");
-  }, 10);
-}
-
-// Función para cerrar la ventana emergente
-function closeModal() {
-  var modal = document.getElementById("modal");
-  modal.classList.remove("show");
-  setTimeout(function() {
-    modal.style.display = "none";
-  }, 300);
-  var welcomeBox = document.querySelector(".welcome-box");
-  welcomeBox.style.display = "block";
-}
-
-document.getElementById("btn-new-member").onclick = function() {
-  openModal();
-};
-
-function mostrarAlertaExitosa() {
-  var successMessage = document.getElementById("success-message");
-  successMessage.style.display = "block";
-}
-
-function closeSuccessMessage() {
-  var successMessage = document.getElementById("success-message");
-  successMessage.style.display = "none";
-}
-
-
-
-// Escucha el evento 'keydown' en el documento
-document.addEventListener('keydown', function(event) {
-  if (event.key === 'Escape') {
-    // Cierra el modal de Nuevo Estudiante si está abierto
-    var estudianteModal = document.getElementById('modal');
-    if (estudianteModal && estudianteModal.style.display === 'block') {
-      closeModal();
-    }
-  }
-});
-
-
-
-// Función para abrir el modal de asistencia
-function openAttendanceModal() {
-  var attendanceModal = document.getElementById("attendance-modal-asistencia");
-  attendanceModal.style.display = "block";
-}
-
-// Función para cerrar el modal de tomar asistencia
-function closeAttendanceModaltomarasistencia() {
-  var attendanceModal = document.getElementById("attendance-modal-asistencia");
-  attendanceModal.style.display = "none";
-}
-// Función para abrir el modal de ver asistencia 
-function openAttendanceModalasistencia() {
-  var attendanceModalasistencia = document.getElementById("attendance-modal-asistencia");
-  openAttendanceModalasistencia.style.display = "block";
-}
-
-// Función para cerrar el modal de ver asistencia
-function closeAttendanceModal() {
-  var attendanceModal = document.getElementById("attendance-modal-asistencia");
-  attendanceModal.style.display = "none";
-}
-
-// Funciones para abrir y cerrar el modal de Comisión A
-function openModalComisionA() {
-  // Cierra el modal de asistencia
-  closeAttendanceModal();
-
-  var modalComisionA = document.getElementById("asistenciamodalComisionA");
-  modalComisionA.style.display = 'block';
-}
-
-function closeModalComisionA() {
-  var modalComisionA = document.getElementById('asistenciamodalComisionA');
-  modalComisionA.style.display = 'none';
-}
-// comision B
-
-function openModalComisionB() {
-  // Cierra el modal de asistencia
-  closeAttendanceModal();
-
-  var modalComisionB = document.getElementById("asistenciamodalComisionB");
-  modalComisionB.style.display = 'block';
-}
-
-function closeModalComisionB() {
-  var modalComisionB = document.getElementById('asistenciamodalComisionB');
-  modalComisionB.style.display = 'none';
-}
-// comision c
-
-function openModalComisionC() {
-  // Cierra el modal de asistencia
-  closeAttendanceModal();
-
-  var modalComisionC = document.getElementById("asistenciamodalComisionC");
-  modalComisionC.style.display = 'block';
-}
-
-function closeModalComisionC() {
-  var modalComisionC = document.getElementById('asistenciamodalComisionC');
-  modalComisionC.style.display = 'none';
-}
-
-
-//__________________________ver asistencia ____________________________
-
-// Función para abrir el modal de asistencia
-function openAttendanceModalverasistencia() {
-  var attendanceModal = document.getElementById("attendance-modal");
-  attendanceModal.style.display = "block";
-}
-
-// Función para cerrar el modal de asistencia
-function closeAttendanceModalverasistencia() {
-  var attendanceModal = document.getElementById("attendance-modal");
-  attendanceModal.style.display = "none";
-}
-// Función para abrir el modal de ver asistencia 
-function openAttendanceModalasistencia() {
-  var attendanceModalasistencia = document.getElementById("attendance-modal");
-  openAttendanceModalasistencia.style.display = "block";
-}
-
-// Función para cerrar el modal de ver asistencia
-function closeAttendanceModal() {
-  var attendanceModal = document.getElementById("attendance-modal");
-  attendanceModal.style.display = "none";
-}
-
-// Funciones para abrir y cerrar el modal de Comisión A
-function openModalComisionAverasistencia() {
-  // Cierra el modal de asistencia
-  closeAttendanceModal();
-
-  var modalComisionA = document.getElementById("modalComisionAverasistencia");
-  modalComisionA.style.display = 'block';
-}
-
-function closeModalComisionAverasistencia() {
-  var modalComisionA = document.getElementById('modalComisionAverasistencia');
-  modalComisionA.style.display = 'none';
-}
-
-
-// comision B
-
-function openModalComisionBverasistencia() {
-  // Cierra el modal de asistencia
-  closeAttendanceModal();
-
-  var modalComisionB = document.getElementById("modalComisionBverasistencia");
-  modalComisionB.style.display = 'block';
-}
-
-function closeModalComisionBverasistencia() {
-  var modalComisionB = document.getElementById('modalComisionBverasistencia');
-  modalComisionB.style.display = 'none';
-}
-// comision c
-
-function openModalComisionCverasistencia() {
-  // Cierra el modal de asistencia
-  closeAttendanceModal();
-
-  var modalComisionC = document.getElementById("modalComisionCverasistencia");
-  modalComisionC.style.display = 'block';
-}
-
-function closeModalComisionCverasistencia() {
-  var modalComisionC = document.getElementById('modalComisionCverasistencia');
-  modalComisionC.style.display = 'none';
-}
-
-
-
-
-
-
-
-
-
-function showModalMessage() {
-    alert('¡Los datos se han enviado satisfactoriamente!');
-}
-function showDatePicker() {
-    const fechaInput = document.getElementById("fecha");
-    const fechaSeleccionada = fechaInput.value;
-    const fechaMostrada = document.getElementById("fecha-seleccionada");
-
-    fechaMostrada.textContent = "Fecha seleccionada: " + fechaSeleccionada;
-}
-const tableRows = document.querySelectorAll('.table-comision-a tbody tr');
-
-
-
-// ajax para recargar la fecha en el mismo modal (Comisión A)
-function showAsistencia() {
-        var comisionId = $("#comisionId").val();
-        var selectedDate = $("#fecha").val();
-
-        $.ajax({
-            type: "GET",
-            url: "obtener_asistencia_ajax.php",
-            data: { comisionId: comisionId, fecha: selectedDate },
-            success: function (response) {
-                $("#asistenciaBody").html(response);
-            },
-            error: function (xhr, status, error) {
-                console.error("Error en la solicitud Ajax: " + xhr.responseText);
-            }
-        });
-    }
-
-    // ajax para recargar la fecha en el mismo modal (Comisión B)
-    function showAsistenciaComisionB() {
-    var comisionId = $("#comisionIdB").val();
-    var selectedDate = $("#fechaB").val(); // Cambiado el ID a fechaB
-
-    $.ajax({
-        type: "GET",
-        url: "obtener_asistencia_ajax.php",
-        data: { comisionId: comisionId, fecha: selectedDate },
-        success: function (response) {
-            console.log("Respuesta del servidor:", response);
-            $("#asistenciaBodyB").html(response);
-        },
-        error: function (xhr, status, error) {
-            console.error("Error en la solicitud Ajax:", status, error);
-        }
-    });
-}
-
- // ajax para recargar la fecha en el mismo modal (Comisión C)
-function showAsistenciaComisionC() {
-    var comisionId = $("#comisionIdC").val();
-    var selectedDate = $("#fechaC").val();
-
-    $.ajax({
-        type: "GET",
-        url: "obtener_asistencia_ajax.php",
-        data: { comisionId: comisionId, fecha: selectedDate },
-        success: function (response) {
-            console.log("Respuesta del servidor:", response);
-            $("#asistenciaBodyC").html(response);
-        },
-        error: function (xhr, status, error) {
-            console.error("Error en la solicitud Ajax:", status, error);
-        }
-    });
-}
-// Esperar a que el contenido del DOM se cargue completamente.
-document.addEventListener('DOMContentLoaded', function() {
-    // Crear un nuevo objeto de fecha para obtener la fecha actual.
-    var today = new Date();
-    // Obtener el año, mes y día de la fecha actual.
-    var year = today.getFullYear();
-    var month = ('0' + (today.getMonth() + 1)).slice(-2); // Añade un cero si es necesario (formato MM).
-    var day = ('0' + today.getDate()).slice(-2); // Añade un cero si es necesario (formato DD).
-    // Formatear la fecha al formato aceptado por el input de tipo fecha (YYYY-MM-DD).
-    var formattedDate = year + '-' + month + '-' + day;
-    // Establecer el valor del input de fecha al día actual.
-    document.getElementById('fecha').value = formattedDate;
-  });
- 
- 
-
-
-
-
-
-document.addEventListener('DOMContentLoaded', () => {
-    // Selecciona todos los checkboxes
-    const checkboxes = document.querySelectorAll('.table-comision-a tbody .checkbox-cell input[type="checkbox"]');
-
-    checkboxes.forEach((checkbox) => {
-        checkbox.addEventListener('change', function() {
-            // Encuentra todos los checkboxes en la misma fila
-            const rowCheckboxes = Array.from(this.closest('tr').querySelectorAll('.checkbox-cell input[type="checkbox"]'));
-            // Cuenta cuántos checkboxes en la misma fila están marcados
-            const checkedCount = rowCheckboxes.filter(cb => cb.checked).length;
-
-            // Si hay más de 2 checkboxes marcados, desmarca el actual
-            if (checkedCount > 2) {
-                this.checked = false;
-                alert('Solo puedes seleccionar hasta 2 opciones por fila.');
-            }
-        });
-    });
-});
 
 
 function validarFormulario() {
@@ -496,6 +148,151 @@ function validarFormulario() {
 
     return true; // Permitir el envío si todo está correcto
 }
+
+
+
+document.addEventListener('DOMContentLoaded', function () {
+    const materiaSelect = document.getElementById("materiaSelect");
+    if (materiaSelect) {
+        materiaSelect.addEventListener("change", function () {
+            var materiaId = this.value;
+            var curso = "<?php echo $curso; ?>";
+            var carrera = "<?php echo $carrera; ?>";
+            var comision = "<?php echo $comision; ?>";
+
+            // Realizar una solicitud AJAX para obtener las asistencias de la materia seleccionada
+            fetch(`./obtener_asistencias.php?materia=${materiaId}&curso=${curso}&carrera=${carrera}&comision=${comision}`)
+                .then(response => response.json())
+                .then(data => {
+                    var tableBody = document.getElementById("asistenciasTable");
+                    tableBody.innerHTML = ""; // Limpiar la tabla
+
+                    if (data.error) {
+                        console.error("Error en la consulta:", data.error);
+                        return;
+                    }
+
+                    if (data.length === 0) {
+                        tableBody.innerHTML = `<tr><td colspan="5" class="data-cell">No hay estudiantes inscritos para esta materia.</td></tr>`;
+                        return;
+                    }
+
+                    data.forEach((item, index) => {
+                        var row = `
+                            <tr>
+                                <td class="data-cell">${index + 1}</td>
+                                <td class="data-cell">${item.apellido_alumno}</td>
+                                <td class="data-cell">${item.nombre_alumno}</td>
+                                <td class="checkbox-cell">
+                                    <input type="radio" name="asistencia[${item.legajo}]" value="1" ${item.asistencia == 1 ? "checked" : ""} required>
+                                </td>
+                                <td class="checkbox-cell">
+                                    <input type="radio" name="asistencia[${item.legajo}]" value="2" ${item.asistencia == 2 ? "checked" : ""} required>
+                                </td>
+                            </tr>
+                        `;
+                        tableBody.innerHTML += row;
+                    });
+                })
+                .catch(error => console.error("Error al cargar las asistencias:", error));
+        });
+    } else {
+        console.error("El elemento materiaSelect no existe en el DOM.");
+    }
+});
+document.addEventListener('DOMContentLoaded', function() {
+    var today = new Date();
+    var year = today.getFullYear();
+    var month = ('0' + (today.getMonth() + 1)).slice(-2); // Añade ceros si es necesario
+    var day = ('0' + today.getDate()).slice(-2); // Añade ceros si es necesario
+    var formattedDate = day + '/' + month + '/' + year; // Formato: DD/MM/YYYY
+    document.getElementById('fecha').value = formattedDate; // Asignar al input
+});
+
 </script>
+
+<style>
+/* Contenedor del input de fecha */
+.date-picker {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+    font-family: Arial, sans-serif;
+    background-color: transparent; /* Asegúrate de que el fondo sea transparente */
+    padding: 0; /* Elimina cualquier padding extra */
+    border: none; /* Evita que haya un borde extra */
+}
+/* Estilo del label */
+.date-picker label {
+    font-size: 18px;
+    font-weight: bold;
+    color: #fff; /* Cambiar texto del label a blanco */
+    margin-bottom: 5px;
+}
+/* Input de fecha */
+.date-picker input[type="text"] {
+    width: 150px; /* Ajustar el ancho */
+    padding: 8px;
+    font-size: 14px;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    text-align: center;
+    background-color: #f9f9f9; /* Fondo solo del input */
+    color: #000;
+    cursor: not-allowed; /* Indica que es de solo lectura */
+    box-shadow: none; /* Elimina cualquier sombra */
+}
+
+/* Hover para el input */
+.date-picker input[type="text"]:hover {
+    border-color: #f3545d;
+}
+
+/* Focus para el input */
+.date-picker input[type="text"]:focus {
+    outline: none;
+    border-color: #f3545d;
+    box-shadow: 0 0 5px rgba(243, 84, 93, 0.5);
+}
+
+
+/* Contenedor del área de navegación derecha */
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Espacio entre el nombre del usuario y el botón */
+    font-family: Arial, sans-serif;
+}
+
+/* Estilo del nombre del usuario */
+.user-name {
+    font-size: 16px;
+    font-weight: bold;
+    color: #fff; /* Color blanco para el texto */
+    text-transform: capitalize; /* Primera letra en mayúscula */
+    margin-right: 10px; /* Separación adicional si es necesario */
+}
+
+/* Estilo del botón de cerrar sesión */
+.btn-logout {
+    font-size: 14px;
+    font-weight: bold;
+    text-decoration: none;
+    padding: 8px 15px;
+    color: #fff; /* Color del texto */
+    background-color: #f3545d; /* Fondo rojo */
+    border-radius: 5px; /* Bordes redondeados */
+    transition: all 0.3s ease; /* Transición suave */
+}
+
+/* Hover para el botón */
+.btn-logout:hover {
+    background-color: #d93b4b; /* Fondo más oscuro en hover */
+    color: #fff; /* Asegurarse de que el texto sigue blanco */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2); /* Sombra al pasar el cursor */
+}
+
+</style>
 </body>
 </html>

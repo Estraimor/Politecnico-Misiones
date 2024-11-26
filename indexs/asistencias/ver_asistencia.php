@@ -50,8 +50,9 @@ if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)
 
 
 
-    <div class="nav-right">
-        <a href="../../login/cerrar_sesion.php" class="btn-logout">Cerrar sesión</a>
+      <div class="nav-right">
+    <span class="user-name"><?php echo $_SESSION['nombre'] . ' ' . $_SESSION['apellido']; ?></span>
+    <a href="../../login/cerrar_sesion.php" class="btn-logout">Cerrar sesión</a>
     </div>
   </nav>
   
@@ -88,20 +89,13 @@ WHERE c.idcursos = '$curso' AND c2.idCarrera = '$carrera' AND cm.idComisiones = 
 <input type="hidden" id="comision" value="<?php echo $comision ?>">
 <input type="hidden" id="curso" value="<?php echo $curso ?>"> 
 <div class="date-picker">
+<h2 class="invisible-title">Ver Asistencia</h2>
     <label for="fecha">Selecciona una fecha:</label>
     <input type="date" id="fecha" name="fecha" onchange="showAsistencia()">
 </div>
 <div class="table-responsive">
     <table class="table-comision-a">
-        <thead>
-            <tr>
-                <th rowspan="2">N°</th>
-                <th rowspan="2">Apellido</th>
-                <th rowspan="2">Nombre</th>
-                <th rowspan="2">Asistencia</th>
-                <th colspan="4">Fecha</th>
-            </tr>
-        </thead>
+        
         <tbody id="asistenciaBody">
             <!-- Aquí se mostrará la asistencia cargada mediante Ajax -->
         </tbody>
@@ -110,254 +104,7 @@ WHERE c.idcursos = '$curso' AND c2.idCarrera = '$carrera' AND cm.idComisiones = 
     
 <script>
   
-
-function toggleMenu() {
-  const navbar = document.querySelector(".navbar");
-  navbar.classList.toggle("show-menu");
-}
-
-// Función para abrir la ventana emergente
-function openModal() {
-  var modal = document.getElementById("modal");
-  modal.style.display = "block";
-  if (window.innerWidth <= 768) {
-    toggleMenu();
-  }
-  setTimeout(function() {
-    modal.classList.add("show");
-  }, 10);
-
-  var welcomeBox = document.querySelector(".welcome-box");
-  welcomeBox.style.display = "none";
-  setTimeout(function() {
-    modal.classList.add("show");
-  }, 10);
-}
-
-// Función para cerrar la ventana emergente
-function closeModal() {
-  var modal = document.getElementById("modal");
-  modal.classList.remove("show");
-  setTimeout(function() {
-    modal.style.display = "none";
-  }, 300);
-  var welcomeBox = document.querySelector(".welcome-box");
-  welcomeBox.style.display = "block";
-}
-
-document.getElementById("btn-new-member").onclick = function() {
-  openModal();
-};
-
-function mostrarAlertaExitosa() {
-  var successMessage = document.getElementById("success-message");
-  successMessage.style.display = "block";
-}
-
-function closeSuccessMessage() {
-  var successMessage = document.getElementById("success-message");
-  successMessage.style.display = "none";
-}
-
-
-
-// Escucha el evento 'keydown' en el documento
-document.addEventListener('keydown', function(event) {
-  if (event.key === 'Escape') {
-    // Cierra el modal de Nuevo Estudiante si está abierto
-    var estudianteModal = document.getElementById('modal');
-    if (estudianteModal && estudianteModal.style.display === 'block') {
-      closeModal();
-    }
-  }
-});
-
-
-
-// Función para abrir el modal de asistencia
-function openAttendanceModal() {
-  var attendanceModal = document.getElementById("attendance-modal-asistencia");
-  attendanceModal.style.display = "block";
-}
-
-// Función para cerrar el modal de tomar asistencia
-function closeAttendanceModaltomarasistencia() {
-  var attendanceModal = document.getElementById("attendance-modal-asistencia");
-  attendanceModal.style.display = "none";
-}
-// Función para abrir el modal de ver asistencia 
-function openAttendanceModalasistencia() {
-  var attendanceModalasistencia = document.getElementById("attendance-modal-asistencia");
-  openAttendanceModalasistencia.style.display = "block";
-}
-
-// Función para cerrar el modal de ver asistencia
-function closeAttendanceModal() {
-  var attendanceModal = document.getElementById("attendance-modal-asistencia");
-  attendanceModal.style.display = "none";
-}
-
-// Funciones para abrir y cerrar el modal de Comisión A
-function openModalComisionA() {
-  // Cierra el modal de asistencia
-  closeAttendanceModal();
-
-  var modalComisionA = document.getElementById("asistenciamodalComisionA");
-  modalComisionA.style.display = 'block';
-}
-
-function closeModalComisionA() {
-  var modalComisionA = document.getElementById('asistenciamodalComisionA');
-  modalComisionA.style.display = 'none';
-}
-// comision B
-
-function openModalComisionB() {
-  // Cierra el modal de asistencia
-  closeAttendanceModal();
-
-  var modalComisionB = document.getElementById("asistenciamodalComisionB");
-  modalComisionB.style.display = 'block';
-}
-
-function closeModalComisionB() {
-  var modalComisionB = document.getElementById('asistenciamodalComisionB');
-  modalComisionB.style.display = 'none';
-}
-// comision c
-
-function openModalComisionC() {
-  // Cierra el modal de asistencia
-  closeAttendanceModal();
-
-  var modalComisionC = document.getElementById("asistenciamodalComisionC");
-  modalComisionC.style.display = 'block';
-}
-
-function closeModalComisionC() {
-  var modalComisionC = document.getElementById('asistenciamodalComisionC');
-  modalComisionC.style.display = 'none';
-}
-
-
-//__________________________ver asistencia ____________________________
-
-// Función para abrir el modal de asistencia
-function openAttendanceModalverasistencia() {
-  var attendanceModal = document.getElementById("attendance-modal");
-  attendanceModal.style.display = "block";
-}
-
-// Función para cerrar el modal de asistencia
-function closeAttendanceModalverasistencia() {
-  var attendanceModal = document.getElementById("attendance-modal");
-  attendanceModal.style.display = "none";
-}
-// Función para abrir el modal de ver asistencia 
-function openAttendanceModalasistencia() {
-  var attendanceModalasistencia = document.getElementById("attendance-modal");
-  openAttendanceModalasistencia.style.display = "block";
-}
-
-// Función para cerrar el modal de ver asistencia
-function closeAttendanceModal() {
-  var attendanceModal = document.getElementById("attendance-modal");
-  attendanceModal.style.display = "none";
-}
-
-// Funciones para abrir y cerrar el modal de Comisión A
-function openModalComisionAverasistencia() {
-  // Cierra el modal de asistencia
-  closeAttendanceModal();
-
-  var modalComisionA = document.getElementById("modalComisionAverasistencia");
-  modalComisionA.style.display = 'block';
-}
-
-function closeModalComisionAverasistencia() {
-  var modalComisionA = document.getElementById('modalComisionAverasistencia');
-  modalComisionA.style.display = 'none';
-}
-
-
-// comision B
-
-function openModalComisionBverasistencia() {
-  // Cierra el modal de asistencia
-  closeAttendanceModal();
-
-  var modalComisionB = document.getElementById("modalComisionBverasistencia");
-  modalComisionB.style.display = 'block';
-}
-
-function closeModalComisionBverasistencia() {
-  var modalComisionB = document.getElementById('modalComisionBverasistencia');
-  modalComisionB.style.display = 'none';
-}
-// comision c
-
-function openModalComisionCverasistencia() {
-  // Cierra el modal de asistencia
-  closeAttendanceModal();
-
-  var modalComisionC = document.getElementById("modalComisionCverasistencia");
-  modalComisionC.style.display = 'block';
-}
-
-function closeModalComisionCverasistencia() {
-  var modalComisionC = document.getElementById('modalComisionCverasistencia');
-  modalComisionC.style.display = 'none';
-}
-
-
-
-
-
-
-
-
-
-function showModalMessage() {
-    alert('¡Los datos se han enviado satisfactoriamente!');
-}
-function showDatePicker() {
-    const fechaInput = document.getElementById("fecha");
-    const fechaSeleccionada = fechaInput.value;
-    const fechaMostrada = document.getElementById("fecha-seleccionada");
-
-    fechaMostrada.textContent = "Fecha seleccionada: " + fechaSeleccionada;
-}
-const tableRows = document.querySelectorAll('.table-comision-a tbody tr');
-
-
-
-// ajax para recargar la fecha en el mismo modal (Comisión A)
-function showAsistencia() {
-        var carrera = $("#carrera").val();
-        var comision = $("#comision").val();
-        var curso = $("#curso").val();
-        var selectedDate = $("#fecha").val();
-
-        $.ajax({
-            type: "GET",
-            url: "obtener_asistencia_ajax.php",
-            data: { carrera: carrera,
-                  fecha: selectedDate,
-                comision: comision,
-              curso: curso,
-             },
-            success: function (response) {
-                $("#asistenciaBody").html(response);
-            },
-            error: function (xhr, status, error) {
-                console.error("Error en la solicitud Ajax: " + xhr.responseText);
-            }
-        });
-    }
-
-    
-// Esperar a que el contenido del DOM se cargue completamente.
-document.addEventListener('DOMContentLoaded', function() {
+  document.addEventListener('DOMContentLoaded', function() {
     // Crear un nuevo objeto de fecha para obtener la fecha actual.
     var today = new Date();
     // Obtener el año, mes y día de la fecha actual.
@@ -366,35 +113,137 @@ document.addEventListener('DOMContentLoaded', function() {
     var day = ('0' + today.getDate()).slice(-2); // Añade un cero si es necesario (formato DD).
     // Formatear la fecha al formato aceptado por el input de tipo fecha (YYYY-MM-DD).
     var formattedDate = year + '-' + month + '-' + day;
-    // Establecer el valor del input de fecha al día actual.
-    document.getElementById('fecha').value = formattedDate;
-  });
- 
- 
-
-
-
-
-
-document.addEventListener('DOMContentLoaded', () => {
-    // Selecciona todos los checkboxes
-    const checkboxes = document.querySelectorAll('.table-comision-a tbody .checkbox-cell input[type="checkbox"]');
-
-    checkboxes.forEach((checkbox) => {
-        checkbox.addEventListener('change', function() {
-            // Encuentra todos los checkboxes en la misma fila
-            const rowCheckboxes = Array.from(this.closest('tr').querySelectorAll('.checkbox-cell input[type="checkbox"]'));
-            // Cuenta cuántos checkboxes en la misma fila están marcados
-            const checkedCount = rowCheckboxes.filter(cb => cb.checked).length;
-
-            // Si hay más de 2 checkboxes marcados, desmarca el actual
-            if (checkedCount > 2) {
-                this.checked = false;
-                alert('Solo puedes seleccionar hasta 2 opciones por fila.');
-            }
-        });
-    });
+    // Comentamos la línea que configura el valor predeterminado:
+    // document.getElementById('fecha').value = formattedDate;
 });
+
+function showModalMessage() {
+    alert('¡Los datos se han enviado satisfactoriamente!');
+}
+
+function showDatePicker() {
+    const fechaInput = document.getElementById("fecha");
+    const fechaSeleccionada = fechaInput.value;
+    const fechaMostrada = document.getElementById("fecha-seleccionada");
+
+    fechaMostrada.textContent = "Fecha seleccionada: " + fechaSeleccionada;
+}
+
+// Ajax para recargar la fecha en el mismo modal (Comisión A)
+function showAsistencia() {
+    var carrera = $("#carrera").val();
+    var comision = $("#comision").val();
+    var curso = $("#curso").val();
+    var selectedDate = $("#fecha").val();
+
+    $.ajax({
+        type: "GET",
+        url: "obtener_asistencia_ajax.php",
+        data: { 
+            carrera: carrera,
+            fecha: selectedDate,
+            comision: comision,
+            curso: curso,
+        },
+        success: function (response) {
+            $("#asistenciaBody").html(response);
+        },
+        error: function (xhr, status, error) {
+            console.error("Error en la solicitud Ajax: " + xhr.responseText);
+        }
+    });
+}
+
 </script>
+
+<style>
+    /* Contenedor del área de navegación derecha */
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Espacio entre el nombre del usuario y el botón */
+    font-family: Arial, sans-serif;
+}
+
+/* Estilo del nombre del usuario */
+.user-name {
+    font-size: 16px;
+    font-weight: bold;
+    color: #fff; /* Color blanco para el texto */
+    text-transform: capitalize; /* Primera letra en mayúscula */
+    margin-right: 10px; /* Separación adicional si es necesario */
+}
+
+/* Estilo del botón de cerrar sesión */
+.btn-logout {
+    font-size: 14px;
+    font-weight: bold;
+    text-decoration: none;
+    padding: 8px 15px;
+    color: #fff; /* Color del texto */
+    background-color: #f3545d; /* Fondo rojo */
+    border-radius: 5px; /* Bordes redondeados */
+    transition: all 0.3s ease; /* Transición suave */
+}
+
+/* Hover para el botón */
+.btn-logout:hover {
+    background-color: #d93b4b; /* Fondo más oscuro en hover */
+    color: #fff; /* Asegurarse de que el texto sigue blanco */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2); /* Sombra al pasar el cursor */
+}
+/* Contenedor del input de fecha */
+.date-picker {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+    font-family: Arial, sans-serif;
+    background-color: transparent; /* Elimina el fondo blanco */
+    padding: 0; /* Elimina cualquier padding */
+    border: none; /* Elimina cualquier borde */
+}
+
+/* Estilo del h2 */
+.date-picker .invisible-title {
+    font-size: 25px;
+    font-weight: bold;
+    color: white; /* Texto en blanco */
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+/* Input de fecha */
+.date-picker input[type="date"] {
+    width: 150px; /* Ajustar el ancho */
+    padding: 8px;
+    font-size: 14px;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    text-align: center;
+    background-color: #f9f9f9; /* Fondo del input */
+    color: #555; /* Color del texto dentro del input */
+    cursor: pointer;
+}
+
+/* Hover para el input */
+.date-picker input[type="date"]:hover {
+    border-color: #f3545d;
+}
+
+/* Focus para el input */
+.date-picker input[type="date"]:focus {
+    outline: none;
+    border-color: #f3545d;
+    box-shadow: 0 0 5px rgba(243, 84, 93, 0.5);
+}
+.date-picker label {
+    font-size: 18px;
+    font-weight: bold;
+    color: #fff; /* Cambiar texto del label a blanco */
+    margin-bottom: 5px;
+}
+
+</style>
 </body>
 </html>
