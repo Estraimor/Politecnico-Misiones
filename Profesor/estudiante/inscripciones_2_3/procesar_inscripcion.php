@@ -17,17 +17,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($resultado_eliminar) {
             echo "Inscripción eliminada correctamente.";
+            
         } else {
             echo "Error al eliminar la inscripción: " . mysqli_error($conexion);
         }
         exit; // Terminar la ejecución después de eliminar
     }
 
-    // Inscripción de materias (mantener lógica existente)
+    // Inscripción de materias
     $legajo = mysqli_real_escape_string($conexion, $_POST['legajo']);
     $carrera = mysqli_real_escape_string($conexion, $_POST['carrera']);
     $curso = mysqli_real_escape_string($conexion, $_POST['curso']);
-    $materias = isset($_POST['materias']) ? $_POST['materias'] : []; // Array de materias
+    $materias = isset($_POST['materias']) ? $_POST['materias'] : []; // Array de materias seleccionadas
     $comision = mysqli_real_escape_string($conexion, $_POST['comision']);
     $año_inscripcion = mysqli_real_escape_string($conexion, $_POST['Año_inscripcion']);
 
@@ -51,33 +52,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    $errores = [];
-    $exitos = [];
-
     foreach ($materias as $materiaId) {
-        $sql_inscribir_materia = "INSERT INTO inscripcion_asignatura (cursos_idcursos, comisiones_idComisiones, materias_idMaterias, alumno_legajo, año_cursada) 
-                                  VALUES ($curso, $comision, $materiaId, $legajo, $año_inscripcion)";
-        $resultado_inscribir_materia = mysqli_query($conexion, $sql_inscribir_materia);
+        // Verificar si la materia ya está inscrita
+        $sql_verificar = "
+            SELECT 1 
+            FROM inscripcion_asignatura 
+            WHERE alumno_legajo = '$legajo' 
+              AND materias_idMaterias = '$materiaId' 
+              AND cursos_idcursos = '$curso'
+        ";
+        $resultado_verificar = mysqli_query($conexion, $sql_verificar);
 
-        if ($resultado_inscribir_materia) {
-            $exitos[] = "Inscripción en materia ID: $materiaId exitosa.";
-        } else {
-            $errores[] = "Error al inscribir en materia ID: $materiaId: " . mysqli_error($conexion);
+        if (mysqli_num_rows($resultado_verificar) === 0) {
+            // Insertar solo si no existe un registro previo
+            $sql_inscribir_materia = "INSERT INTO inscripcion_asignatura (cursos_idcursos, comisiones_idComisiones, materias_idMaterias, alumno_legajo, año_cursada) 
+                                      VALUES ($curso, $comision, $materiaId, $legajo, $año_inscripcion)";
+            mysqli_query($conexion, $sql_inscribir_materia);
         }
     }
 
-    if (!empty($exitos)) {
-        echo implode("\n", $exitos) . "\n";
-    }
-
-    if (!empty($errores)) {
-        echo implode("\n", $errores) . "\n";
-    }
-
-    if (empty($exitos) && empty($errores)) {
-        echo "No se seleccionaron materias para inscribir.";
-    }
+    echo "Inscripción procesada correctamente.";
 } else {
     echo "Método no permitido.";
 }
-?>

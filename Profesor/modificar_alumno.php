@@ -44,6 +44,7 @@ if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)
     <div class="nav-right">
         <a href="./controlador_preceptormodificar.php" class="home-button">Inicio</a>
         <a href="../login/cerrar_sesion.php" class="btn-logout">Cerrar sesión</a>
+        <span class="user-name"><?php echo $_SESSION['nombre'] . ' ' . $_SESSION['apellido']; ?></span>
     </div>
 </nav>
 
@@ -170,23 +171,23 @@ if (isset($_GET['legajo'])) {
                 <?php
                 foreach ($todas_materias[$anio] as $materia) {
                     $año_cursada = isset($materia['año_cursada']) ? " (" . htmlspecialchars($materia['año_cursada']) . ")" : "";
-                    
-                    if ($anio === 1) {
-                        // Primer Año: Solo `readonly`
-                        $valorMateria = isset($materias_inscritas[$anio]) && in_array($materia, $materias_inscritas[$anio]) ? htmlspecialchars($materia['Nombre']) . $año_cursada : "No cursa";
 
-                        // Campo visible readonly
+                    // Primer año: input normal
+                    if ($anio === 1) {
+                        $valorMateria = isset($materias_inscritas[$anio]) && in_array($materia, $materias_inscritas[$anio]) ? htmlspecialchars($materia['Nombre']) . $año_cursada : "No cursa";
                         echo "<input type='text' readonly class='form-container__input' value='$valorMateria'><br>";
 
-                        // Campo hidden que se envía al servidor
+                        // Campo hidden para enviar al servidor
                         $idMateria = isset($materias_inscritas[$anio]) && in_array($materia, $materias_inscritas[$anio]) ? htmlspecialchars($materia['idMaterias']) : '0';
                         echo "<input type='hidden' name='materias[$anio][]' value='$idMateria'>";
                     } else {
-                        // Segundo y Tercer Año: Selects normales
-                        echo "<select name='materias[$anio][]' class='form-container__input'>";
-                        echo "<option value='0'" . (!isset($materias_inscritas[$anio]) || !in_array($materia, $materias_inscritas[$anio]) ? " selected" : "") . ">No cursa</option>";
-                        echo "<option value='" . htmlspecialchars($materia['idMaterias']) . "'" . (isset($materias_inscritas[$anio]) && in_array($materia, $materias_inscritas[$anio]) ? " selected" : "") . ">" . htmlspecialchars($materia['Nombre']) . "$año_cursada</option>";
-                        echo "</select><br>";
+                        // Segundo y tercer año: readonly
+                        $valorMateria = isset($materias_inscritas[$anio]) && in_array($materia, $materias_inscritas[$anio]) ? htmlspecialchars($materia['Nombre']) . $año_cursada : "No cursa";
+                        echo "<input type='text' readonly class='form-container__input' value='$valorMateria'><br>";
+
+                        // Campo hidden para enviar al servidor
+                        $idMateria = isset($materias_inscritas[$anio]) && in_array($materia, $materias_inscritas[$anio]) ? htmlspecialchars($materia['idMaterias']) : '0';
+                        echo "<input type='hidden' name='materias[$anio][]' value='$idMateria'>";
                     }
                 }
                 ?>
@@ -194,6 +195,7 @@ if (isset($_GET['legajo'])) {
         </div>
     <?php endfor; ?>
 </div>
+
 
     <input type="submit" value="Enviar" name="Enviar" class="btn-enviar">
 </form>
@@ -260,5 +262,36 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 </script>
+
+<style>
+    * Contenedor del área de navegación derecha */
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Espacio entre el nombre del usuario y el botón */
+    font-family: Arial, sans-serif;
+}
+
+/* Estilo del nombre del usuario */
+.user-name {
+    font-size: 16px;
+    font-weight: bold;
+    color: #fff; /* Color blanco para el texto */
+    text-transform: capitalize; /* Primera letra en mayúscula */
+    margin-right: 10px; /* Separación adicional si es necesario */
+}
+
+/* Estilo del botón de cerrar sesión */
+.btn-logout {
+    font-size: 14px;
+    font-weight: bold;
+    text-decoration: none;
+    padding: 8px 15px;
+    color: #fff; /* Color del texto */
+    background-color: #f3545d; /* Fondo rojo */
+    border-radius: 5px; /* Bordes redondeados */
+    transition: all 0.3s ease; /* Transición suave */
+}
+</style>
 </body>
 </html>

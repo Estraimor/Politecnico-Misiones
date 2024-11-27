@@ -68,6 +68,7 @@ if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)
  
         
 <form action="../../Profesor/asistencia/guardar_asistencia_enfermeria.php" method="post">
+<h2 class="section-title"> Tomar Asistencia </h2>
     <div class="table-responsive">
         <?php
         include '../../conexion/conexion.php';
@@ -292,6 +293,43 @@ document.addEventListener('DOMContentLoaded', function() {
     color: #fff; /* Asegurarse de que el texto sigue blanco */
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2); /* Sombra al pasar el cursor */
 }
+
+.section-title {
+    font-size: 28px; /* Tamaño del texto más grande */
+    font-weight: bold; /* Texto en negrita */
+    color: #fff; /* Color del texto en blanco */
+    text-align: center; /* Centrar el texto */
+    margin-top: 20px; /* Espaciado superior */
+    margin-bottom: 20px; /* Espaciado inferior */
+    text-transform: uppercase; /* Texto en mayúsculas */
+    font-family: 'Arial', sans-serif; /* Fuente moderna */
+    letter-spacing: 2px; /* Espaciado entre letras */
+    position: relative; /* Para añadir efectos decorativos */
+}
+
+/* Línea decorativa debajo del texto */
+.section-title::after {
+    content: ""; /* Pseudo-elemento vacío */
+    display: block;
+    width: 50%; /* Ancho de la línea decorativa */
+    height: 3px; /* Grosor de la línea */
+    background-color: #f3545d; /* Color rojo elegante */
+    margin: 10px auto 0; /* Centrar la línea y separarla del texto */
+    border-radius: 5px; /* Bordes redondeados */
+}
+
+/* Efecto hover (opcional) */
+.section-title:hover {
+    color: #f3545d; /* Cambia el texto a rojo al pasar el cursor */
+    transition: color 0.3s ease; /* Transición suave */
+}
+
+.section-title:hover::after {
+    background-color: #fff; /* Cambia la línea a blanco al pasar el cursor */
+    transition: background-color 0.3s ease; /* Transición suave */
+}
+
+
 
 </style>
 </body>

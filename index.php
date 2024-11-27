@@ -110,58 +110,63 @@ if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)
 
 
 
-<!-- Modal de inscripción para segundo año / tercero  -->
 <div id="inscripcionSegundoAnioModal" class="estudiantes-modal" style="display: none;">
     <div class="modal-content-estudiantes">
         <span class="modal-close-estudiantes close-modal-button" id="closeInscripcionSegundoAnioModal">&times; Cerrar</span>
-        <h2>Registro de Inscripción para Segundo Y Tercer Año</h2>
-        <form id="formInscripcion" action="./Profesor/estudiante/inscripciones_2_3/procesar_inscripcion.php">
-        <label for="nombre_alu">Nombre:</label><br>
-    <input type="text" name="legajo" placeholder="N° Legajo" class="form-container__input" required>
-    <label for="nombre_alu">Carrera:</label>
-    <select name="carrera" id="carreraSelect" class="form-container__input" required>
-        <option hidden>Selecciona Carrera</option>
-        <?php
-        $sql_carreras = "SELECT * FROM carreras WHERE idCarrera in (18, 27, 46, 55)";
-        $result_carreras = mysqli_query($conexion, $sql_carreras);
-        while ($row = mysqli_fetch_assoc($result_carreras)) {
-            echo "<option value='{$row['idCarrera']}'>{$row['nombre_carrera']}</option>";
-        }
-        ?>
-    </select>
-    <label for="nombre_alu">Curso:</label>
-    <select name="curso" id="cursoSelect" class="form-container__input" required>
-        <option hidden>Selecciona Curso</option>
-        <option value="2">Segundo Año</option>
-        <option value="3">Tercer Año</option>
-    </select>
-
-    <div id="materias-container">
-        <!-- Los checkboxes de materias se agregarán aquí mediante JavaScript -->
-    </div>
-    <label for="nombre_alu">Comision:</label>
-    <select name="comision" class="form-container__input" required>
-        <option hidden>Selecciona Comisión</option>
-        <?php
-        $sql_comision = "SELECT * FROM comisiones";
-        $result_comision = mysqli_query($conexion, $sql_comision);
-        while ($row = mysqli_fetch_assoc($result_comision)) {
-            echo "<option value='{$row['idComisiones']}'>{$row['N_comicion']}</option>";
-        }
-        ?>
-    </select>
-    <label for="nombre_alu">Año:</label>
-    <select name="Año_inscripcion" id="Año_inscripcion" class="form-container__input" required>
-    <option hidden value="">Selecciona un año</option>
-    <?php for ($year = 2025; $year <= 2034; $year++) { ?>
-    <option value="<?php echo $year; ?>"><?php echo $year; ?></option>
-    <?php } ?>
-</select>
-
-    <input type="submit" name="enviar" value="Inscribir" class="form-container__input">
-</form>
+        <h2>Registro de Inscripción para Segundo y Tercer Año</h2>
+        <form id="formInscripcion" method="POST" action="./Profesor/estudiante/inscripciones_2_3/procesar_inscripcion.php">
+            <label for="legajo">Legajo:</label>
+            <input type="text" name="legajo" placeholder="N° Legajo" class="form-container__input" required>
+            
+            <label for="carrera">Carrera:</label>
+            <select name="carrera" id="carreraSelect" class="form-container__input" required>
+                <option hidden>Selecciona Carrera</option>
+                <?php
+                $sql_carreras = "SELECT * FROM carreras WHERE idCarrera IN (18, 27, 46, 55)";
+                $result_carreras = mysqli_query($conexion, $sql_carreras);
+                while ($row = mysqli_fetch_assoc($result_carreras)) {
+                    echo "<option value='{$row['idCarrera']}'>{$row['nombre_carrera']}</option>";
+                }
+                ?>
+            </select>
+            
+            <label for="curso">Curso:</label>
+            <select name="curso" id="cursoSelect" class="form-container__input" required>
+                <option hidden>Selecciona Curso</option>
+                <option value="2">Segundo Año</option>
+                <option value="3">Tercer Año</option>
+            </select>
+            
+            <div id="materias-container">
+                <!-- Los checkboxes de materias se agregarán dinámicamente con JavaScript -->
+            </div>
+            
+            <label for="comision">Comisión:</label>
+            <select name="comision" class="form-container__input" required>
+                <option hidden>Selecciona Comisión</option>
+                <?php
+                $sql_comision = "SELECT * FROM comisiones";
+                $result_comision = mysqli_query($conexion, $sql_comision);
+                while ($row = mysqli_fetch_assoc($result_comision)) {
+                    echo "<option value='{$row['idComisiones']}'>{$row['N_comicion']}</option>";
+                }
+                ?>
+            </select>
+            
+            <label for="Año_inscripcion">Año:</label>
+            <select name="Año_inscripcion" id="Año_inscripcion" class="form-container__input" required>
+                <option hidden value="">Selecciona un año</option>
+                <?php for ($year = 2025; $year <= 2034; $year++) { ?>
+                    <option value="<?php echo $year; ?>"><?php echo $year; ?></option>
+                <?php } ?>
+            </select>
+            
+            <input type="submit" name="enviar" value="Inscribir" class="form-container__input">
+        </form>
     </div>
 </div>
+
+
 
 
 <div id="modal" class="modal">
@@ -620,42 +625,42 @@ document.addEventListener("DOMContentLoaded", function() {
         console.error("No se encontraron los elementos del modal. Verifica los IDs en el HTML.");
     }
 
-    // Cuando se cambie de curso o carrera
-$('#cursoSelect').change(function () {
-    var carrera = $('#carreraSelect').val();
-    var curso = $('#cursoSelect').val();
-    var legajo = $('input[name="legajo"]').val(); // Obtener el legajo del input
-    var materiasContainer = $('#materias-container');
 
-    // Vaciar el contenedor de materias antes de cargar nuevas
-    materiasContainer.empty();
 
-    if (carrera && curso && legajo) {
-        $.ajax({
-            url: './Profesor/estudiante/inscripciones_2_3/obtener_materias.php',
-            type: 'POST',
-            data: { carrera: carrera, curso: curso, legajo: legajo },
-            success: function (data) {
-                try {
-                    var materias = JSON.parse(data);
+
+    $(document).ready(function () {
+    $('#cursoSelect').change(function () {
+        const carrera = $('#carreraSelect').val();
+        const curso = $('#cursoSelect').val();
+        const legajo = $('input[name="legajo"]').val();
+        const materiasContainer = $('#materias-container');
+
+        materiasContainer.empty();
+
+        if (carrera && curso && legajo) {
+            $.ajax({
+                url: './Profesor/estudiante/inscripciones_2_3/obtener_materias.php',
+                type: 'POST',
+                data: { carrera: carrera, curso: curso, legajo: legajo },
+                success: function (data) {
+                    const materias = JSON.parse(data);
 
                     materias.forEach(function (materia) {
-                        var div = $('<div></div>'); // Crear un contenedor para cada materia
-
-                        var checkbox = $('<input>')
+                        const div = $('<div></div>');
+                        const checkbox = $('<input>')
                             .attr('type', 'checkbox')
                             .attr('name', 'materias[]')
                             .attr('value', materia.idMaterias)
-                            .prop('checked', materia.cursada == 1); // Marcar el checkbox si la materia ya está cursada
+                            .prop('checked', materia.cursada === 1);
 
-                        var label = $('<label></label>')
+                        const label = $('<label></label>')
                             .text(materia.Nombre)
-                            .prepend(checkbox); // Añadir el checkbox al inicio del label
+                            .prepend(checkbox);
 
                         div.append(label);
                         materiasContainer.append(div);
 
-                        // Evento para manejar cambios en los checkboxes
+                        // Manejo de eliminación de materias
                         checkbox.change(function () {
                             if (!this.checked) {
                                 if (confirm("¿Estás seguro de que deseas eliminar esta inscripción?")) {
@@ -672,49 +677,42 @@ $('#cursoSelect').change(function () {
                                             alert(response);
                                         },
                                         error: function (xhr, status, error) {
-                                            console.error("Error al eliminar la inscripción: " + xhr.responseText);
+                                            console.error("Error al eliminar la inscripción:", xhr.responseText);
                                         }
                                     });
                                 } else {
-                                    // Si el usuario cancela, volver a marcar el checkbox
-                                    this.checked = true;
+                                    this.checked = true; // Revertir si se cancela
                                 }
                             }
                         });
                     });
-                } catch (e) {
-                    console.error("Error al procesar las materias: ", e);
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error al cargar las materias:", xhr.responseText);
                 }
-            },
-            error: function (xhr, status, error) {
-                console.error("Error al cargar las materias: " + xhr.responseText);
-            }
-        });
-    } else {
-        console.warn("Carrera, curso o legajo no seleccionados.");
-    }
-});
-
-// Limpiar la tabla al enviar el formulario
-$('#formInscripcion').submit(function (event) {
-    event.preventDefault(); // Prevenir el envío tradicional del formulario
-
-    var materiasContainer = $('#materias-container');
-    materiasContainer.empty(); // Vaciar las materias antes de enviar el formulario
-
-    $.ajax({
-        url: './Profesor/estudiante/inscripciones_2_3/procesar_inscripcion.php',
-        type: 'POST',
-        data: $(this).serialize(),
-        success: function (response) {
-            alert(response); // Mostrar respuesta del servidor
-        },
-        error: function (xhr, status, error) {
-            console.error("Error al procesar el formulario: " + xhr.responseText);
-            alert("Ocurrió un error al procesar el formulario.");
+            });
         }
     });
-});
+
+    // Envío del formulario para inscribir materias
+    $('#formInscripcion').submit(function (event) {
+        event.preventDefault(); // Prevenir el envío tradicional del formulario
+
+        $.ajax({
+            url: './Profesor/estudiante/inscripciones_2_3/procesar_inscripcion.php',
+            type: 'POST',
+            data: $(this).serialize(),
+            success: function (response) {
+                alert(response); // Mostrar respuesta del servidor
+                location.reload();
+            },
+            error: function (xhr, status, error) {
+                console.error("Error al procesar la inscripción:", xhr.responseText);
+                alert("Ocurrió un error al procesar la inscripción.");
+            }
+        });
+    });
+});-
 
 
 
@@ -857,7 +855,35 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 });
+
+
+// Evento al abrir el modal
+$('#openInscripcionModal').on('click', function() {
+    // Limpiar los campos al abrir el modal
+    limpiarModal();
+});
+
+// Evento al cerrar el modal
+$('#closeInscripcionSegundoAnioModal').on('click', function() {
+    // Limpiar los campos al cerrar el modal
+    limpiarModal();
+    // Opcional: cerrar el modal
+    $('#inscripcionSegundoAnioModal').hide();
+});
+
+// Función para limpiar el modal
+function limpiarModal() {
+    // Restablecer todos los campos del formulario
+    $('#formInscripcion')[0].reset();
+
+    // Vaciar el contenedor de materias (checkboxes)
+    $('#materias-container').empty();
+}
+
 </script>
+
+
+
 
 <style>
     /* Ocultar el modal inicialmente */
