@@ -134,7 +134,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     $asistencias_por_alumno[$nombre] = [];
                 }
 
-                $asistencias_por_alumno[$nombre][$fecha] = $asistencia == 'Presente' ? 'P' : 'A';
+                $asistencias_por_alumno[$nombre][$fecha] = $asistencia == '1' ? 'P' : 'A';
             }
 
             $contador = 1;
