@@ -50,6 +50,7 @@ if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)
         <button class="btn-inscripcion" id="btnInscripcionSegundoAnio">Inscripción Segundo/Tercer Año</button>
     </div>
     <div class="nav-right">
+        <span class="user-name"><?php echo $_SESSION['nombre'] . ' ' . $_SESSION['apellido']; ?></span>
         <a href="./login/cerrar_sesion.php" class="btn-logout">Cerrar sesión</a>
     </div>
 </nav>
@@ -114,9 +115,15 @@ if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)
     <div class="modal-content-estudiantes">
         <span class="modal-close-estudiantes close-modal-button" id="closeInscripcionSegundoAnioModal">&times; Cerrar</span>
         <h2>Registro de Inscripción para Segundo y Tercer Año</h2>
+        
+        <!-- Campo de búsqueda -->
+        <label for="buscarAlumno">Buscar Alumno:</label>
+        <input type="text" id="buscarAlumno" class="form-container__input" placeholder="Escribe el nombre o apellido del alumno">
+        <div id="resultadosBusqueda" style="max-height: 200px; overflow-y: auto; border: 1px solid #ccc; display: none;"></div>
+        
         <form id="formInscripcion" method="POST" action="./Profesor/estudiante/inscripciones_2_3/procesar_inscripcion.php">
             <label for="legajo">Legajo:</label>
-            <input type="text" name="legajo" placeholder="N° Legajo" class="form-container__input" required>
+            <input type="text" name="legajo" id="legajo" placeholder="N° Legajo" class="form-container__input" required readonly>
             
             <label for="carrera">Carrera:</label>
             <select name="carrera" id="carreraSelect" class="form-container__input" required>
@@ -165,6 +172,7 @@ if (isset($_SESSION['time']) && (time() - $_SESSION['time'] > $inactivity_limit)
         </form>
     </div>
 </div>
+
 
 
 
@@ -857,6 +865,39 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 
+document.getElementById('buscarAlumno').addEventListener('input', function () {
+    const query = this.value.trim();
+
+    if (query.length > 0) {
+        fetch(`./buscar_estudiante.php?nombre=${encodeURIComponent(query)}`)
+            .then(response => response.json())
+            .then(data => {
+                const resultadosDiv = document.getElementById('resultadosBusqueda');
+                resultadosDiv.innerHTML = '';
+
+                if (data.length > 0) {
+                    resultadosDiv.style.display = 'block';
+                    data.forEach(alumno => {
+                        const item = document.createElement('div');
+                        item.textContent = `${alumno.nombre_alumno} ${alumno.apellido_alumno} - Legajo: ${alumno.legajo}`;
+                        item.style.cursor = 'pointer';
+                        item.addEventListener('click', () => {
+                            document.getElementById('legajo').value = alumno.legajo;
+                            document.getElementById('buscarAlumno').value = `${alumno.nombre_alumno} ${alumno.apellido_alumno} ${alumno.legajo}`;
+                            resultadosDiv.style.display = 'none';
+                        });
+                        resultadosDiv.appendChild(item);
+                    });
+                } else {
+                    resultadosDiv.style.display = 'none';
+                }
+            });
+    } else {
+        document.getElementById('resultadosBusqueda').style.display = 'none';
+    }
+});
+
+
 // Evento al abrir el modal
 $('#openInscripcionModal').on('click', function() {
     // Limpiar los campos al abrir el modal
@@ -878,10 +919,16 @@ function limpiarModal() {
 
     // Vaciar el contenedor de materias (checkboxes)
     $('#materias-container').empty();
+
+    // Limpiar el campo de búsqueda
+    $('#buscarAlumno').val('');
 }
 
 </script>
 
+<script>
+   
+</script>
 
 
 
@@ -950,7 +997,33 @@ function limpiarModal() {
     cursor: pointer;
     font-size: 16px;
 }
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Espacio entre el nombre del usuario y el botón */
+    font-family: Arial, sans-serif;
+}
 
+/* Estilo del nombre del usuario */
+.user-name {
+    font-size: 16px;
+    font-weight: bold;
+    color: #fff; /* Color blanco para el texto */
+    text-transform: capitalize; /* Primera letra en mayúscula */
+    margin-right: 10px; /* Separación adicional si es necesario */
+}
+
+/* Estilo del botón de cerrar sesión */
+.btn-logout {
+    font-size: 14px;
+    font-weight: bold;
+    text-decoration: none;
+    padding: 8px 15px;
+    color: #fff; /* Color del texto */
+    background-color: #f3545d; /* Fondo rojo */
+    border-radius: 5px; /* Bordes redondeados */
+    transition: all 0.3s ease; /* Transición suave */
+}
 
 
 </style>

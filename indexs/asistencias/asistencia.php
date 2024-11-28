@@ -185,10 +185,10 @@ document.addEventListener('DOMContentLoaded', function () {
                                 <td class="data-cell">${item.apellido_alumno}</td>
                                 <td class="data-cell">${item.nombre_alumno}</td>
                                 <td class="checkbox-cell">
-                                    <input type="radio" name="asistencia[${item.legajo}]" value="1" ${item.asistencia == 1 ? "checked" : ""} required>
+                                    <input type="radio" name="asistencia[${item.legajo}]" value="1" ${item.asistencia == 1 ? "checked" : ""} >
                                 </td>
                                 <td class="checkbox-cell">
-                                    <input type="radio" name="asistencia[${item.legajo}]" value="2" ${item.asistencia == 2 ? "checked" : ""} required>
+                                    <input type="radio" name="asistencia[${item.legajo}]" value="2" ${item.asistencia == 2 ? "checked" : ""} >
                                 </td>
                             </tr>
                         `;
